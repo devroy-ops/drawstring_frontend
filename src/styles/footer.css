@@ -1,0 +1,115 @@
+.footer-link-title {
+    font-weight: 700 !important;
+    font-size: 18px;
+    line-height: 120%;
+}
+
+.footer-links{
+    text-decoration: none !important;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 120%;
+}
+
+.slide-dots{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0px;
+    padding-top: 15px;
+}
+
+.dot{
+    width: 20px;
+    height: 20px;
+    background: #C4C4C4;
+    margin-right: 10px;
+    border-radius: 50%;
+}
+
+
+.border-top-2{
+    border-top: 2px solid #3D3D3D;
+}
+
+footer.menu.text-white {
+    padding-top: 45px !important;
+}
+.footer-btm a.text-white {
+    text-decoration: none;
+    margin-left: 60px;
+}
+.row.footer-btm {
+    margin-top: 70px;
+}
+@media screen and (max-width:1025px) {
+    footer.menu.text-white {
+        padding-top: 25px !important;
+    }
+    .row.footer-btm {
+        margin-top: 45px;
+    }
+}
+@media screen and (max-width:992px) {
+footer.menu.text-white .navbar-brand {
+    margin: 0 auto 0 0 !important;
+    display: block;
+    text-align: left;
+}
+footer.menu.text-white .col-lg-5.col-md-6 {
+    width: 25%;
+}
+footer.menu.text-white .col-lg-7.col-md-6 {
+    width: 75%;
+}
+footer.menu.text-white .col-lg-7.col-md-6 .row .col-lg-4.col-md-6 {
+    width: 33.33%;
+    text-align: left;
+}
+.row.footer-btm .col-6.font-size-16 {
+    text-align: left;
+}
+}
+
+@media screen and (max-width:768px) {
+    
+    footer.menu.text-white a.navbar-brand.text-light {
+        text-align: left !important;
+        display: block;
+    }
+    footer.menu.text-white p.pe-5.font-size-16.pt-3 {
+        display: none;
+    }
+    footer.menu.text-white .col-lg-7.col-md-6 .row .col-lg-4.col-md-6.mb-4.mb-md-0:nth-child(1) {
+        display: none;
+    }
+    footer.menu.text-white .col-lg-7.col-md-6 .row .col-lg-4.col-md-6.mb-4.mb-md-0 {
+        width: 50%;
+        text-align: left;
+    }
+    .row.footer-btm {
+        margin-top: 0;
+        flex-direction: column-reverse;
+    }
+    .row.footer-btm .col-6.font-size-16 {
+        width: 100%;
+    }
+    .row.footer-btm .col-6.font-size-16 {
+        width: 100%;
+        text-align: left !important;
+    }
+    .footer-btm a.text-white {
+        text-decoration: none;
+        margin-left: 0;
+        margin-right: 20px;
+        margin-bottom: 15px !important;
+        display: inline-block;
+    }
+}
+
+@media screen and (max-width:580px) {
+    footer.menu.text-white .col-lg-7.col-md-6,
+    footer.menu.text-white .col-lg-5.col-md-6 {
+        width: 100%;
+    }
+}

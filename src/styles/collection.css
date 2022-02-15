@@ -1,0 +1,89 @@
+tr{
+    height: 62px;
+    vertical-align: middle;
+}
+.collection-table .btn-danger {
+    background: #C51254;
+    border-radius: 50px;
+    width: 100px;
+    height: 30px;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 100%;
+    padding: 0;
+}
+.collection-table th:first-child, .collection-table td:first-child {
+    padding-left: 12%;
+}
+.collection-table td img {
+    margin-right: 10px;
+}    
+.collection-table th:last-child, 
+.collection-table td:last-child{
+    padding-right: 75px;
+}
+.collection-table.table>:not(caption)>*>* {
+    background-color: #2a2a2a;
+}
+.collection-table.table-striped>tbody>tr:nth-of-type(odd)>* {
+    --bs-table-accent-bg: #1c1c1c;
+}
+.collection-table.table th[width="250px"] {
+    padding-left: 5%;
+}
+@media only screen and (min-width: 1850px) {
+
+    .collection-table th:first-child, .collection-table td:first-child {
+        padding-left: 12%;
+        width: 19% !important;
+    }
+
+    th:last-child, td:last-child{
+        padding-right: 75px;
+    }
+}
+@media only screen and (min-width: 2500px) {
+.collection-table th:first-child, .collection-table td:first-child {
+    padding-left: 12%;
+    width: 27% !important;
+}
+}
+@media only screen and (max-width: 1800px) {
+.collection-table th:first-child, .collection-table td:first-child {
+    padding-left: 12%;
+    width: 17%;
+}
+}
+@media only screen and (max-width: 1600px) {
+.collection-table th:first-child, .collection-table td:first-child {
+    padding-left: 12%;
+    width: 11%;
+}
+}
+@media only screen and (max-width: 1441px) {
+.collection-table th:first-child, .collection-table td:first-child {
+    padding-left: 12%;
+    width: 9%;
+}
+}
+@media only screen and (max-width: 1367px) {
+.collection-table th:first-child, .collection-table td:first-child {
+    padding-left: 12%;
+    width: 6%;
+}
+}
+@media only screen and (max-width: 1281px) {
+    .collection-table th:first-child, .collection-table td:first-child {
+        padding-left: 12%;
+        width: 4%;
+    }
+    }
+@media only screen and (max-width: 1025px) {
+    .collection-table th:first-child, .collection-table td:first-child {
+        padding-left: 0%;
+        width: 0%;
+    }
+    .collection-table th:last-child, .collection-table td:last-child {
+        padding-right: 10px;
+    }
+}

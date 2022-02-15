@@ -1,0 +1,113 @@
+.img-preview-box{
+    width: 370px;
+    height: 598px;
+    background: #1C1C1C;
+    border: 2px solid #3D3D3D;
+    box-sizing: border-box;
+    border-radius: 8px;
+    position: relative;
+}
+
+.no-img-txt {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    text-align: center;
+    font-size: 16px;
+    line-height: 120%;
+    text-align: center;
+    color: #C4C4C4;
+}
+
+.file-upload label{
+    border: 2px dashed #3D3D3D;
+    height: 120px;
+    max-width: 100%;
+}
+
+.help{
+    width: 36px;
+    height: 36px;
+    border: 2px solid #3D3D3D;
+    box-sizing: border-box;
+    border-radius: 50%;
+    text-align: center;
+    padding-top: 4px;
+}
+.createcollection .py-3.title {
+    margin: 20px 0 10px;
+}
+.pb-2.upload-text {
+    font-weight: bold;
+    font-size: 18px;
+}
+label.sc-bdvvtL.iciELI svg {
+    display: none;
+}
+.ebdQkY .file-types{
+    display: none;
+}
+label.sc-bdvvtL.iciELI .ebdQkY {
+    text-align: center;
+    display: block;
+}
+label.sc-bdvvtL.iciELI .ebdQkY > span {
+    font-size: 16px;
+    line-height: 120%;
+    text-align: center;
+    color: #C4C4C4;
+    position: relative;
+    top: -15px;
+}
+span.file-upload-cosef {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 150%;
+    text-align: center;
+    color: #C51254;
+    position: relative;
+    top: -50px;
+    left: 40%;
+    transform: translate(-50%);
+    pointer-events: none;
+}
+input.profile-input::placeholder {
+    font-size: 16px;
+    line-height: 120%;
+    color: #C4C4C4;
+}
+.createcollection .profile-input {
+    font-size: 16px;
+    margin-bottom: 0;
+    padding: 15px 0px !important;
+}
+.suggested-text {
+    font-size: 14px;
+    line-height: 130%;
+    color: #C4C4C4;
+    padding-right: 15px;
+    margin-bottom: 20px;
+}
+
+@media screen and (max-width:580px) {
+.suggested-text {
+    padding-right: 0px;
+}
+.font-size-18.mob-f-16 {
+    font-size: 16px !important;
+}
+.help {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #3D3D3D;
+    padding-top: 2px;
+}
+.mobile-none{
+    display: none !important;
+}
+.desk-none.mobile-block{
+    display: block !important;
+}
+}
