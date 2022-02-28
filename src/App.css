@@ -409,11 +409,30 @@ form.login-info .form-inline input {
 }
 
 
+.dropdown-toggle::after{
+  display: none !important;
+}
 
+.text-decoration-none{
+  text-decoration: none !important
+}
 
+.red-btn{
+    background: #C51254 !important;
+    border-radius: 30px !important;
+    color: white !important;
+}
 
-
-
+.divLoader{
+    position: fixed;
+    z-index: 9999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform: -webkit-translate(-50%, -50%);
+    transform: -moz-translate(-50%, -50%);
+    transform: -ms-translate(-50%, -50%);
+}
 
 
 

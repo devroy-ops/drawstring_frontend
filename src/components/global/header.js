@@ -8,34 +8,47 @@ import dp from '../../images/header/dp.svg';
 
 import night from '../../images/header/night.svg';
 import { ThemeContext, themes } from '../../theame/theameContext';
-import { AuthContext } from "../../auth/auth";
+// import { AuthContext } from "../../auth/auth";
 import { db, auth } from "../../db/firebase";
 
-export default function Header() {
+export default function Header({ currentUser, nearConfig, wallet }) {
 
   const [darkMode, setDarkMode] = React.useState(true);
 
-  var networkId = "testnet"; //mainnet
-
-  const near = new window.nearApi.Near({
-    networkId: networkId,
-    keyStore: new window.nearApi.keyStores.BrowserLocalStorageKeyStore(),
-    nodeUrl: `https://rpc.${networkId}.near.org`,
-    walletUrl: `https://wallet.${networkId}.near.org`,
-    helperUrl: `https://helper.${networkId}.near.org`,
-    explorerUrl: `https://explorer.${networkId}.near.org`,
-  });
-
-  // connect to the NEAR Wallet
-  const wallet = new window.nearApi.WalletConnection(near, '');
-
-  var accountId = "";
-  if (wallet.isSignedIn()) {
-    accountId = wallet.getAccountId();
-  }
+  // var networkId = "testnet"; //mainnet
+  // const near = new window.nearApi.Near({
+  //   networkId: networkId,
+  //   keyStore: new window.nearApi.keyStores.BrowserLocalStorageKeyStore(),
+  //   nodeUrl: `https://rpc.${networkId}.near.org`,
+  //   walletUrl: `https://wallet.${networkId}.near.org`,
+  //   helperUrl: `https://helper.${networkId}.near.org`,
+  //   explorerUrl: `https://explorer.${networkId}.near.org`,
+  // });
+  // // connect to the NEAR Wallet
+  // const wallet = new window.nearApi.WalletConnection(near, '');
+  // var accountId = "";
+  // if (wallet.isSignedIn()) {
+  //   accountId = wallet.getAccountId();
+  // }
   // const { currentUser } = useContext(AuthContext);
   // if (currentUser) {
   // }
+
+  const handleUser = (e) => {
+    debugger;
+    if (currentUser) {
+      (function signOut() {
+        wallet.signOut();
+        window.location.replace(
+          window.location.origin + window.location.pathname
+        );
+      })();
+    } else if (!currentUser) {
+      (function signIn() {
+        wallet.requestSignIn(nearConfig.contractName, "Drawstring");
+      })();
+    }
+  };
 
   return (
 
@@ -54,16 +67,18 @@ export default function Header() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/collections" className="nav-link active">Explore</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/" className="nav-link active">Explore</NavLink>
+              {/* collections */}
             </li>
             <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/users/123" className="nav-link">My profile</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/createcollection" className="nav-link">Activity</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/users" className="nav-link">Activity</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/viewcollection" className="nav-link">How it works</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/" className="nav-link">How it works</NavLink>
+              {/* viewcollection */}
             </li>
             <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/product" className="nav-link">Community</NavLink>
@@ -73,15 +88,11 @@ export default function Header() {
 
         <ul className="navbar-nav me-auto mb-2 mb-lg-0 create-signin-btn">
           <li className="nav-item">
-            <NavLink exact="true" activeclassname="active" to="/users" className="create-link">Create</NavLink>
+            <NavLink exact="true" activeclassname="active" to="/authors" className="create-link">Create</NavLink>
           </li>
           <li className="nav-item">
 
-            {/* {!currentUser && (
-                <NavLink exact="true" activeclassname="active" to="/login" className="login-link">Sign in</NavLink>
-              )} */}
-
-            {!accountId && (
+            {/* {!accountId && (
               <a href="#!" onClick={(e) => {
                 e.preventDefault();
 
@@ -92,20 +103,26 @@ export default function Header() {
                   "http://YOUR-URL.com/failure" // optional
                 );
               }} className="login-link">Sign in</a>
+            )} */}
+
+            {!currentUser && (
+              <a href="javascript:void(0)" onClick={handleUser} className="login-link">Sign in</a>
             )}
 
           </li>
         </ul>
 
-        {/* <button type="button" className="btn toggle-link p-0 height-width" onClick={() => changeThemes(!darkMode)}><img src={day} /></button> */}
+        {currentUser && (
+          <button type="button" className="btn toggle-link p-0 height-width me-3" onClick={handleUser}><img src={dp} /></button>
+        )}
 
-        {accountId && (
+        {/* {accountId && (
           <button type="button" className="btn toggle-link p-0 height-width me-3" onClick={() => {
             //auth.signOut();
             wallet.signOut();
 
           }}><img src={dp} /></button>
-        )}
+        )} */}
 
         <div className="search-box mx-3 desk-none tab-block">
           <div className="mobile_serch-bar">

@@ -2,6 +2,7 @@ import '../App.css';
 import { useParams } from "react-router-dom";
 import React from 'react';
 import avtar from '../images/users/avtar.svg';
+import { db, auth } from "./../db/firebase";
 
 class EditProfile extends React.Component {
 

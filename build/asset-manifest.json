@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/static/css/main.36c0b1c7.css",
-    "main.js": "/static/js/main.51396721.js",
+    "main.css": "/static/css/main.17144877.css",
+    "main.js": "/static/js/main.683b04c5.js",
     "static/js/787.ba40d511.chunk.js": "/static/js/787.ba40d511.chunk.js",
     "static/media/bg_users.svg": "/static/media/bg_users.f79abd3c77fef06161f266b49db4638a.svg",
     "static/media/covid_santa.svg": "/static/media/covid_santa.cdf47f0a6eafc2772681.svg",
@@ -46,12 +46,12 @@
     "static/media/more.svg": "/static/media/more.ba9917ddd8eb74767a04a5dc11eff09e.svg",
     "static/media/night.svg": "/static/media/night.54ee940b0a9a69761f4ed2f8410abc8c.svg",
     "static/media/sort.svg": "/static/media/sort.71f75e318e844e19a264bc7a099a15d8.svg",
-    "main.36c0b1c7.css.map": "/static/css/main.36c0b1c7.css.map",
-    "main.51396721.js.map": "/static/js/main.51396721.js.map",
+    "main.17144877.css.map": "/static/css/main.17144877.css.map",
+    "main.683b04c5.js.map": "/static/js/main.683b04c5.js.map",
     "787.ba40d511.chunk.js.map": "/static/js/787.ba40d511.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.36c0b1c7.css",
-    "static/js/main.51396721.js"
+    "static/css/main.17144877.css",
+    "static/js/main.683b04c5.js"
   ]
 }
