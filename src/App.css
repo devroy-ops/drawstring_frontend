@@ -434,6 +434,14 @@ form.login-info .form-inline input {
     transform: -ms-translate(-50%, -50%);
 }
 
+.featured-img{
+  height: 100% !important;
+  border-radius: 10px;
+}
+
+.border-radius-50{
+  border-radius: 50%;
+}
 
 
 

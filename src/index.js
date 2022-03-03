@@ -49,7 +49,7 @@ async function initContract() {
 
   // await account.addKey("8hSHprDq2StXwMtNd43wDTXQYsjXcD4MJTXQYsjXcc");
   const keys = await account.getAccessKeys();
-  console.log(keys);
+  // console.log(keys);
 
   const data = await account.state();
   const codeHash = data.code_hash.split("");

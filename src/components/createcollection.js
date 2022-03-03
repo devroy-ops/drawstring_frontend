@@ -9,7 +9,7 @@ import Big from "big.js";
 import * as nearAPI from "near-api-js";
 import { db, auth, fb } from "../db/firebase";
 
-const fileTypes = ["JPG", "PNG", "GIF", "WEBP", "MP4", "MP3"];
+const fileTypes = ["JPG", "JPEG" , "PNG", "GIF", "WEBP", "SVG"];
 
 const mint_txFee = Big(0.1)
     .times(10 ** 24)
@@ -83,8 +83,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
         await db.collection('authors').doc(authorId).get().then((querySnapshot) => {
             let author = querySnapshot.data();
             setAuthor(author);
-            debugger;
-
             return author;
         });
     }
@@ -96,7 +94,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
     const deploy = async () => {
         try {
-            debugger;
             // load and deploy smart contract
             const respons = await contractX.deploy_contract_code(
                 {
@@ -169,7 +166,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
         try {
             const response = await viewCollection();//viewNFTs();//mintNFT();//
-            debugger;
             console.log(response);
         } catch (error) {
             console.log(error);
@@ -182,7 +178,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
     const viewCollection = async () => {
         try {
             const response = await contract.nft_metadata({});
-            debugger;
             console.log(response);
         } catch (error) {
             console.log(error);
@@ -193,7 +188,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
     const [searchParams, setSearchParams] = useSearchParams();
     var transactionHashes = searchParams.get("transactionHashes")
     var isContractInitialized = localStorage.getItem("isContractInitialized");
-    debugger;
 
     if (transactionHashes && !isContractInitialized) {
         db.collection('authors').doc(authorId).get().then((querySnapshot) => {
@@ -226,7 +220,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
             const response = await contract.nft_tokens(
                 { from_index: "0", limit: 10 },
             );
-            debugger;
             console.log(response);
         } catch (error) {
             console.log(error);

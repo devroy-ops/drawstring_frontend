@@ -51,7 +51,6 @@ const Author = () => {
         db.collection('authors').doc(authorId).get().then((querySnapshot) => {
             let author = querySnapshot.data();
             setAuthor(author);
-            debugger
             setLoader(false);
         });
     }

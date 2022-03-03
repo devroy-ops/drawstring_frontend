@@ -1,6 +1,7 @@
 import '../App.css';
 import { useParams, NavLink } from "react-router-dom";
 import avtar from '../images/users/avtar.svg';
+import collection1 from '../images/collection/collection1.svg';
 import bg_users from '../images/users/bg_users.svg';
 import copy_icon from '../images/users/copy_icon.svg';
 import upload from '../images/users/upload.svg';
@@ -46,7 +47,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
 
     const { authorId, collectionId } = useParams();
 
-    debugger;
     const init1 = async () => {
         setLoader(true);
         var auther = await author(authorId);
@@ -72,12 +72,10 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     const viewCollection = async () => {
         try {
             const response = await contract.nft_token({ token_id: collectionId });
-            debugger;
             console.log(response);
 
             return response;
         } catch (error) {
-            debugger;
             console.log(error);
         }
     };
@@ -90,7 +88,7 @@ const ViewCollection = ({ contractX, account, wallet }) => {
 
                 </div>
                 <div className="container pb-5 px-0">
-                    <img src={avtar} className="avtar-position" />
+                    <img src={collection?.metadata?.media ? collection?.metadata?.media : collection1} className="avtar-position" width="182" height="182"/>
                 </div>
             </div>
             <div className="container pb-5 px-0">

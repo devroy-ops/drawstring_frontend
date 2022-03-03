@@ -7,7 +7,7 @@
 }
 
 .first-box-image{
-    background: url('../images/home/covid_santa.svg');
+    /* background: url('../images/home/covid_santa.svg'); */
     background-repeat: no-repeat;
     background-size: cover;
     height: 462px;
@@ -17,6 +17,14 @@
     /* border-radius: 8px; */
     border-left: 2px solid #3D3D3D;
     /* box-sizing: border-box; */
+}
+/* 
+.alice-carousel__wrapper{
+    overflow: inherit !important;
+} */
+.sliderimg{
+    /* padding-left: 20px !important;
+    padding-right: 20px !important; */
 }
 /* 
 .create-link{
@@ -73,7 +81,7 @@
 }
 
 .bg-img1{
-    background: url('../images/home/1.svg');
+    /* background: url('../images/home/1.svg'); */
     background-repeat: no-repeat;
     background-size: cover;
     height: 220px;

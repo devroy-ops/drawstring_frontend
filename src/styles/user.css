@@ -9,6 +9,8 @@
 .avtar-position{
     position: absolute;
     top: 140px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
 }
 
 .copy-btn{

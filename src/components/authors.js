@@ -81,11 +81,6 @@ const Authors = () => {
 
     let navigate = useNavigate();
 
-    const routeChange = (authorId) => {
-        let path = `/createcollection/${authorId}`;
-        navigate(path);
-    }
-
     const openPage = (link, authorId) => {
         let path = `/${link}/${authorId}`;
         navigate(path);

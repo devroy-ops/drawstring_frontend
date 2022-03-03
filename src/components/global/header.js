@@ -1,6 +1,6 @@
 // import React from "react";
 import React, { useCallback, useContext } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import '../../styles/header.css';
 import search from '../../images/header/search.svg';
 import day from '../../images/header/day.svg';
@@ -35,7 +35,6 @@ export default function Header({ currentUser, nearConfig, wallet }) {
   // }
 
   const handleUser = (e) => {
-    debugger;
     if (currentUser) {
       (function signOut() {
         wallet.signOut();
@@ -49,6 +48,8 @@ export default function Header({ currentUser, nearConfig, wallet }) {
       })();
     }
   };
+
+  let navigate = useNavigate();
 
   return (
 
@@ -71,7 +72,7 @@ export default function Header({ currentUser, nearConfig, wallet }) {
               {/* collections */}
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/users/123" className="nav-link">My profile</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/users/123" onClick={(e)=>{e.preventDefault(); !currentUser ? handleUser() : navigate('/users/123')}} className="nav-link">My profile</NavLink>
             </li>
             <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/users" className="nav-link">Activity</NavLink>
@@ -106,7 +107,7 @@ export default function Header({ currentUser, nearConfig, wallet }) {
             )} */}
 
             {!currentUser && (
-              <a href="javascript:void(0)" onClick={handleUser} className="login-link">Sign in</a>
+              <a href="#" onClick={(e)=> {e.preventDefault(); handleUser();}} className="login-link">Sign in</a>
             )}
 
           </li>
