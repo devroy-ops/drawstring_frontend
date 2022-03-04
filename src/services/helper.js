@@ -67,5 +67,5 @@ const author = async (authorId) =>{
 }
 
 
-export { init, mint_txFee, GAS, author };
+export { init, mint_txFee, deploy_txFee, transfer_txFee,  GAS, author };
 

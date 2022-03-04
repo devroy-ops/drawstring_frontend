@@ -3,33 +3,15 @@ import React, { useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { useParams, useSearchParams } from "react-router-dom";
 import '../styles/createcollection.css';
-import Big from "big.js";
-import * as nearAPI from "near-api-js";
-import { db } from "../db/firebase";
+import { init, author, GAS, deploy_txFee } from "../services/helper";
 
-const fileTypes = ["JPG", "JPEG" , "PNG", "GIF", "WEBP", "SVG"];
-
-const mint_txFee = Big(0.1)
-    .times(10 ** 24)
-    .toFixed();
-
-const deploy_txFee = Big(4)
-    .times(10 ** 24)
-    .toFixed();
-
-const transfer_txFee = Big(1)
-    .times(10 ** 24)
-    .toFixed();
-
-const GAS = Big(20)
-    .times(10 ** 13)
-    .toFixed();
+const fileTypes = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
 
 var tableRowIndex = 0;
 
 export default function CreateCollection({ contractX, account, wallet }) {
 
-    const [author, setAuthor] = useState({});
+    const [currentAuthor, setAuthor] = useState({});
 
     const [talbeRows, setRows] = useState([{
         index: 0,
@@ -71,17 +53,29 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
     const { authorId } = useParams();
 
-    const getAuthor = async () => {
-        await db.collection('authors').doc(authorId).get().then((querySnapshot) => {
-            let author = querySnapshot.data();
-            setAuthor(author);
-            return author;
-        });
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const init1 = async () => {
+
+        var authors = await author(authorId);
+        setAuthor(authors);
+
+        var transactionHashes = searchParams.get("transactionHashes");
+        var isContractInitialized = localStorage.getItem(authors.userName + "isContractInitialized");
+        if (transactionHashes && !isContractInitialized) {
+
+            contract = await init(wallet, authors);
+
+            localStorage.setItem(authors.userName + "isContractInitialized", true);
+            initializeContract(contract)
+
+        }
     }
 
     useEffect(() => {
-        return getAuthor();
-    }, []);
+        return init1();
+        //return getAuthor();
+    });
 
 
     /**
@@ -94,7 +88,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
             // load and deploy smart contract
             const respons = await contractX.deploy_contract_code(
                 {
-                    account_id: `${author.userName}.stingy.testnet` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
+                    account_id: `${currentAuthor.userName}.stingy.testnet` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
                 },
                 GAS,
                 deploy_txFee
@@ -105,92 +99,27 @@ export default function CreateCollection({ contractX, account, wallet }) {
         }
     };
 
-    const init = async (author) => {
+    const initializeContract = async (contract) => {
         try {
-            // Load the NFT from the subaccount created in the deploy function
-            contract = new nearAPI.Contract(
-                wallet.account(),
-                `${author.userName}.stingy.testnet`, //"jitendra.stingy.testnet", // newly created subaccount
-                {
-                    // View methods
-                    viewMethods: [
-                        "nft_token",
-                        "nft_tokens",
-                        "nft_tokens_for_owner",
-                        "nft_metadata",
-                        "nft_total_supply",
-                        "nft_supply_for_owner",
-                        "nft_is_approved",
-                        "nft_payout",
-                    ],
-                    // Change methods
-                    changeMethods: [
-                        "nft_mint",
-                        "new",
-                        "nft_transfer",
-                        "nft_transfer_call",
-                        "nft_approve",
-                        "nft_revoke",
-                        "nft_revoke_all",
-                        "burn_nft",
-                    ],
-                    sender: wallet.getAccountId(),
-                }
-            );
-        } catch (error) {
-            console.log(error);
-        }
-
-        try {
-          // Create a collection by initializing the NFT contract
-          localStorage.setItem("isContractInitialized", true);
-          const response = await contract.new({
-            owner_id: account.accountId,
-            metadata: {
-              "spec": collection.spec,
-              "name": collection.name,
-              "symbol": collection.symbol,
-              "icon": null,
-              "base_uri": null,
-              "referance": null,
-              "referance_hash": null, // must exist if the "referance" field exists.
-            },
-          }, GAS);
-          console.log(response);
-        } catch (error) {
-          console.log(error);
-        }
-
-        try {
-            const response = await viewCollection();//viewNFTs();//mintNFT();//
+            // Create a collection by initializing the NFT contract
+            const response = await contract.new({
+                owner_id: account.accountId,
+                metadata: {
+                    "spec": collection.spec,
+                    "name": collection.name,
+                    "symbol": collection.symbol,
+                    "icon": null,
+                    "base_uri": null,
+                    "referance": null,
+                    "referance_hash": null, // must exist if the "referance" field exists.
+                },
+            }, GAS);
             console.log(response);
         } catch (error) {
             console.log(error);
         }
-    };
-
-    /**
-     * View the metadata of the contract(collection) using the contract.nft_metadata
-     */
-    const viewCollection = async () => {
-        try {
-            const response = await contract.nft_metadata({});
-            console.log(response);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-
-    const [searchParams, setSearchParams] = useSearchParams();
-    var transactionHashes = searchParams.get("transactionHashes")
-    var isContractInitialized = localStorage.getItem("isContractInitialized");
-
-    if (transactionHashes && !isContractInitialized) {
-        db.collection('authors').doc(authorId).get().then((querySnapshot) => {
-            init(querySnapshot.data());
-        })
     }
+
 
     const handleChange = (e) => {
         switch (e.target.name) {
