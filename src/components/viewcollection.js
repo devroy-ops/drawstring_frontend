@@ -1,22 +1,16 @@
 import '../App.css';
 import { useParams, NavLink } from "react-router-dom";
-import avtar from '../images/users/avtar.svg';
 import collection1 from '../images/collection/collection1.svg';
-import bg_users from '../images/users/bg_users.svg';
 import copy_icon from '../images/users/copy_icon.svg';
 import upload from '../images/users/upload.svg';
 import more from '../images/home/more.svg';
-
 import '../styles/user.css';
-import blockchain from '../images/home/blockchain.svg';
 import category from '../images/home/category.svg';
 import saletype from '../images/home/saletype.svg';
 import price from '../images/home/price.svg';
 import sort from '../images/home/sort.svg';
 import images from '../images/home/images.svg';
-import calendar from '../images/home/calendar.svg';
 import arrow_down from '../images/home/arrow_down.svg';
-
 import explore1 from '../images/home/explore1.svg';
 import explore2 from '../images/home/explore2.svg';
 import explore3 from '../images/home/explore3.svg';
@@ -25,13 +19,10 @@ import explore5 from '../images/home/explore5.svg';
 import explore6 from '../images/home/explore6.svg';
 import explore7 from '../images/home/explore7.svg';
 import explore8 from '../images/home/explore8.svg';
-
 import heart from '../images/home/heart.svg';
-
 import { Tabs, Tab } from 'react-bootstrap';
 import React, { useEffect, useState } from "react";
-import * as nearAPI from "near-api-js";
-import { init, author, GAS, mint_txFee } from "../services/helper";
+import { init, author } from "../services/helper";
 import { Loader } from "../services/ui";
 
 const ViewCollection = ({ contractX, account, wallet }) => {
@@ -59,7 +50,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     };
 
     useEffect(() => {
-        //return init();
         return init1()
     }, []);
 
@@ -412,8 +402,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <div>Requested topic ID: {userId}</div>
-            <div>Users Page </div> */}
                             </div>
                         </Tab>
                         <Tab eventKey={2} title="Activity">Tab 2 content</Tab>

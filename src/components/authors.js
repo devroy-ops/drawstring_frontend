@@ -1,10 +1,10 @@
 import '../App.css';
 import '../styles/collection.css';
 import collection1 from '../images/collection/collection1.svg';
-import { db, auth, fb } from "../db/firebase";
+import { db, fb } from "../db/firebase";
 import { Button, Modal, Form, Row, Col, InputGroup } from 'react-bootstrap';
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Dropdown } from 'react-bootstrap';
 import more from '../images/home/more.svg';
 import { Loader } from "../services/ui";
@@ -21,14 +21,12 @@ const Authors = () => {
             let authors = [];
             querySnapshot.forEach(element => {
                 var data = element.data();
-                //setAuthers(authors => [...authors , data]);
                 authors = [...authors, data];
             });
 
             setAuthers(authors);
             console.log(authors);
             setLoader(false);
-           // toast("Wow so easy!", {type: 'success'});
         });
     }
 
@@ -66,9 +64,9 @@ const Authors = () => {
         const docId = db.collection('authors').doc().id;
         data.docId = docId;
         data.createdDate = fb.firestore.FieldValue.serverTimestamp();
-        db.collection('authors').doc(docId).set(data).then(res => {
+        db.collection('authors').doc(docId).set(data).then(() => {
             handleClose();
-            toast("Author added successfully!", {type: 'success'});
+            toast("Author added successfully!", { type: 'success' });
             getAuthors();
         })
     }

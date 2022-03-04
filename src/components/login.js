@@ -1,6 +1,5 @@
 import React, { useCallback, useContext } from "react";
 import { Navigate } from 'react-router-dom';
-// import { Redirect } from "react-router-dom";
 
 import { auth } from "../db/firebase";
 
@@ -14,7 +13,6 @@ export default function Login() {
             const { email, password } = event.target.elements;
             try {
                 await auth
-                    //.auth()
                     .signInWithEmailAndPassword(email.value, password.value);
             } catch (error) {
                 alert(error);
@@ -46,13 +44,6 @@ export default function Login() {
         </div>
     );
 };
-
-
-// this.testClick = this.testClick.bind(this);
-// db.collection("customersData").add({
-//     name: "jkp",
-//     password: "jitendra@123",
-// });
 
 // auth.createUserWithEmailAndPassword('jitendra@ugi.co.il', 'Abc@123').then(res => {
 //     auth.signInWithEmailAndPassword('jitendra@ugi.co.il', 'Abc@123').then(res => {

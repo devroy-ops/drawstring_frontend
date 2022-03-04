@@ -1,13 +1,11 @@
 import '../App.css';
 import React, { useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
-import { useParams, NavLink, useSearchParams } from "react-router-dom";
-
+import { useParams, useSearchParams } from "react-router-dom";
 import '../styles/createcollection.css';
-
 import Big from "big.js";
 import * as nearAPI from "near-api-js";
-import { db, auth, fb } from "../db/firebase";
+import { db } from "../db/firebase";
 
 const fileTypes = ["JPG", "JPEG" , "PNG", "GIF", "WEBP", "SVG"];
 
@@ -71,12 +69,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
     });
     console.log(account);
 
-    /**
-   * Deploys to an account, and initialize the smart contract with NFTContractMetadata
-   * @function
-   * @returns Promise<void>
-   */
-
     const { authorId } = useParams();
 
     const getAuthor = async () => {
@@ -92,6 +84,11 @@ export default function CreateCollection({ contractX, account, wallet }) {
     }, []);
 
 
+    /**
+   * Deploys to an account, and initialize the smart contract with NFTContractMetadata
+   * @function
+   * @returns Promise<void>
+   */
     const deploy = async () => {
         try {
             // load and deploy smart contract
@@ -194,87 +191,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
             init(querySnapshot.data());
         })
     }
-
-    const transferNFT = async () => {
-        try {
-            const response = await contract.nft_transfer(
-                {
-                    receiver_id: "ruger.testnet",
-                    token_id: "beat-is-chemical",
-                    approval_id: 0,
-                    memo: "Happy birthday Granny",
-                },
-                GAS,
-                "1"
-            );
-
-            console.log(response);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-
-    const viewNFTs = async () => {
-        try {
-            const response = await contract.nft_tokens(
-                { from_index: "0", limit: 10 },
-            );
-            console.log(response);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const mintNFT = async () => {
-        try {
-            const response = await contract.nft_mint(
-                {
-                    token_id: "high-on-substance",
-                    metadata: {
-                        title: "Methylphenidate (Ritalin)",
-                        description: "Forgotten industry of drunks",
-                        media:
-                            "https://media.giphy.com/media/xTiTniuHdUjpOlNo1q/giphy.gif",
-                        media_hash: null,
-                        copies: null,
-                        issued_at: null, // Unix epoch in milliseconds
-                        expires_at: null,
-                        starts_at: null, // When token starts being valid, Unix epoch in milliseconds
-                        updated_at: null, // When token was last updated, Unix epoch in milliseconds
-                        extra: null, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
-                        referance: null, // URL to a JSON file with more info
-                        referance_hash: null,
-                    },
-                    receiver_id: "rough.testnet",
-                    perpetual_royalties: null,
-                },
-                GAS,
-                mint_txFee
-            );
-
-            console.log(response);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const approveMarketplace = async () => {
-        try {
-            const response = await contract.nft_approve({
-                token_id: "high-on-substance",
-                account_id: account.accountId,
-                msg: "foo",
-            });
-
-            console.log(response);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-
-    //init()
 
     const handleChange = (e) => {
         switch (e.target.name) {

@@ -1,42 +1,22 @@
 import '../App.css';
 import { NavLink } from "react-router-dom";
 import '../styles/home.css';
-
 import arrow_back from '../images/home/arrow_back.svg';
 import arrow_fwd from '../images/home/arrow_fwd.svg';
-
-// import covid_santa from '../../images/home/covid_santa.svg';
-// import logo from '../logo.svg';
-// import featured1 from '../images/home/featured1.svg';
-// import featured2 from '../images/home/featured2.svg';
-// import featured3 from '../images/home/featured3.svg';
-// import featured4 from '../images/home/featured4.svg';
-
 import images from '../images/home/images.svg';
 import calendar from '../images/home/calendar.svg';
 import arrow_down from '../images/home/arrow_down.svg';
-
 import blockchain from '../images/home/blockchain.svg';
 import category from '../images/home/category.svg';
 import saletype from '../images/home/saletype.svg';
 import price from '../images/home/price.svg';
 import sort from '../images/home/sort.svg';
 import more from '../images/home/more.svg';
-
-import explore1 from '../images/home/explore1.svg';
-import explore2 from '../images/home/explore2.svg';
-import explore3 from '../images/home/explore3.svg';
-import explore4 from '../images/home/explore4.svg';
-import explore5 from '../images/home/explore5.svg';
-import explore6 from '../images/home/explore6.svg';
-import explore7 from '../images/home/explore7.svg';
-import explore8 from '../images/home/explore8.svg';
-
 import heart from '../images/home/heart.svg';
 import { db } from "../db/firebase";
 import React, { useEffect, useState } from "react";
 import { Loader } from "../services/ui";
-import { Dropdown } from 'react-bootstrap';
+// import { Dropdown } from 'react-bootstrap';
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
 
@@ -68,7 +48,7 @@ const Home = () => {
             {isLoading ? <Loader /> : null}
 
             <div className="pos-rel home_banner-section">
-                <AliceCarousel ref={(el) => (carousel = el)} autoPlay autoPlayInterval="3000" disableButtonsControls="true" disableDotsControls="true">
+                <AliceCarousel ref={(el) => (carousel = el)} autoPlay infinite autoPlayInterval="3000" disableButtonsControls="true" disableDotsControls="true">
                     {nfts && nfts.length > 0 && nfts.filter(x => x.isMainSlideImage == true).map((nft, index) => {
                         return (
                             <div className="sliderimg" key={index}>
@@ -339,7 +319,45 @@ const Home = () => {
                     </div>
 
                     <div className="row home_explore">
-                        <div className="col-sm-3 pb-4">
+                        {nfts && nfts.length > 0 && nfts.map((nft, index) => {
+                            return (
+                                <div className="col-sm-3 pb-4" key={index}>
+                                    <div className="top-sec-box">
+                                        <div className="row py-2 px-3">
+                                            <div className="col-sm-8">
+                                                <div className="d-flex">
+                                                    <div className="explore-dot bg-pink"></div>
+                                                    <div className="explore-dot bg-blue"></div>
+                                                    <div className="explore-dot bg-green"></div>
+                                                </div>
+                                            </div>
+                                            <div className="col-sm-4 ">
+                                                <div className="explore-dot bg-black float-end">
+                                                    <img src={more} className="pb-1" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <img src={nft.nftData.metadata.media} className="w-100" height="270" />
+                                        <div className="text-light font-size-18 p-3">
+                                            <div>{nft.nftData.metadata.title}</div>
+                                            <div className="row pt-2 bid-mobile-100">
+                                                <div className="col-sm-6">
+                                                    3.89 ETN <span className="color-gray">1/1</span>
+                                                </div>
+                                                <div className="col-sm-6 text-end">
+                                                    <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
+                                                </div>
+                                            </div>
+                                            <div className="pt-1">
+                                                <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} /> <span className="color-gray">18</span></NavLink>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        }
+                        )}
+                        {/* <div className="col-sm-3 pb-4">
                             <div className="top-sec-box">
                                 <div className="row py-2 px-3">
                                     <div className="col-sm-8">
@@ -603,6 +621,7 @@ const Home = () => {
                                 </div>
                             </div>
                         </div>
+                     */}
                     </div>
                 </div>
             </div>

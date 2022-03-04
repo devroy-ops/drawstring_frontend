@@ -1,11 +1,10 @@
 import '../App.css';
 import '../styles/collection.css';
 import collection1 from '../images/collection/collection1.svg';
-import * as nearAPI from "near-api-js";
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, NavLink, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { init, author, GAS, mint_txFee } from "../services/helper";
-import { Button, Modal, Form, Row, Col, InputGroup } from 'react-bootstrap';
+import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
@@ -32,12 +31,8 @@ const Collections = ({ contractX, account, wallet }) => {
     };
 
     useEffect(() => {
-        //return init();
         return init1();
     }, []);
-    /**
-     * View the metadata of the contract(collection) using the contract.nft_metadata
-     */
 
     let navigate = useNavigate();
 
@@ -75,7 +70,6 @@ const Collections = ({ contractX, account, wallet }) => {
         description: ""
     });
 
-
     const handleSubmit = (event) => {
         event.preventDefault();
         const form = event.currentTarget;
@@ -87,12 +81,6 @@ const Collections = ({ contractX, account, wallet }) => {
         }
         setValidated(true);
     };
-
-    // const [searchParams, setSearchParams] = useSearchParams();
-    // var transactionHashes = searchParams.get("transactionHashes");
-    // if(transactionHashes){
-    //    // toast("Mint added successfully!", {type: 'success'})
-    // }
 
     const uploadFile = async () => {
         if (nft.media) {
@@ -138,7 +126,7 @@ const Collections = ({ contractX, account, wallet }) => {
                 },
                 receiver_id: "rough.testnet",
                 perpetual_royalties: null,
-                price:"$2593251"
+                price: "$2593251"
             };
 
             var data = {};
@@ -146,44 +134,23 @@ const Collections = ({ contractX, account, wallet }) => {
             const docId = db.collection('nfts').doc().id;
             data.docId = docId;
             data.createdDate = fb.firestore.FieldValue.serverTimestamp();
+            data.authorId = authorId;
 
             await db.collection("nfts").doc(docId).set(data);
 
             const response = await contracts.nft_mint(
                 nftData,
-                // {
-                //     token_id: nft.token,
-                //     metadata: {
-                //         title: nft.title,
-                //         description: nft.description,
-                //         media: nft.media,
-                //         media_hash: null,
-                //         copies: null,
-                //         issued_at: null, // Unix epoch in milliseconds
-                //         expires_at: null,
-                //         starts_at: null, // When token starts being valid, Unix epoch in milliseconds
-                //         updated_at: null, // When token was last updated, Unix epoch in milliseconds
-                //         extra: null, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
-                //         referance: null, // URL to a JSON file with more info
-                //         referance_hash: null,
-                //     },
-                //     receiver_id: "rough.testnet",
-                //     perpetual_royalties: null,
-                // },
                 GAS,
                 mint_txFee
             );
 
             console.log(response);
-            //toast("Author added successfully!", {type: 'success'});
-
         } catch (error) {
             console.log(error);
         }
     };
 
     const handleChange = (e) => {
-
         setNft((prev) => {
             if (e.target.name == "media") {
                 return { ...prev, [e.target.name]: e };
@@ -238,7 +205,7 @@ const Collections = ({ contractX, account, wallet }) => {
                                 return (
                                     <tr key={index}>
                                         <td></td>
-                                        <td > <img src={collection.metadata.media ? collection.metadata.media : collection1} width="42" height="42" className="border-radius-50"/> {collection.metadata.title}</td>
+                                        <td > <img src={collection.metadata.media ? collection.metadata.media : collection1} width="42" height="42" className="border-radius-50" /> {collection.metadata.title}</td>
                                         <td>{collection.token_id}</td>
                                         <td></td>
                                         <td></td>
@@ -259,20 +226,6 @@ const Collections = ({ contractX, account, wallet }) => {
                                 )
                             })
                             }
-                            {/* <tr>
-                                <td></td>
-                                <td> <img src={collection1} /> Collection name name</td>
-                                <td>1050</td>
-                                <td>7896</td>
-                                <td>98%</td>
-                                <td>298.39</td>
-                                <td>$28 369</td>
-                                <td>360,00</td>
-                                <td>$52 852</td>
-                                <td>$159 196 200</td>
-                                <td> <button type="button" className="btn btn-danger">Show Data</button> </td>
-                            </tr>
-                             */}
                         </tbody>
                     </table>
                 </div>

@@ -10,7 +10,6 @@ function Footer() {
           <div className="row">
             <div className="col-lg-5 col-md-6 mb-4 mb-md-0 pe-lg-5">
               <NavLink exact="true" activeclassname="active" to="/" className="navbar-brand text-light text-transform-uppercase font-size-18"><span className="color-theme">draw</span>string</NavLink>
-              {/* <h5 className="text-uppercase text-light mb-3"><span className="color-theme">draw</span>string</h5> */}
               <p className="pe-5 font-size-16 pt-3 tab-none">
                 Lorem ipsum dolor sit amet consectetur, adipisicing elit. Iste atque ea quis
                 molestias. Fugiat pariatur maxime quis culpa corporis vitae repudiandae aliquam
