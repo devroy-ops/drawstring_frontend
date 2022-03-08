@@ -17,6 +17,8 @@ import ThemeContextWrapper from './theame/themeContextWrapper';
 
 import getConfig from "./config.js";
 import * as nearAPI from "near-api-js";
+import { ApolloProvider } from '@apollo/client';
+import { client } from './db/mongodb';
 
 // Initializing contract
 async function initContract() {
@@ -45,6 +47,7 @@ async function initContract() {
   // Validate if a smart contract has been deployed to this account previously
 
   const account = await near.account("jitendra0891.testnet");
+  //const account = await near.account(walletConnection.getAccountId());
 
 
   // await account.addKey("8hSHprDq2StXwMtNd43wDTXQYsjXcD4MJTXQYsjXcc");
@@ -115,6 +118,7 @@ window.nearInitPromise = initContract().then(
       // <React.StrictMode>
       //   <App />
       // </React.StrictMode>,
+      <ApolloProvider client={client}>
 
       <ThemeContextWrapper>
         <React.StrictMode>
@@ -127,7 +131,9 @@ window.nearInitPromise = initContract().then(
             nearAPI={nearAPI}
           />
         </React.StrictMode>{' '}
-      </ThemeContextWrapper>,
+      </ThemeContextWrapper>
+      </ApolloProvider>
+      ,
 
 
       //routing,

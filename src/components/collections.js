@@ -3,7 +3,7 @@ import '../styles/collection.css';
 import collection1 from '../images/collection/collection1.svg';
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { init, author, GAS, mint_txFee } from "../services/helper";
+import { init, author, GAS, mint_txFee, transfer_txFee, txFee, storage1 } from "../services/helper";
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
@@ -85,7 +85,7 @@ const Collections = ({ contractX, account, wallet }) => {
     const uploadFile = async () => {
         if (nft.media) {
             setLoader(true);
-            storage.ref(nft.media.name).put(nft.media).then(res => {
+            storage.ref(nft.media.name).put(nft.media).then(() => {
                 storage.ref(nft.media.name).getDownloadURL().then((url) => {
                     mintNFT(url);
                     setLoader(false);
@@ -152,7 +152,7 @@ const Collections = ({ contractX, account, wallet }) => {
 
     const handleChange = (e) => {
         setNft((prev) => {
-            if (e.target.name == "media") {
+            if (e.target.name === "media") {
                 return { ...prev, [e.target.name]: e };
             } else {
                 return { ...prev, [e.target.name]: e.target.value };
@@ -166,6 +166,45 @@ const Collections = ({ contractX, account, wallet }) => {
 
     const onSizeError = (error) => {
         debugger;
+    }
+
+    // const initializeContract = async (contract) => {
+    //     try {
+    //         // Create a collection by initializing the NFT contract
+    //         const response = await contract.new({
+    //             owner_id: account.accountId,
+    //             metadata: {
+    //                 "spec": null,
+    //                 "name": null,
+    //                 "symbol": null,
+    //                 "icon": null,
+    //                 "base_uri": null,
+    //                 "referance": null,
+    //                 "referance_hash": null,
+    //             },
+    //         }, GAS);
+    //         console.log(response);
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
+
+    const checkApis = async () => {
+        try {
+            debugger;
+            // const response = await contract.storage_minimum_balance({})
+            const response = await contract.storage_deposit(
+                {
+                    "account_id": account.accountId
+                },
+                GAS,
+                txFee
+            )
+            debugger;
+            return response;
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
@@ -205,7 +244,7 @@ const Collections = ({ contractX, account, wallet }) => {
                                 return (
                                     <tr key={index}>
                                         <td></td>
-                                        <td > <img src={collection.metadata.media ? collection.metadata.media : collection1} width="42" height="42" className="border-radius-50" /> {collection.metadata.title}</td>
+                                        <td> <img src={collection.metadata.media ? collection.metadata.media : collection1} width="42" height="42" className="border-radius-50" alt="nft media"/> {collection.metadata.title}</td>
                                         <td>{collection.token_id}</td>
                                         <td></td>
                                         <td></td>

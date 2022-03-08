@@ -130,11 +130,12 @@ body{
 
 .profile-input {
   background: none;
-  border: none;
   color: #FFFFFF;
   font-size: 16px;
   margin-bottom: 10px;
   padding: 5px !important;
+  width: 100%;
+  border: none !important;
 }
 .profile-input:focus-visible{
   outline: 0;

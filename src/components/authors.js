@@ -9,8 +9,41 @@ import { Dropdown } from 'react-bootstrap';
 import more from '../images/home/more.svg';
 import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
+// import * as Realm from "realm-web";
+// import { ApolloClient, ApolloProvider, HttpLink, InMemoryCache } from "@apollo/client";
+import { gql, useMutation, useQuery } from '@apollo/client';
+
 
 const Authors = () => {
+
+    const GET_AUTHORS = gql`
+        query getAuthors {
+            authors {
+                id
+                firstName
+                lastName
+                userName
+                description
+                createdDate
+            }
+        }
+        `;
+
+    const ADD_AUTHOR = gql`
+        mutation AddAuthor($id: String!, $firstName: String!, $lastName: String!, $userName:String!, $description: String!, $createdDate: String!) {
+            addAuthor(id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, description: $description, createdDate: $createdDate) {
+            id
+            firstName
+            lastName
+            userName
+            description
+            createdDate
+            }
+        }
+    `;
+
+    const [addAuthor, {newAuthor}] = useMutation(ADD_AUTHOR);
+    const { loading, error, data } = useQuery(GET_AUTHORS);
 
     const [authors, setAuthers] = useState([]);
     const [isLoading, setLoader] = useState(false);
@@ -40,7 +73,7 @@ const Authors = () => {
 
     const [validated, setValidated] = useState(false);
 
-    const [auther, setAuther] = useState({
+    const [author, setAuthor] = useState({
         firstName: "",
         lastName: "",
         userName: "",
@@ -53,26 +86,39 @@ const Authors = () => {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            saveAuther(auther);
+            saveAuthor(author);
         }
         setValidated(true);
 
     };
 
-    const saveAuther = (data) => {
+    const saveAuthor = (data) => {
+        debugger;
+        // const docId = db.collection('authors').doc().id;
+        // data.docId = docId;
+        // data.createdDate = fb.firestore.FieldValue.serverTimestamp();
+        // db.collection('authors').doc(docId).set(data).then(() => {
+        //     handleClose();
+        //     toast("Author added successfully!", { type: 'success' });
+        //     getAuthors();
+        // });
 
-        const docId = db.collection('authors').doc().id;
-        data.docId = docId;
-        data.createdDate = fb.firestore.FieldValue.serverTimestamp();
-        db.collection('authors').doc(docId).set(data).then(() => {
-            handleClose();
-            toast("Author added successfully!", { type: 'success' });
-            getAuthors();
-        })
+        //AddAuthor({ variables: { type: input.value } });
+        
+        data.createdDate = new Date().toDateString();
+        data.id = "1";
+        
+        addAuthor({ variables: data}).then(res=>{
+            debugger
+        }, error=>{
+            debugger;
+        });
+
+       // dbUser.
     }
 
     const handleChange = (e) => {
-        setAuther((prev) => {
+        setAuthor((prev) => {
             return { ...prev, [e.target.name]: e.target.value };
         });
     };
@@ -119,7 +165,7 @@ const Authors = () => {
                                 return (
                                     <tr key={index}>
                                         <td></td>
-                                        <td > <img src={collection1} /> {author.firstName}</td>
+                                        <td > <img src={collection1} alt="author media"/> {author.firstName}</td>
                                         <td>{author.lastName}</td>
                                         <td>{author.userName}</td>
                                         <td>{author.description}</td>
@@ -128,7 +174,7 @@ const Authors = () => {
                                         <td>
                                             <Dropdown>
                                                 <Dropdown.Toggle variant="" id="dropdown-basic">
-                                                    <img src={more} />
+                                                    <img src={more} alt="more icon"/>
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <Dropdown.Item onClick={() => openPage('authors', author.docId)}>View Author</Dropdown.Item>
@@ -152,7 +198,7 @@ const Authors = () => {
             {/* modal */}
             <Modal show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Add New Auther</Modal.Title>
+                    <Modal.Title>Add New Author</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -164,7 +210,7 @@ const Authors = () => {
                                     type="text"
                                     placeholder="First name"
                                     name="firstName"
-                                    defaultValue={auther.firstName}
+                                    defaultValue={author.firstName}
                                     onChange={handleChange}
                                 />
                                 <Form.Control.Feedback type="invalid">First name is required!</Form.Control.Feedback>
@@ -176,7 +222,7 @@ const Authors = () => {
                                     type="text"
                                     placeholder="Last name"
                                     name="lastName"
-                                    defaultValue={auther.lastName}
+                                    defaultValue={author.lastName}
                                     onChange={handleChange}
                                 />
                                 <Form.Control.Feedback type="invalid">Last name is required!</Form.Control.Feedback>
@@ -194,7 +240,7 @@ const Authors = () => {
                                         aria-describedby="inputGroupPrepend"
                                         required
                                         name="userName"
-                                        defaultValue={auther.userName}
+                                        defaultValue={author.userName}
                                         onChange={handleChange}
                                     />
                                     <Form.Control.Feedback type="invalid">
@@ -212,11 +258,11 @@ const Authors = () => {
                                     rows={3}
                                     required
                                     name="description"
-                                    defaultValue={auther.description}
+                                    defaultValue={author.description}
                                     onChange={handleChange}
                                 />
                                 <Form.Control.Feedback type="invalid">
-                                    Please provide the auther description.
+                                    Please provide the author description.
                                 </Form.Control.Feedback>
                             </Form.Group>
                         </Row>

@@ -1,7 +1,6 @@
-import logo from './logo.svg';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Route, BrowserRouter as Router, Routes, Switch, Navigate } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Home from './components/home';
 import Users from './components/users';
 import EditProfile from './components/editprofile';
@@ -16,7 +15,7 @@ import { AuthProvider } from "./auth/auth";
 import PrivateRoute from './PrivateRoute';
 import Authors from './components/authors';
 import Author from './components/author';
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // const routing = (
@@ -84,14 +83,32 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
           <Routes>
 
             {<Route exact path='/' element={<PrivateRoute />}>
-              <Route exact path='/' element={<Home />} />
+              <Route exact path='/' element={<Home 
+              contractX={contractX}
+              currentUser={currentUser}
+              account={account}
+              wallet={wallet}
+              nearConfig={nearConfig}
+              />} />
               {/* <Route exact path="/" render={() => <Navigate to="/home" />} /> */}
-              <Route exact path='/home' element={<Home />} />
+              <Route exact path='/home' element={<Home 
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
               
               <Route path="/users" component={Users} element={<Users />} />
               <Route path="/authors" component={Authors} element={<Authors />} />
               <Route path="/authors/:authorId" component={Author} element={<Author />} />
-              <Route path="/users/:userId" component={EditProfile} element={<EditProfile />} />
+              <Route path="/users/:userId" component={EditProfile} element={<EditProfile 
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
               <Route path="/product" component={Product} element={<Product />} />
               <Route exact="true" path="/collections/:authorId" component={Collections} element={<Collections 
                 contractX={contractX}

@@ -49,7 +49,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
         name: "Chemical Rain",
         symbol: "CHM-10",
     });
-    console.log(account);
 
     const { authorId } = useParams();
 
@@ -67,14 +66,13 @@ export default function CreateCollection({ contractX, account, wallet }) {
             contract = await init(wallet, authors);
 
             localStorage.setItem(authors.userName + "isContractInitialized", true);
-            initializeContract(contract)
+            initializeContract(contract);
 
         }
     }
 
     useEffect(() => {
         return init1();
-        //return getAuthor();
     });
 
 
@@ -196,9 +194,8 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             <div>
                                 <div className="font-size-18 text-light py-3">Number of copies</div>
                                 <input type="text" className="profile-input pb-3 w-100" placeholder='E. g. 10”'
-                                    placeholder="Collection spec"
+                                    // placeholder="Collection spec"
                                     name="spec"
-                                    type="text"
                                     defaultValue={collection.spec}
                                     required
                                 />
@@ -242,9 +239,9 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                 <div className="col-sm-6">
                                     <div>
                                         <div className="font-size-18 text-light py-3">Royalties</div>
-                                        <input type="text" className="profile-input pb-3 w-100" placeholder='10%'
-                                            placeholder="Base URI (optional)"
-                                            type="url"
+                                        <input type="text" className="profile-input pb-3 w-100" 
+                                            placeholder='10%'
+                                            // placeholder="Base URI (optional)"
                                             name="base_uri"
                                             value={collection.URI}
                                             onChange={(e) => {
@@ -272,7 +269,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                     <div>
                                         <div className="font-size-18 mob-f-16 text-light py-3">Properties <span className="color-gray"> (Optional)</span></div>
                                         <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. Size'
-                                            placeholder="Collection symbol"
+                                            // placeholder="Collection symbol"
                                             name="symbol"
                                             value={collection.symbol}
                                             onChange={(e) => {
@@ -287,7 +284,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                     <div>
                                         <div className="font-size-18 mob-f-16 text-light py-3">Wallet address</div>
                                         <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. M'
-                                            placeholder="Collection icon link"
+                                            // placeholder="Collection icon link"
                                             name="icon"
                                             value={collection.icon || ''}
                                             onChange={(e) => {
