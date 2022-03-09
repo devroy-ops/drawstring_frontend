@@ -4,34 +4,58 @@ import { db } from '../db/firebase';
 import { Loader } from "../services/ui";
 // import { toast } from 'react-toastify';
 import { Form } from 'react-bootstrap';
+import { mongodb } from '../db/mongodb';
+import { ObjectID } from 'bson';
+import { toast } from 'react-toastify';
 
 const EditProfile = ({ contractX, account, wallet }) => {
-    
+   
+    const accountId = wallet.getAccountId();
+
     const [file, setFile] = useState();
-    const [author, setAuthor] = useState();
+    const [author, setAuthor] = useState({
+        userName: accountId,
+        customUrl: "",
+        bio: "",
+        twitterUsername: "",
+        siteOrPortfolioLink: "",
+        email: ""
+    });
+    const [isAuthor, setIsAuthor] = useState(false);
     const [isLoading, setLoader] = useState(false);
     const [validated, setValidated] = useState(false);
+
+    
 
     useEffect(() => {
         return getAuthor();
     }, []);
 
     const getAuthor = () => {
-        const accountId = wallet.getAccountId();
         setLoader(true);
-        
-        db.collection('authors').where('userName', '==', accountId).limitToLast().get().then((querySnapshot) => {
+        debugger;
+        mongodb.collection('authors').findOne({ 'userName': accountId }).then(res => {
             setLoader(false);
-            if (querySnapshot.size > 0) {
-                let authors = [];
-                querySnapshot.forEach(element => {
-                    var data = element.data();
-                    authors = [...authors, data];
-                });
-
-                setAuthor(authors[0]);
+            debugger;
+            if (res) {
+                setIsAuthor(true);
+                setAuthor(res);
+            }else{
+                setIsAuthor(false);
             }
-        });
+        })
+
+        // db.collection('authors').where('userName', '==', accountId).limitToLast().get().then((querySnapshot) => {
+        //     setLoader(false);
+        //     if (querySnapshot.size > 0) {
+        //         let authors = [];
+        //         querySnapshot.forEach(element => {
+        //             var data = element.data();
+        //             authors = [...authors, data];
+        //         });
+        //         setAuthor(authors[0]);
+        //     }
+        // });
     }
 
     const handleChange = (e) => {
@@ -62,12 +86,36 @@ const EditProfile = ({ contractX, account, wallet }) => {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            debugger;
-
+            saveAuthor();
         }
         setValidated(true);
 
     };
+
+    const saveAuthor = () => {
+     
+        var data = author;
+        setLoader(true);
+        if (!isAuthor) {
+            data.createdDate = new Date().toDateString();
+            data._id = new ObjectID();
+            mongodb.collection('authors').insertOne(data).then((res)=>{
+                setLoader(false);
+                toast("Your profile updated successfully!", { type: 'success' });
+                getAuthor();
+            }, error=>{
+                toast(error, { type: 'error' });
+            });
+        } else {
+            mongodb.collection('authors').findOneAndUpdate({ 'userName': accountId }, data).then((res)=>{
+                setLoader(false);
+                toast("Your profile updated successfully!", { type: 'success' });
+                getAuthor();
+            }, error=>{
+                toast(error, { type: 'error' });
+            });
+        }
+    }
 
     return (
         <div className="bg-darkmode edit-profile">
@@ -105,37 +153,42 @@ const EditProfile = ({ contractX, account, wallet }) => {
 
                 <div className="container">
                     <div className="font-size-18 text-light pb-3">Display name</div>
-                    <input type="text" defaultValue="author_name.tez" onChange={handleChange} name="firstName" placeholder="Enter display name" className="profile-input pb-3" />
+                    <input type="text" defaultValue={author.userName} onChange={handleChange} name="userName" placeholder="Enter display name" className="profile-input pb-3" />
                 </div>
                 <div className="border-bottom-2"></div>
 
                 <div className="container">
                     <div className="font-size-18 text-light py-3">Custom URL</div>
-                    <input type="text" defaultValue="drawstring.io" onChange={handleChange} name="customUrl" placeholder="Enter custom url" className="profile-input pb-3" />
+                    {/* "drawstring.io" */}
+                    <input type="text" defaultValue={author.customUrl} onChange={handleChange} name="customUrl" placeholder="Enter custom url" className="profile-input pb-3" />
                 </div>
                 <div className="border-bottom-2"></div>
                 <div className="container">
                     <div className="font-size-18 text-light py-3">Bio</div>
-                    <input type="text" defaultValue="excuse me" onChange={handleChange} name="bio" placeholder="Enter bio" className="profile-input pb-3" />
+                    {/* "excuse me" */}
+                    <input type="text" defaultValue={author.bio} onChange={handleChange} name="bio" placeholder="Enter bio" className="profile-input pb-3" />
                 </div>
                 <div className="border-bottom-2"></div>
                 <div className="container">
                     <div className="font-size-18 text-light py-3">Twitter Username</div>
                     <div className="d-flex">
-                        <input type="text" defaultValue="@author_name" onChange={handleChange} name="twitterUsername" placeholder="Enter twitter user name" className="profile-input pb-3 me-5 w-25" />
+                        {/* "@author_name" */}
+                        <input type="text" defaultValue={author.twitterUsername} onChange={handleChange} name="twitterUsername" placeholder="Enter twitter user name" className="profile-input pb-3 me-5 w-25" />
                         <div className="color-pink">Veriefied Twitter</div>
                     </div>
                 </div>
                 <div className="border-bottom-2"></div>
                 <div className="container">
                     <div className="font-size-18 text-light py-3">Personal site or portfolio</div>
-                    <input type="text" defaultValue="https://link.com" onChange={handleChange} name="siteOrPortfolioLink" placeholder="Enter personal site or portfolio" className="profile-input pb-3" />
+                    {/* "https://link.com" */}
+                    <input type="text" defaultValue={author.siteOrPortfolioLink} onChange={handleChange} name="siteOrPortfolioLink" placeholder="Enter personal site or portfolio" className="profile-input pb-3" />
                 </div>
                 <div className="border-bottom-2"></div>
                 <div className="container">
                     <div className="font-size-18 text-light py-3">Email</div>
                     <div className="d-flex">
-                        <input type="text" defaultValue="Enter your email" onChange={handleChange} name="email" placeholder="Enter your email" className="profile-input pb-3 me-5 w-25" />
+                        {/* "Enter your email" */}
+                        <input type="text" defaultValue={author.email} onChange={handleChange} name="email" placeholder="Enter your email" className="profile-input pb-3 me-5 w-25" />
                         <div className="color-pink">Confirm</div>
                     </div>
                 </div>

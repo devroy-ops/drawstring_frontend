@@ -82,6 +82,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
    * @returns Promise<void>
    */
     const deploy = async () => {
+        debugger;
         try {
             // load and deploy smart contract
             const respons = await contractX.deploy_contract_code(
