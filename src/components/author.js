@@ -34,6 +34,8 @@ import React, { useEffect, useState } from "react";
 import { db } from "../db/firebase";
 import { Dropdown } from 'react-bootstrap';
 import { Loader } from "../services/ui";
+import { mongodb } from '../db/mongodb';
+import { ObjectID } from 'bson';
 
 const Author = () => {
     const [activeTab, setActive] = useState(1);
@@ -48,9 +50,15 @@ const Author = () => {
 
     const getAuthor = () => {
         setLoader(true);
-        db.collection('authors').doc(authorId).get().then((querySnapshot) => {
-            let author = querySnapshot.data();
-            setAuthor(author);
+        // db.collection('authors').doc(authorId).get().then((querySnapshot) => {
+        //     let author = querySnapshot.data();
+        //     setAuthor(author);
+        //     setLoader(false);
+        // });
+
+        const id = ObjectID(authorId);
+        mongodb.collection('authors').findOne({_id: id}).then(response=>{
+            setAuthor(response);
             setLoader(false);
         });
     }

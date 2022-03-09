@@ -19,6 +19,7 @@ import { Loader } from "../services/ui";
 // import { Dropdown } from 'react-bootstrap';
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
+import { mongodb } from '../db/mongodb';
 
 const Home = ({ contractX, account, wallet }) => {
     var [nfts, setNfts] = useState([]);
@@ -30,15 +31,21 @@ const Home = ({ contractX, account, wallet }) => {
 
     const getNfts = () => {
         setLoader(true);
-        db.collection('nfts').get().then((querySnapshot) => {
-            let nftss = [];
-            querySnapshot.forEach(element => {
-                var data = element.data();
-                nftss = [...nftss, data];
-            });
+        // db.collection('nfts').get().then((querySnapshot) => {
+        //     let nftss = [];
+        //     querySnapshot.forEach(element => {
+        //         var data = element.data();
+        //         nftss = [...nftss, data];
+        //     });
+        //     setNfts(nftss);
+        //     setLoader(false);
+        // });
+
+        mongodb.collection('nfts').find().then(nftss=>{
+            debugger;
             setNfts(nftss);
             setLoader(false);
-        });
+        })
     }
 
     const viewDrop = async (e) => {

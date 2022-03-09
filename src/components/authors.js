@@ -9,58 +9,38 @@ import { Dropdown } from 'react-bootstrap';
 import more from '../images/home/more.svg';
 import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
+import { mongodb } from '../db/mongodb';
 // import * as Realm from "realm-web";
 // import { ApolloClient, ApolloProvider, HttpLink, InMemoryCache } from "@apollo/client";
-import { gql, useMutation, useQuery } from '@apollo/client';
-
+// import { gql, useMutation, useQuery } from '@apollo/client';
+import { ObjectID } from 'bson';
 
 const Authors = () => {
-
-    const GET_AUTHORS = gql`
-        query getAuthors {
-            authors {
-                id
-                firstName
-                lastName
-                userName
-                description
-                createdDate
-            }
-        }
-        `;
-
-    const ADD_AUTHOR = gql`
-        mutation AddAuthor($id: String!, $firstName: String!, $lastName: String!, $userName:String!, $description: String!, $createdDate: String!) {
-            addAuthor(id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, description: $description, createdDate: $createdDate) {
-            id
-            firstName
-            lastName
-            userName
-            description
-            createdDate
-            }
-        }
-    `;
-
-    const [addAuthor, {newAuthor}] = useMutation(ADD_AUTHOR);
-    const { loading, error, data } = useQuery(GET_AUTHORS);
 
     const [authors, setAuthers] = useState([]);
     const [isLoading, setLoader] = useState(false);
 
     const getAuthors = () => {
         setLoader(true);
-        db.collection('authors').get().then((querySnapshot) => {
-            let authors = [];
-            querySnapshot.forEach(element => {
-                var data = element.data();
-                authors = [...authors, data];
-            });
+        // db.collection('authors').get().then((querySnapshot) => {
+        //     let authors = [];
+        //     querySnapshot.forEach(element => {
+        //         var data = element.data();
+        //         authors = [...authors, data];
+        //     });
+        //     setAuthers(authors);
+        //     console.log(authors);
+        //     setLoader(false);
+        // });
 
+        mongodb.collection('authors').find().then((authors)=>{
+            debugger;
             setAuthers(authors);
-            console.log(authors);
             setLoader(false);
+        }, error=>{
+            toast(error, { type: 'error' });
         });
+
     }
 
     useEffect(() => {
@@ -106,15 +86,17 @@ const Authors = () => {
         //AddAuthor({ variables: { type: input.value } });
         
         data.createdDate = new Date().toDateString();
-        data.id = "1";
-        
-        addAuthor({ variables: data}).then(res=>{
-            debugger
+        data._id = new ObjectID();
+debugger;
+        //const id  = new ObjectID();
+        mongodb.collection('authors').insertOne(data).then((res)=>{
+            handleClose();
+            toast("Author added successfully!", { type: 'success' });
+            getAuthors();
         }, error=>{
-            debugger;
+            toast(error, { type: 'error' });
         });
 
-       // dbUser.
     }
 
     const handleChange = (e) => {
@@ -169,7 +151,7 @@ const Authors = () => {
                                         <td>{author.lastName}</td>
                                         <td>{author.userName}</td>
                                         <td>{author.description}</td>
-                                        <td>{author.createdDate.toDate().toDateString()}</td>
+                                        <td>{author.createdDate}</td>
                                         <td></td>
                                         <td>
                                             <Dropdown>
@@ -177,9 +159,9 @@ const Authors = () => {
                                                     <img src={more} alt="more icon"/>
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
-                                                    <Dropdown.Item onClick={() => openPage('authors', author.docId)}>View Author</Dropdown.Item>
-                                                    <Dropdown.Item onClick={() => openPage('createcollection', author.docId)}>Deploy Contract</Dropdown.Item>
-                                                    <Dropdown.Item onClick={() => openPage('collections', author.docId)}>View Collections</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => openPage('authors', author._id.toString())}>View Author</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => openPage('createcollection', author._id.toString())}>Deploy Contract</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => openPage('collections', author._id.toString())}>View Collections</Dropdown.Item>
                                                 </Dropdown.Menu>
                                             </Dropdown>
                                             {/* <NavLink href={void(0)} exact="true" activeclassname="active" to={`/authors/${author.docId}`}>View</NavLink> */}
