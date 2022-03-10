@@ -6,9 +6,9 @@ on:
       - jitendra
 
 jobs:
-  build_and_test:
-    name: Build and test
-    runs-on: ubuntu-latest
+    build_and_test:
+      name: Build and test
+      runs-on: ubuntu-latest
 
     strategy:
       matrix:
