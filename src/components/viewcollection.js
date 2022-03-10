@@ -55,7 +55,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
 
     let contract;
 
-
     /**
    * View the metadata of the contract(collection) using the contract.nft_metadata
    */

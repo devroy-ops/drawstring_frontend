@@ -1,0 +1,27 @@
+name: Github Pages Deploy
+
+on:
+  push:
+    branches:
+      - jitendra
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [15.x]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1   
+
+      - name: Install and build
+        run: npm install && npm run build
+
+      - name: Deploy
+        uses: Drawstring-io/drawstring_frontend
+        with:
+          branch: gh-pages
+          folder: build      
