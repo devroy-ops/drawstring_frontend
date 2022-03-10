@@ -20,8 +20,7 @@ jobs:
           clean: false
           single-commit: true
 
-name: Github Pages Deploy
-
+# name: Github Pages Deploy
 # on:
 #   push:
 #     branches:
