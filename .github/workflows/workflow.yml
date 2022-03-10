@@ -6,7 +6,8 @@ on:
       - jitendra
 
 jobs:
-  build-and-deploy:
+  build_and_test:
+    name: Build and test
     runs-on: ubuntu-latest
 
     strategy:
