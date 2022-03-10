@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: Drawstring-io/drawstring_frontend/actions/checkout
+        uses: actions/checkout
 
       - name: Install and build
         run: npm install && npm run build
