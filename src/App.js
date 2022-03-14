@@ -17,6 +17,8 @@ import Authors from './components/authors';
 import Author from './components/author';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Nfts from './components/nfts';
+import MintNft from './components/mintnft';
 
 // const routing = (
 //   <AuthProvider>
@@ -100,7 +102,13 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
               />} />
               
               <Route path="/users" component={Users} element={<Users />} />
-              <Route path="/authors" component={Authors} element={<Authors />} />
+              <Route path="/authors" component={Authors} element={<Authors 
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
               <Route path="/authors/:authorId" component={Author} element={<Author />} />
               <Route path="/users/:userId" component={EditProfile} element={<EditProfile 
                 contractX={contractX}
@@ -117,6 +125,13 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 wallet={wallet}
                 nearConfig={nearConfig}
               />} />
+              <Route exact="true" path="/nfts/:authorId" component={Nfts} element={<Nfts 
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
               <Route path="/createcollection" component={CreateCollection} element={<CreateCollection 
                 // {...props}
                 contractX={contractX}
@@ -126,13 +141,23 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 nearConfig={nearConfig}
               />} />
 
-              <Route path="/createcollection/:authorId" component={CreateCollection} element={<CreateCollection 
+            <Route path="/mintnft" component={MintNft} element={<MintNft 
+                // {...props}
                 contractX={contractX}
                 currentUser={currentUser}
                 account={account}
                 wallet={wallet}
                 nearConfig={nearConfig}
               />} />
+
+            <Route path="/createcollection/:authorId" component={CreateCollection} element={<CreateCollection 
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
+
               <Route path="/viewcollection" component={ViewCollection} element={<ViewCollection 
                 contractX={contractX}
                 currentUser={currentUser}
@@ -148,6 +173,26 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 wallet={wallet}
                 nearConfig={nearConfig}
               />} />
+
+              <Route path="/mintnft" component={MintNft} element={<MintNft 
+                // {...props}
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
+
+              <Route path="/mintnft/:authorId" component={MintNft} element={<MintNft 
+                // {...props}
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
+
+              
             </Route>
             }
             

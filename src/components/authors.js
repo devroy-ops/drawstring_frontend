@@ -14,8 +14,9 @@ import { mongodb } from '../db/mongodb';
 // import { ApolloClient, ApolloProvider, HttpLink, InMemoryCache } from "@apollo/client";
 // import { gql, useMutation, useQuery } from '@apollo/client';
 import { ObjectID } from 'bson';
+import { init, author, GAS, deploy_txFee } from "../services/helper";
 
-const Authors = () => {
+const Authors = ({ contractX, account, wallet }) => {
 
     const [authors, setAuthers] = useState([]);
     const [isLoading, setLoader] = useState(false);
@@ -34,7 +35,6 @@ const Authors = () => {
         // });
 
         mongodb.collection('authors').find().then((authors)=>{
-            debugger;
             setAuthers(authors);
             setLoader(false);
         }, error=>{
@@ -73,7 +73,6 @@ const Authors = () => {
     };
 
     const saveAuthor = (data) => {
-        debugger;
         // const docId = db.collection('authors').doc().id;
         // data.docId = docId;
         // data.createdDate = fb.firestore.FieldValue.serverTimestamp();
@@ -87,7 +86,7 @@ const Authors = () => {
         
         data.createdDate = new Date().toDateString();
         data._id = new ObjectID();
-debugger;
+
         //const id  = new ObjectID();
         mongodb.collection('authors').insertOne(data).then((res)=>{
             handleClose();
@@ -111,6 +110,25 @@ debugger;
         let path = `/${link}/${authorId}`;
         navigate(path);
     }
+
+   
+    const deployContract = async(userName) =>{
+        try {
+            // load and deploy smart contract
+            const respons = await contractX.deploy_contract_code(
+                {
+                    account_id: `${userName}.stingy.testnet` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
+                },
+                GAS,
+                deploy_txFee
+            );
+            console.log(respons);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+     
 
     return (
         <div className="menu">
@@ -160,7 +178,9 @@ debugger;
                                                 </Dropdown.Toggle>
                                                 <Dropdown.Menu>
                                                     <Dropdown.Item onClick={() => openPage('authors', author._id.toString())}>View Author</Dropdown.Item>
-                                                    <Dropdown.Item onClick={() => openPage('createcollection', author._id.toString())}>Deploy Contract</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => deployContract(author.userName)}>Deploy Contract</Dropdown.Item>
+                                                    <Dropdown.Item onClick={() => openPage('createcollection', author._id.toString())}>Create Collection</Dropdown.Item>
+                                                    {/* openPage('createcollection', author._id.toString()) */}
                                                     <Dropdown.Item onClick={() => openPage('collections', author._id.toString())}>View Collections</Dropdown.Item>
                                                 </Dropdown.Menu>
                                             </Dropdown>

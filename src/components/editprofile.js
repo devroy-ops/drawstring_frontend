@@ -33,10 +33,8 @@ const EditProfile = ({ contractX, account, wallet }) => {
 
     const getAuthor = () => {
         setLoader(true);
-        debugger;
         mongodb.collection('authors').findOne({ 'userName': accountId }).then(res => {
             setLoader(false);
-            debugger;
             if (res) {
                 setIsAuthor(true);
                 setAuthor(res);

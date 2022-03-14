@@ -42,14 +42,12 @@ const Home = ({ contractX, account, wallet }) => {
         // });
 
         mongodb.collection('nfts').find().then(nftss=>{
-            debugger;
             setNfts(nftss);
             setLoader(false);
         })
     }
 
     const viewDrop = async (e) => {
-        debugger;
         e.preventDefault();
     }
 
