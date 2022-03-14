@@ -1,8 +1,8 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import './index.css'
+import App from './App'
+import reportWebVitals from './reportWebVitals'
 // import Header from './components/global/header';
 // import Footer from './components/global/footer';
 // import { Route, BrowserRouter as Router, Routes, Switch } from "react-router-dom";
@@ -13,75 +13,18 @@ import reportWebVitals from './reportWebVitals';
 // import Product from './components/product';
 // import CreateCollection from './components/createcollection';
 // import ViewCollection from './components/viewcollection';
-import ThemeContextWrapper from './theame/themeContextWrapper';
+import ThemeContextWrapper from './theame/themeContextWrapper'
 
-import getConfig from "./config.js";
-import * as nearAPI from "near-api-js";
-// import { ApolloProvider } from '@apollo/client';
-// import { client } from './db/mongodb';
+import getConfig from './config.js'
+import * as nearAPI from 'near-api-js'
+import { initContracts } from './services/utils'
 
+import {
+  NearContextProvider,
+  NftContractContextProvider,
+  MarketContractContextProvider,
+} from './contexts'
 // Initializing contract
-async function initContract() {
-  const nearConfig = getConfig(process.env.NODE_ENV || "testnet");
-
-  // Initializing connection to the NEAR TestNet
-  const near = await nearAPI.connect({
-    deps: {
-      keyStore: new nearAPI.keyStores.BrowserLocalStorageKeyStore(),
-    },
-    ...nearConfig,
-  });
-
-  // Needed to access wallet
-  const walletConnection = new nearAPI.WalletConnection(near);
-
-  // Load in account data
-  let currentUser;
-  if (walletConnection.getAccountId()) {
-    currentUser = {
-      accountId: walletConnection.getAccountId(),
-      balance: (await walletConnection.account().state()).amount,
-    };
-  }
-
-  // Validate if a smart contract has been deployed to this account previously
-
-  const account = await near.account("jitendra0891.testnet");
-  //const account = await near.account(walletConnection.getAccountId());
-
-
-  // await account.addKey("8hSHprDq2StXwMtNd43wDTXQYsjXcD4MJTXQYsjXcc");
-  const keys = await account.getAccessKeys();
-  // console.log(keys);
-
-  const data = await account.state();
-  const codeHash = data.code_hash.split("");
-
-  const containsContract = codeHash.every((el) => el === "1");
-
-  if (!containsContract) {
-    //alert("This account contains a smart contract");
-    console.log("This account contains a smart contract");
-  }
-
-  const contractX = new nearAPI.Contract(
-    walletConnection.account(),
-    nearConfig.contractName,
-    {
-      changeMethods: ["deploy_contract_code"],
-    }
-  );
-
-  return {
-    contractX,
-    currentUser,
-    nearConfig,
-    walletConnection,
-    account,
-    nearAPI,
-  };
-}
-
 
 // const routing = (
 //   <Router>
@@ -93,7 +36,7 @@ async function initContract() {
 //         <Route path="/users" component={Users} element={<Users />} />
 //         <Route path="/users/:userId" component={EditProfile} element={<EditProfile />} />
 //         <Route path="/product" component={Product} element={<Product />} />
-//         <Route path="/createcollection" component={CreateCollection} element={<CreateCollection 
+//         <Route path="/createcollection" component={CreateCollection} element={<CreateCollection
 //         />} />
 //         <Route path="/viewcollection" component={ViewCollection} element={<ViewCollection />} />
 //         {/* <Route path="/contact" component={Contact} />
@@ -104,7 +47,7 @@ async function initContract() {
 //   </Router>
 // );
 
-window.nearInitPromise = initContract().then(
+window.nearInitPromise = initContracts().then(
   ({
     contractX,
     currentUser,
@@ -112,36 +55,43 @@ window.nearInitPromise = initContract().then(
     walletConnection,
     account,
     nearAPI,
+    nftContract,
+    marketContract,
+    near,
   }) => {
-
     ReactDOM.render(
       // <React.StrictMode>
       //   <App />
       // </React.StrictMode>,
-      // <ApolloProvider client={client}>
 
       <ThemeContextWrapper>
         <React.StrictMode>
-          <App
-            contractX={contractX}
+          <NearContextProvider
             currentUser={currentUser}
             nearConfig={nearConfig}
             wallet={walletConnection}
-            account={account}
-            nearAPI={nearAPI}
-          />
+            near={near}
+          >
+            <NftContractContextProvider nftContract={nftContract}>
+              <App
+                contractX={contractX}
+                account={account}
+                nearAPI={nearAPI}
+                contract={nftContract}
+                wallet={walletConnection}
+              />
+            </NftContractContextProvider>
+          </NearContextProvider>
         </React.StrictMode>{' '}
-      </ThemeContextWrapper>
-      // </ApolloProvider>
-      ,
-
+      </ThemeContextWrapper>,
 
       //routing,
 
-      document.getElementById('root')
-    );
-  });
+      document.getElementById('root'),
+    )
+  },
+)
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+reportWebVitals()
