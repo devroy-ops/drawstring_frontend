@@ -2,6 +2,8 @@
 import * as nearAPI from "near-api-js";
 import { db } from "../db/firebase";
 import Big from "big.js";
+import { ObjectID } from 'bson';
+import { mongodb } from "../db/mongodb";
 
 
 const mint_txFee = Big(0.1)
@@ -125,10 +127,13 @@ const init = async (wallet, author) => {
 };
 
 const author = async (authorId) =>{
-   return await db.collection('authors').doc(authorId).get().then((querySnapshot) => {
-        let response = querySnapshot.data();
-        return response;
-    });
+  //  return await db.collection('authors').doc(authorId).get().then((querySnapshot) => {
+  //       let response = querySnapshot.data();
+  //       return response;
+  //   });
+  const id = ObjectID(authorId);
+  return await mongodb.collection('authors').findOne({_id: id});
+  
 }
 
 

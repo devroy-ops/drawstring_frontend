@@ -17,8 +17,8 @@ import ThemeContextWrapper from './theame/themeContextWrapper';
 
 import getConfig from "./config.js";
 import * as nearAPI from "near-api-js";
-import { ApolloProvider } from '@apollo/client';
-import { client } from './db/mongodb';
+// import { ApolloProvider } from '@apollo/client';
+// import { client } from './db/mongodb';
 
 // Initializing contract
 async function initContract() {
@@ -118,7 +118,7 @@ window.nearInitPromise = initContract().then(
       // <React.StrictMode>
       //   <App />
       // </React.StrictMode>,
-      <ApolloProvider client={client}>
+      // <ApolloProvider client={client}>
 
       <ThemeContextWrapper>
         <React.StrictMode>
@@ -132,7 +132,7 @@ window.nearInitPromise = initContract().then(
           />
         </React.StrictMode>{' '}
       </ThemeContextWrapper>
-      </ApolloProvider>
+      // </ApolloProvider>
       ,
 
 

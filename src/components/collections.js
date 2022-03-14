@@ -9,6 +9,9 @@ import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
 import { FileUploader } from "react-drag-drop-files";
+import { ObjectID } from 'bson';
+import { mongodb } from '../db/mongodb';
+
 const fileTypes = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
 
 const Collections = ({ contractX, account, wallet }) => {
@@ -131,13 +134,14 @@ const Collections = ({ contractX, account, wallet }) => {
 
             var data = {};
             data.nftData = nftData;
-            const docId = db.collection('nfts').doc().id;
-            data.docId = docId;
-            data.createdDate = fb.firestore.FieldValue.serverTimestamp();
+            // const docId = db.collection('nfts').doc().id;
+            // data.docId = docId;
+            data.createdDate = new Date().toDateString(); //fb.firestore.FieldValue.serverTimestamp();
             data.authorId = authorId;
-
-            await db.collection("nfts").doc(docId).set(data);
-
+            data._id = new ObjectID();
+            // await db.collection("nfts").doc(docId).set(data);
+            await mongodb.collection('nfts').insertOne(data);
+            
             const response = await contracts.nft_mint(
                 nftData,
                 GAS,
