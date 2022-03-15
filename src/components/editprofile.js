@@ -4,15 +4,23 @@ import { db } from '../db/firebase';
 import { Loader } from "../services/ui";
 // import { toast } from 'react-toastify';
 import { Form } from 'react-bootstrap';
-import { mongodb } from '../db/mongodb';
+import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 import { ObjectID } from 'bson';
 import { toast } from 'react-toastify';
+import { create } from "ipfs-http-client";
+const client = create('https://ipfs.infura.io:5001/api/v0');
 
 const EditProfile = ({ contractX, account, wallet }) => {
    
     const accountId = wallet.getAccountId();
 
     const [file, setFile] = useState();
+    const [image, setImage] = useState();
+    const [isProfilePicChanged, setProfilePicChanged] = useState(false);
+    const [isAuthor, setIsAuthor] = useState(false);
+    const [isLoading, setLoader] = useState(false);
+    const [validated, setValidated] = useState(false);
+
     const [author, setAuthor] = useState({
         userName: accountId,
         customUrl: "",
@@ -21,41 +29,40 @@ const EditProfile = ({ contractX, account, wallet }) => {
         siteOrPortfolioLink: "",
         email: ""
     });
-    const [isAuthor, setIsAuthor] = useState(false);
-    const [isLoading, setLoader] = useState(false);
-    const [validated, setValidated] = useState(false);
-
-    
 
     useEffect(() => {
-        return getAuthor();
+        return getProfile();
     }, []);
 
-    const getAuthor = () => {
-        setLoader(true);
-        debugger;
-        mongodb.collection('authors').findOne({ 'userName': accountId }).then(res => {
-            setLoader(false);
-            debugger;
-            if (res) {
-                setIsAuthor(true);
-                setAuthor(res);
-            }else{
-                setIsAuthor(false);
-            }
-        })
+    const getProfile = async () => {
+    setLoader(true);        
+      const user = await getUser();
+       const response = await user.functions.get_profile(accountId);
+       setLoader(false); 
+        if (response) {
+            setImage({image:response.profile_pic});
+            setIsAuthor(true);
+            setAuthor({
+                userName:response.display_name,
+                customUrl:response.custom_url,
+                bio: response.bio,
+                twitterUsername: response.twitter,
+                siteOrPortfolioLink: response.personal_site,
+                email: response.email,
+            });
+        } else {
+            setIsAuthor(false);
+        }
 
-        // db.collection('authors').where('userName', '==', accountId).limitToLast().get().then((querySnapshot) => {
+        // mongodb.collection('authors').findOne({ 'userName': accountId }).then(res => {
         //     setLoader(false);
-        //     if (querySnapshot.size > 0) {
-        //         let authors = [];
-        //         querySnapshot.forEach(element => {
-        //             var data = element.data();
-        //             authors = [...authors, data];
-        //         });
-        //         setAuthor(authors[0]);
+        //     if (res) {
+        //         setIsAuthor(true);
+        //         setAuthor(res);
+        //     }else{
+        //         setIsAuthor(false);
         //     }
-        // });
+        // })
     }
 
     const handleChange = (e) => {
@@ -69,11 +76,19 @@ const EditProfile = ({ contractX, account, wallet }) => {
         if (event.target.files && event.target.files[0]) {
             let reader = new FileReader();
             reader.onload = (e) => {
-                setFile({ image: e.target.result });
+                setImage({ image: e.target.result });
             };
             reader.readAsDataURL(event.target.files[0]);
         }
+        
+        // set file for save into ipfs
+        const reader1 = new FileReader();
+        reader1.readAsArrayBuffer(event.target.files[0]);
+        reader1.onloadend = () => {
+            setFile(Buffer(reader1.result));
+        };
 
+        setProfilePicChanged(true);
     }
 
     const upload = () => {
@@ -86,35 +101,68 @@ const EditProfile = ({ contractX, account, wallet }) => {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            saveAuthor();
+            if(isProfilePicChanged){
+                uploadFile();
+            }else{
+                saveAuthor(image.image)
+            }
         }
         setValidated(true);
 
     };
 
-    const saveAuthor = () => {
-     
-        var data = author;
+    const uploadFile = async () => {
+       
+        setLoader(true)
+        const created = await client.add(file);
+        const url = `https://ipfs.infura.io/ipfs/${created.path}`;
+        setLoader(false);
+
+        saveAuthor(url);
+    }
+
+    const saveAuthor = async (profile_picture_url) => {
+        debugger;
         setLoader(true);
-        if (!isAuthor) {
-            data.createdDate = new Date().toDateString();
-            data._id = new ObjectID();
-            mongodb.collection('authors').insertOne(data).then((res)=>{
-                setLoader(false);
-                toast("Your profile updated successfully!", { type: 'success' });
-                getAuthor();
-            }, error=>{
-                toast(error, { type: 'error' });
-            });
-        } else {
-            mongodb.collection('authors').findOneAndUpdate({ 'userName': accountId }, data).then((res)=>{
-                setLoader(false);
-                toast("Your profile updated successfully!", { type: 'success' });
-                getAuthor();
-            }, error=>{
-                toast(error, { type: 'error' });
-            });
-        }
+        const user = await getUserForUpdateDb();
+        await user.functions.update_profile(
+            accountId,
+            author.email,
+            profile_picture_url,
+            author.userName,
+            author.customUrl,
+            author.bio,
+            author.twitterUsername,
+            author.siteOrPortfolioLink
+        ).then(res => {
+            toast("Your profile updated successfully!", { type: 'success' });
+        }, error => {
+            toast(error, { type: 'error' });
+        });
+        setLoader(false);
+
+     
+        // var data = author;
+        // setLoader(true);
+        // if (!isAuthor) {
+        //     data.createdDate = new Date().toDateString();
+        //     data._id = new ObjectID();
+        //     mongodb.collection('authors').insertOne(data).then((res)=>{
+        //         setLoader(false);
+        //         toast("Your profile updated successfully!", { type: 'success' });
+        //         getProfile();
+        //     }, error=>{
+        //         toast(error, { type: 'error' });
+        //     });
+        // } else {
+        //     mongodb.collection('authors').findOneAndUpdate({ 'userName': accountId }, data).then((res)=>{
+        //         setLoader(false);
+        //         toast("Your profile updated successfully!", { type: 'success' });
+        //         getProfile();
+        //     }, error=>{
+        //         toast(error, { type: 'error' });
+        //     });
+        // }
     }
 
     return (
@@ -128,7 +176,7 @@ const EditProfile = ({ contractX, account, wallet }) => {
                     </div>
                     <div className="container pb-5">
                         {/* <img src={avtar} className="avtar-position" /> */}
-                        <div className="avtar-position edit-profile-pic-input" onClick={upload} style={{ backgroundImage: `url('${file?.image}')` }}>
+                        <div className="avtar-position edit-profile-pic-input" onClick={upload} style={{ backgroundImage: `url('${image?.image}')` }}>
                             <div className="pos-rel" style={{ width: '180px', height: '180px' }}>
                                 <div className="edit-prifile-pic-text"> Choose file </div>
                                 <input id='selectImage' hidden type="file" onChange={fileSelectHandler} accept="image/*" />
