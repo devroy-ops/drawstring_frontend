@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
 import { FileUploader } from "react-drag-drop-files";
 import { ObjectID } from 'bson';
-import { mongodb } from '../db/mongodb';
+import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 
 const fileTypes = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
 
@@ -30,7 +30,7 @@ const Collections = ({ contractX, account, wallet }) => {
         setContract(contract);
         const response = await viewCollection(); //viewNFTs();
 
-        setCollections([response]);
+        setCollections(response);
         setLoader(false);
     };
 
@@ -41,6 +41,17 @@ const Collections = ({ contractX, account, wallet }) => {
     let navigate = useNavigate();
 
     const viewCollection = async () => {
+        try {
+          const user = await getUser();
+          const response = await user.functions.get_collections();
+          console.log(response);
+          return response;
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+    const viewCollection1 = async () => {
         try {
           const response = await contract.nft_metadata({});
           console.log(response);
@@ -183,43 +194,6 @@ const Collections = ({ contractX, account, wallet }) => {
     const onSizeError = (error) => {
     }
 
-    // const initializeContract = async (contract) => {
-    //     try {
-    //         // Create a collection by initializing the NFT contract
-    //         const response = await contract.new({
-    //             owner_id: account.accountId,
-    //             metadata: {
-    //                 "spec": null,
-    //                 "name": null,
-    //                 "symbol": null,
-    //                 "icon": null,
-    //                 "base_uri": null,
-    //                 "referance": null,
-    //                 "referance_hash": null,
-    //             },
-    //         }, GAS);
-    //         console.log(response);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
-
-    const checkApis = async () => {
-        try {
-            // const response = await contract.storage_minimum_balance({})
-            const response = await contract.storage_deposit(
-                {
-                    "account_id": account.accountId
-                },
-                GAS,
-                txFee
-            )
-            return response;
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
     return (
         <div className="menu">
             {isLoading ? <Loader /> : null}
@@ -257,7 +231,7 @@ const Collections = ({ contractX, account, wallet }) => {
                                 return (
                                     <tr key={index}>
                                         <td></td>
-                                        <td> <img src={collection.icon ? collection.icon : collection1} width="42" height="42" className="border-radius-50" alt="nft media"/> {collection.name}</td>
+                                        <td> <img src={collection.img ? collection.img : collection1} width="42" height="42" className="border-radius-50" alt="nft media"/> {collection.name}</td>
                                         <td>{collection.spec}</td>
                                         <td>{collection.symbol}</td>
                                         <td></td>

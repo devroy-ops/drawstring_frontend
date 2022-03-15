@@ -19,27 +19,26 @@ import { Loader } from "../services/ui";
 // import { Dropdown } from 'react-bootstrap';
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
-import { mongodb } from '../db/mongodb';
+import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 
 const Home = ({ contractX, account, wallet }) => {
     var [nfts, setNfts] = useState([]);
     const [isLoading, setLoader] = useState(false);
+    const [listedNfts, setListedNfts] = useState([]);
 
     useEffect(() => {
         return getNfts();
     }, []);
 
-    const getNfts = () => {
+    const getNfts = async () => {
         setLoader(true);
-        // db.collection('nfts').get().then((querySnapshot) => {
-        //     let nftss = [];
-        //     querySnapshot.forEach(element => {
-        //         var data = element.data();
-        //         nftss = [...nftss, data];
-        //     });
-        //     setNfts(nftss);
-        //     setLoader(false);
-        // });
+
+         const user = await getUser();
+        // const featured = await user.functions.get_featured();
+         const allListedNfts = await user.functions.get_all_listed_nfts();
+         console.log(allListedNfts)
+         setListedNfts(allListedNfts);
+        // const top = await user.functions.get_top_collections();
 
         mongodb.collection('nfts').find().then(nftss=>{
             setNfts(nftss);
@@ -49,6 +48,16 @@ const Home = ({ contractX, account, wallet }) => {
 
     const viewDrop = async (e) => {
         e.preventDefault();
+    }
+
+    const addLike = async (nft, index) =>{
+        const newItems = [...listedNfts];
+        newItems[index].likes = newItems[index].likes ? newItems[index].likes + 1 : 1;
+        setListedNfts(newItems);
+
+        const walletId = wallet.getAccountId();
+        const user = await getUserForUpdateDb();
+        await user.functions.add_like(walletId,nft.id, nft.contract_id);
     }
 
     let carousel;
@@ -325,7 +334,7 @@ const Home = ({ contractX, account, wallet }) => {
                     </div>
 
                     <div className="row home_explore">
-                        {nfts && nfts.length > 0 && nfts.map((nft, index) => {
+                        {nfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
                             return (
                                 <div className="col-sm-3 pb-4" key={index}>
                                     <div className="top-sec-box">
@@ -343,19 +352,20 @@ const Home = ({ contractX, account, wallet }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <img src={nft.nftData.metadata.media} className="w-100" height="270" alt="nft media"/>
+                                        <img src={nft.media_link} className="w-100" height="270" alt="nft media"/>
                                         <div className="text-light font-size-18 p-3">
-                                            <div>{nft.nftData.metadata.title}</div>
+                                            <div>{nft.name}</div>
                                             <div className="row pt-2 bid-mobile-100">
                                                 <div className="col-sm-6">
-                                                    3.89 ETN <span className="color-gray">1/1</span>
+                                                    {nft.price} ETN <span className="color-gray">1/1</span>
                                                 </div>
                                                 <div className="col-sm-6 text-end">
                                                     <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
                                                 </div>
                                             </div>
                                             <div className="pt-1">
-                                                <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">18</span></NavLink>
+                                                <button type="button" className="btn heart-btn p-0" onClick={()=>addLike(nft, index)}><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></button>
+                                                {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
                                             </div>
                                         </div>
                                     </div>

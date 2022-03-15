@@ -40,6 +40,7 @@ const Nfts = ({ contractX, account, wallet }) => {
 
     const viewNFTs = async () => {
         try {
+
             const response = await contract.nft_tokens({ from_index: "0", limit: 100 });
             console.log(response);
 
@@ -178,7 +179,7 @@ const Nfts = ({ contractX, account, wallet }) => {
                     {/* NFT Collections */}
                     <div className="row">
                         <div className="col-sm-6">
-                            NFT Collections
+                            NFT(S)
                         </div>
                         <div className="col-sm-6 text-end">
                             {/* <button type="button" className="btn red-btn" onClick={handleShow}>Mint NFT</button> */}

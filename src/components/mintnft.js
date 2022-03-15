@@ -8,12 +8,13 @@ import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
 import { ObjectID } from 'bson';
-import { getUser, mongodb } from '../db/mongodb';
+import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 import { Form } from 'react-bootstrap';
 import { components } from 'react-select';
 import Select from 'react-select';
 import dp from '../images/header/dp.svg';
-
+import { create } from "ipfs-http-client";
+const client = create('https://ipfs.infura.io:5001/api/v0');
 
 const fileTypes = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
 
@@ -24,6 +25,8 @@ export default function MintNft({ contractX, account, wallet }) {
     const [currentAuthor, setAuthor] = useState({});
     var [contract, setContract] = useState({});
     const [isLoading, setLoader] = useState(false);
+    const [collections, setCollections] = useState([]);
+    const [options, setOptions] = useState([]);
 
     const [talbeRows, setRows] = useState([{
         index: 0,
@@ -63,13 +66,22 @@ export default function MintNft({ contractX, account, wallet }) {
         return init1();
     }, []);
 
-    const getCollections = () => {
+    const getCollections = async () => {
         setLoader(true);
-        getUser().then(user => {
-            user.functions.get_collections().then((collections) => {
-                setLoader(false);
-            })
-        })
+        const user = await getUser();
+        const response = await user.functions.get_collections();
+        setCollections(response);
+
+        const options = [];
+        response.forEach(col => {
+            options.push({
+                label: col.name,
+                value: col.contractId,
+                image: col.img
+            });
+        });
+        setOptions(options);
+        setLoader(false);
     }
 
     const [validated, setValidated] = useState(false);
@@ -95,6 +107,16 @@ export default function MintNft({ contractX, account, wallet }) {
     };
 
     const uploadFile = async () => {
+       
+        setLoader(true)
+        const created = await client.add(nft.media);
+        const url = `https://ipfs.infura.io/ipfs/${created.path}`;
+        setLoader(false);
+
+        mintNFT(url);
+    }
+
+    const uploadFile1 = async () => {
         if (nft.media) {
             setLoader(true);
             storage.ref(nft.media.name).put(nft.media).then(() => {
@@ -138,18 +160,29 @@ export default function MintNft({ contractX, account, wallet }) {
                 },
                 receiver_id: "rough.testnet",
                 perpetual_royalties: null,
-                price: "$2593251"
+                price: "10"
             };
+            
+            const user = await getUserForUpdateDb();
+            await user.functions.add_new_nft_listing(
+                nft.title, 
+                nft.token, 
+                mediaLink, 
+                mediaLink, 
+                "10", 
+                nft.collection.contractId, 
+                accountId, 
+                nft.collection.name, 
+                nft.description, 
+                "image"
+            )
 
-            var data = {};
-            data.nftData = nftData;
-            // const docId = db.collection('nfts').doc().id;
-            // data.docId = docId;
-            data.createdDate = new Date().toDateString(); //fb.firestore.FieldValue.serverTimestamp();
-            data.authorId = authorId;
-            data._id = new ObjectID();
-            // await db.collection("nfts").doc(docId).set(data);
-            await mongodb.collection('nfts').insertOne(data);
+            // var data = {};
+            // data.nftData = nftData;
+            // data.createdDate = new Date().toDateString(); 
+            // data.authorId = authorId;
+            // data._id = new ObjectID();
+            // await mongodb.collection('nfts').insertOne(data);
             
             const response = await contract.nft_mint(
                 nftData,
@@ -165,13 +198,19 @@ export default function MintNft({ contractX, account, wallet }) {
 
     const handleChange = (e) => {
         setNft((prev) => {
-            if (e.target.name === "media") {
-                return { ...prev, [e.target.name]: e };
-            } else {
-                return { ...prev, [e.target.name]: e.target.value };
-            }
+            // if (e.target.name === "media") {
+            //     return { ...prev, [e.target.name]: e };
+            // } else {
+            return { ...prev, [e.target.name]: e.target.value };
+            //}
         });
     };
+
+    const handleChangeCollection = (e) =>{
+        setNft((prev) => {
+            return { ...prev, "collection": e };
+        });
+    }
 
     const handleFileChange = (file) => {
         setNft((prev) => { return { ...prev, "media": file } });
@@ -180,18 +219,19 @@ export default function MintNft({ contractX, account, wallet }) {
     const onSizeError = (error) => {
     }
 
-    const options = [
-        {
-            label: 'Collection name name',
-            value: 0,
-            image: dp,
-        },
-        {
-            label: 'Collection name name',
-            value: 1,
-            image: dp,
-        }
-    ];
+    // const options = [
+    //     {
+    //         label: 'Collection name name',
+    //         value: 0,
+    //         image: dp,
+    //     },
+    //     {
+    //         label: 'Collection name name',
+    //         value: 1,
+    //         image: dp,
+    //     }
+    // ];
+
 
 const { SingleValue, Option } = components;
 
@@ -262,7 +302,9 @@ const customStyles = {
                                     onChange={handleChange}
                                     required
                                 />
-                                
+                            <Form.Control.Feedback type="invalid">
+                                    Name is required.
+                            </Form.Control.Feedback>
                             </div>
                             <div className="border-bottom-2"></div>
                             <div>
@@ -274,6 +316,9 @@ const customStyles = {
                                     onChange={handleChange}
                                     required
                                 />
+                                <Form.Control.Feedback type="invalid">
+                                    Token is required.
+                                </Form.Control.Feedback>
                             </div>
                             <div className="border-bottom-2"></div>
                             <div>
@@ -302,6 +347,9 @@ const customStyles = {
                                     styles={customStyles}
                                     components={{SingleValue: IconSingleValue, Option: IconOption }}
                                     options={options}
+                                    name="collection"
+                                    defaultValue={nft.collection}
+                                    onChange={handleChangeCollection}
                                 />
 
                             </div>

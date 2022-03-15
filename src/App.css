@@ -99,6 +99,7 @@ body{
   border: 5px solid #FFFFFF;
   box-sizing: border-box;
   border-radius: 50%;
+  background-size: 100% 100%;
 }
 
 .edit-prifile-pic-text{
@@ -448,7 +449,7 @@ form.login-info .form-inline input {
   background: #C51254 !important;
   border: none !important;
 }
-[class*="-control"] {
+.css-b62m3t-container [class*="-control"] {
   background: #C51254 !important;
 }
 

@@ -11,6 +11,9 @@ import { Form } from 'react-bootstrap';
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 import { storage } from '../db/firebase';
 import { toast } from 'react-toastify';
+import { Loader } from '../services/ui';
+import { create } from "ipfs-http-client";
+const client = create('https://ipfs.infura.io:5001/api/v0');
 
 const fileTypes = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
 
@@ -110,10 +113,10 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
     const initializeContract = async (iconUrl) => {
         try {
-            
-             setLoader(true);
-            getUserForUpdateDb().then(user=>{
-                user.functions.add_collection(collection.name, iconUrl, account.accountId).then(async()=>{
+
+            setLoader(true);
+            getUserForUpdateDb().then(user => {
+                user.functions.add_collection(collection.name, iconUrl, account.accountId).then(async () => {
                     setLoader(false);
                     //Create a collection by initializing the NFT contract
                     const response = await contract.new({
@@ -129,12 +132,12 @@ export default function CreateCollection({ contractX, account, wallet }) {
                         }
                     }, GAS);
                     //console.log(response);
-                },error=>{
+                }, error => {
                     toast(error)
                 })
-           });
+            });
 
-            
+
         } catch (error) {
             console.log(error);
         }
@@ -154,25 +157,41 @@ export default function CreateCollection({ contractX, account, wallet }) {
     };
 
     const handleFileChange = (file) => {
-        setCollection((prev) => { return { ...prev, "icon": file } });
+        //setCollection((prev) => { return { ...prev, "icon": file } });
+        const reader = new window.FileReader();
+        reader.readAsArrayBuffer(file);
+
+        reader.onloadend = () => {
+            setFile(Buffer(reader.result));
+        };
     };
 
-
     const uploadFile = async () => {
+       
+        setLoader(true)
+        const created = await client.add(file);
+        const url = `https://ipfs.infura.io/ipfs/${created.path}`;
+        setLoader(false);
+
+        initializeContract(url);
+    }
+
+
+    const uploadFile1 = async () => {
         if (collection.icon) {
-            
+
             const reader = new FileReader();
 
             reader.addEventListener("load", function () {
-              // convert image file to base64 string
-              //preview.src = reader.result;
-              initializeContract(reader.result);
+                // convert image file to base64 string
+                //preview.src = reader.result;
+                initializeContract(reader.result);
             }, false);
-          
+
             if (collection.icon) {
-              reader.readAsDataURL(collection.icon);
+                reader.readAsDataURL(collection.icon);
             }
-          
+
             //setLoader(true);
             // storage.ref(collection.icon.name).put(collection.icon).then(() => {
             //     storage.ref(collection.icon.name).getDownloadURL().then((url) => {
@@ -192,32 +211,9 @@ export default function CreateCollection({ contractX, account, wallet }) {
         });
     };
 
-    // const handleChange = (e) => {
-    //     switch (e.target.name) {
-    //         case "name":
-    //             setCollection((prev) => {
-    //                 return { ...prev, name: e.target.value };
-    //             });
-    //             break;
-    //         case "symbol":
-    //             setCollection((prev) => ({ ...prev, symbol: e.target.value }));
-    //             break;
-    //         case "icon":
-    //             setCollection((prev) => ({ ...prev, icon: e.target.value }));
-    //             break;
-    //         case "base_uri":
-    //             setCollection((prev) => ({ ...prev, base_uri: e.target.value }));
-    //             break;
-    //         case "reference":
-    //             setCollection((prev) => ({ ...prev, reference: e.target.value }));
-    //             break;
-    //         default:
-    //             return;
-    //     }
-    // };
-
     return (
         <div className="bg-darkmode">
+             {isLoading ? <Loader /> : null}
             <div className="container text-light createcollection p-0">
                 <div className="py-3 title">Create Collection</div>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -252,7 +248,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                     }}
                                     required
                                 />
-                            <Form.Control.Feedback type="invalid">
+                                <Form.Control.Feedback type="invalid">
                                     Name is required.
                             </Form.Control.Feedback>
                             </div>
