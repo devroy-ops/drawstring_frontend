@@ -21,10 +21,37 @@ import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
 import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 
+import * as Realm from 'realm-web'
+const app = new Realm.App({ id: "drawstringrealmapp-vafye"});
+
 const Home = ({ contractX, account, wallet }) => {
     var [nfts, setNfts] = useState([]);
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
+    const [topNfts, setTopNfts] = useState([])
+    const [featuredNfts, setFeaturedNfts] = useState([])
+    const [allListing, setAllListing] = useState([])
+    
+    useEffect(() => {
+        return getNFTs()
+      }, [])
+    
+      const getNFTs = async () => {
+        const credentials = Realm.Credentials.anonymous()
+        const user = await app.logIn(credentials) // Authenticate the user
+    
+        const featured = await user.functions.get_featured()
+        setFeaturedNfts(featured)
+    
+        const top = await user.functions.get_top_collections()
+        setTopNfts(top)
+
+        const allNftListing = await user.functions.get_all_listed_nfts()
+        setAllListing(allNftListing)
+      }
+      console.log(topNfts);
+      console.log(featuredNfts);
+      console.log(allListing);
 
     useEffect(() => {
         return getNfts();

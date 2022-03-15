@@ -5,16 +5,18 @@ import '../../styles/header.css';
 import search from '../../images/header/search.svg';
 import day from '../../images/header/day.svg';
 import dp from '../../images/header/dp.svg';
-
+import { Dropdown } from 'react-bootstrap'
 import night from '../../images/header/night.svg';
 import { ThemeContext, themes } from '../../theame/theameContext';
 // import { AuthContext } from "../../auth/auth";
 import { db, auth } from "../../db/firebase";
 
-export default function Header({ currentUser, nearConfig, wallet }) {
+import { NearContext } from '../../contexts';
+
+export default function Header({ currentUser, wallet, nearConfig}) {
 
   const [darkMode, setDarkMode] = React.useState(true);
-
+  const { signIn,signOut } = useContext(NearContext);
   // var networkId = "testnet"; //mainnet
   // const near = new window.nearApi.Near({
   //   networkId: networkId,
@@ -34,20 +36,16 @@ export default function Header({ currentUser, nearConfig, wallet }) {
   // if (currentUser) {
   // }
 
-  const handleUser = (e) => {
-    if (currentUser) {
-      (function signOut() {
-        wallet.signOut();
-        window.location.replace(
-          window.location.origin + window.location.pathname
-        );
-      })();
-    } else if (!currentUser) {
-      (function signIn() {
-        wallet.requestSignIn(nearConfig.contractName, "Drawstring");
-      })();
+const user = wallet.getAccountId();
+let User = wallet.isSignedIn();
+  const handleUser = async (e) => {
+    if (User) {
+      signOut()
+    } else if (!User) {
+      signIn()
+      
     }
-  };
+  }
 
   let navigate = useNavigate();
 
@@ -106,15 +104,39 @@ export default function Header({ currentUser, nearConfig, wallet }) {
               }} className="login-link">Sign in</a>
             )} */}
 
-            {!currentUser && (
-              <a href="#" onClick={(e)=> {e.preventDefault(); handleUser();}} className="login-link">Sign in</a>
+{!User && (
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleUser()
+                }}
+                className="login-link"
+              >
+                Sign in
+              </a>
             )}
-
           </li>
         </ul>
 
-        {currentUser && (
-          <button type="button" className="btn toggle-link p-0 height-width me-3" onClick={handleUser}><img src={dp} /></button>
+        {User && (
+          <Dropdown>
+            <Dropdown.Toggle variant="" id="dropdown-basic">
+              <div
+                type="button"
+                className="btn toggle-link p-0 height-width me-3"
+              >
+                <img src={dp} />
+              </div>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item><h4>{user}</h4></Dropdown.Item>
+              <Dropdown.Item></Dropdown.Item>
+              <Dropdown.Item>Create Item</Dropdown.Item>
+              <Dropdown.Item>View Collections</Dropdown.Item>
+              <Dropdown.Item onClick={handleUser}>Sign out</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         )}
 
         {/* {accountId && (
