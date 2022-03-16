@@ -34,8 +34,18 @@ const Collections = ({ contractX, account, wallet }) => {
         setLoader(false);
     };
 
+    const getCollections = async() =>{
+        setLoader(true);
+        const user = await getUser();
+        const response = await user.functions.get_collections();
+        console.log(response)
+        setCollections(response);
+        setLoader(false);
+    }
+
     useEffect(() => {
-        return init1();
+        //return init1();
+        return getCollections();
     }, []);
 
     let navigate = useNavigate();
@@ -77,9 +87,9 @@ const Collections = ({ contractX, account, wallet }) => {
         }
     };
 
-    const routeChange = () => {
-        //let path = `/viewcollection/${authorId}/${collectionId}`;
-        let path = `/nfts/${authorId}`;
+    const routeChange = (collectionId) => {
+        let path = `/viewcollection/${collectionId}`;
+        //let path = `/nfts/${authorId}`;
         navigate(path);
     }
 

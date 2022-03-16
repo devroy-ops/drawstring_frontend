@@ -36,21 +36,22 @@ const ViewCollection = ({ contractX, account, wallet }) => {
         setActive(parseInt(selectedTab))
     }
 
-    const { authorId, collectionId } = useParams();
+    const { collectionId } = useParams();
 
-    const init1 = async () => {
-        setLoader(true);
-        var auther = await author(authorId);
-        contract = await init(wallet, auther);
-        setContract(contract);
-        const response = await viewCollection();
-        setCollection(response);
+    // const init1 = async () => {
+    //     setLoader(true);
+    //     var auther = await author(authorId);
+    //     contract = await init(wallet, auther);
+    //     setContract(contract);
+    //     const response = await viewCollection();
+    //     setCollection(response);
 
-        setLoader(false);
-    };
+    //     setLoader(false);
+    // };
 
     useEffect(() => {
-        return init1()
+        //return init1()
+        return viewCollection();
     }, []);
 
     let contract;

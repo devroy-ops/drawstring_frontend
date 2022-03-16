@@ -1,4 +1,5 @@
 import '../App.css';
+import * as nearAPI from "near-api-js";
 import React, { useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -14,6 +15,7 @@ import { toast } from 'react-toastify';
 import { Loader } from '../services/ui';
 import { create } from "ipfs-http-client";
 const client = create('https://ipfs.infura.io:5001/api/v0');
+const { transactions } = require("near-api-js");
 
 const fileTypes = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
 
@@ -49,41 +51,83 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
     const [file, setFile] = useState(null);
 
-    // const handleFileChange = (file) => {
-    //     setFile(file);
-    // };
-
     // const [createBtn, setCreateBtn] = useState("Deploy contract and initialize");
 
 
     const [collection, setCollection] = useState({
-        spec: "", // nft-1.0.0
+        spec: "nft-1.0.0", // nft-1.0.0
         name: "", // Chemical Rain
         symbol: "", //CHM-10
     });
 
-    const { authorId } = useParams();
+    // const { authorId } = useParams();
 
     const [searchParams, setSearchParams] = useSearchParams();
 
+    const init1 = async () => {
+        var transactionHashes = searchParams.get("transactionHashes");
+        if (transactionHashes) {
+            let col = JSON.parse(localStorage.getItem("collection"));
+            if (col) {
+                const subaccount = col.name.toLowerCase().replace(/ /g, "_");
+                var isContractInitialized = localStorage.getItem(subaccount + "_isContractInitialized");
+                if (!isContractInitialized) {
+                    localStorage.setItem(subaccount + "_isContractInitialized", true);
+                    initializeContract();
+                }
+            }
+        }
+    }
+
     // const init1 = async () => {
-    //     var authors = await author(authorId);
-    //     setAuthor(authors);
-    //     var transactionHashes = searchParams.get("transactionHashes");
-    //     var isContractInitialized = localStorage.getItem(authors.userName + "isContractInitialized");
-    //     if (transactionHashes && !isContractInitialized) {
-    //         contract = await init(wallet, authors);
-    //         localStorage.setItem(authors.userName + "isContractInitialized", true);
-    //         initializeContract(contract);
-    //     }
+    //    var authors = await author(authorId);
+    //    setAuthor(authors);
+    //     let contract = await init(wallet);
+    //     setContract(contract);
     // }
 
-    const init1 = async () => {
-        var authors = await author(authorId);
-        setAuthor(authors);
-        let contract = await init(wallet, authors);
-        setContract(contract);
-    }
+    const init2 = async (subaccount) => {
+        try {
+            // Load the NFT from the subaccount created in the deploy function
+            return await new nearAPI.Contract(
+                wallet.account(),
+                `${subaccount}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
+                {
+                    // View methods
+                    viewMethods: [
+                        "nft_token",
+                        "nft_tokens",
+                        "nft_tokens_for_owner",
+                        "nft_metadata",
+                        "nft_total_supply",
+                        "nft_supply_for_owner",
+                        "nft_is_approved",
+                        "nft_payout",
+                        "nft_whitelist"
+                    ],
+                    // Change methods
+                    changeMethods: [
+                        "nft_mint",
+                        "new",
+                        "nft_transfer",
+                        "nft_transfer_call",
+                        "nft_approve",
+                        "nft_revoke",
+                        "nft_revoke_all",
+                        "burn_nft",
+                        "add_to_whitelist",
+                        "remove_from_whitelist",
+                        "toggle_whitelisting"
+                    ],
+                    sender: wallet.getAccountId(),
+                }
+            );
+
+        } catch (error) {
+            console.log(error);
+            return error;
+        }
+    };
 
     useEffect(() => {
         return init1();
@@ -95,37 +139,44 @@ export default function CreateCollection({ contractX, account, wallet }) {
    * @function
    * @returns Promise<void>
    */
-    // const deploy = async () => {
-    //     try {
-    //         // load and deploy smart contract
-    //         const respons = await contractX.deploy_contract_code(
-    //             {
-    //                 account_id: `${currentAuthor.userName}.stingy.testnet` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
-    //             },
-    //             GAS,
-    //             deploy_txFee
-    //         );
-    //         console.log(respons);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
-
-    const initializeContract = async (iconUrl) => {
+    const deploy = async () => {
         try {
+            // load and deploy smart contract
+            const subaccount = collection.name.toLowerCase().replace(/ /g, "_");
+            const respons = await contractX.deploy_contract_code(
+                {
+                    account_id: `${subaccount}.stingy.testnet` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
+                },
+                GAS,
+                deploy_txFee
+            );
+            console.log(respons);
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
+    const initializeContract = async () => {
+
+        let col = JSON.parse(localStorage.getItem("collection"));
+
+        const subaccount = col.name.toLowerCase().replace(/ /g, "_");
+
+        const contract = await init2(subaccount);
+
+        try {
             setLoader(true);
             getUserForUpdateDb().then(user => {
-                user.functions.add_collection(collection.name, iconUrl, account.accountId).then(async () => {
+                user.functions.add_collection(col.name, col.fileUrl, account.accountId).then(async () => {
                     setLoader(false);
                     //Create a collection by initializing the NFT contract
                     const response = await contract.new({
                         owner_id: account.accountId,
                         metadata: {
-                            "spec": collection.spec,
-                            "name": collection.name,
-                            "symbol": collection.symbol,
-                            "icon": iconUrl,
+                            "spec": col.spec,
+                            "name": col.name,
+                            "symbol": col.symbol,
+                            "icon": col.fileUrl,
                             "base_uri": null,
                             "referance": null,
                             "referance_hash": null, // must exist if the "referance" field exists.
@@ -133,15 +184,42 @@ export default function CreateCollection({ contractX, account, wallet }) {
                     }, GAS);
                     //console.log(response);
                 }, error => {
-                    toast(error)
+                    toast(error, { type: "error" });
                 })
             });
-
-
         } catch (error) {
             console.log(error);
         }
     }
+
+    // const deployAndInitializeContract = async (iconUrl) => {
+    //     try {
+    //         debugger;
+    //         const result = await account.signAndSendTransaction({
+    //             receiverId: "rough.testnet",//account.accountId,
+    //             actions: [
+    //                 //deploy(),
+    //                 initializeContract(iconUrl)
+    //                 // transactions.deployContract(
+    //                 //     {
+    //                 //         account_id: `${collection.name.replace(/ /g,"_")}.stingy.testnet` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
+    //                 //     },
+    //                 //     GAS,
+    //                 //     deploy_txFee
+    //                 // ),
+    //                 // transactions.functionCall(
+    //                 //     "new",
+    //                 //     Buffer.from(JSON.stringify(newArgs)),
+    //                 //     GAS,
+    //                 //     "0"
+    //                 // ),
+    //             ],
+    //         });
+    //         console.log(result);
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
 
     const [validated, setValidated] = useState(false);
 
@@ -151,6 +229,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
+            // deployAndInitializeContract("https://ipfs.infura.io/ipfs/QmSKypcja9efixmHLzrpVupi1UNFYdVcARPrxJ3fuvLbLg");
             uploadFile();
         }
         setValidated(true);
@@ -167,13 +246,24 @@ export default function CreateCollection({ contractX, account, wallet }) {
     };
 
     const uploadFile = async () => {
-       
-        setLoader(true)
-        const created = await client.add(file);
-        const url = `https://ipfs.infura.io/ipfs/${created.path}`;
-        setLoader(false);
+        debugger;
+        if (file) {
+            setLoader(true)
+            const created = await client.add(file);
+            const url = `https://ipfs.infura.io/ipfs/${created.path}`;
+            setLoader(false);
 
-        initializeContract(url);
+            let col = collection;
+            col.fileUrl = url;
+            debugger;
+
+            localStorage.setItem("collection", JSON.stringify(col));
+
+            deploy();
+            //initializeContract(url);
+        }else{
+            toast("File is required", {type: "error"})
+        }
     }
 
 
@@ -185,7 +275,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
             reader.addEventListener("load", function () {
                 // convert image file to base64 string
                 //preview.src = reader.result;
-                initializeContract(reader.result);
+                //initializeContract(reader.result);
             }, false);
 
             if (collection.icon) {
@@ -213,7 +303,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
     return (
         <div className="bg-darkmode">
-             {isLoading ? <Loader /> : null}
+            {isLoading ? <Loader /> : null}
             <div className="container text-light createcollection p-0">
                 <div className="py-3 title">Create Collection</div>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -254,7 +344,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             </div>
                             <div className="border-bottom-2"></div>
 
-                            <div>
+                            {/* <div>
                                 <div className="font-size-18 text-light py-3">Spec</div>
                                 <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “nft-1.0.0”'
                                     name="spec"
@@ -268,7 +358,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                     Spec is required.
                             </Form.Control.Feedback>
                             </div>
-                            <div className="border-bottom-2"></div>
+                            <div className="border-bottom-2"></div> */}
 
                             <div>
                                 <div className="font-size-18 text-light py-3">Symbol</div>

@@ -27,6 +27,7 @@ export default function MintNft({ contractX, account, wallet }) {
     const [isLoading, setLoader] = useState(false);
     const [collections, setCollections] = useState([]);
     const [options, setOptions] = useState([]);
+    const [image, setImage] = useState();
 
     const [talbeRows, setRows] = useState([{
         index: 0,
@@ -50,14 +51,14 @@ export default function MintNft({ contractX, account, wallet }) {
         setRows(updatedRows)
     }
 
-    const { authorId } = useParams();
+    // const { authorId } = useParams();
 
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const init1 = async () => {
-        var authors = await author(authorId);
-        setAuthor(authors);
-        let contract = await init(wallet, authors);
+    const init1 = async (subaccount) => {
+        // var authors = await author(authorId);
+        // setAuthor(authors);
+        let contract = await init(wallet, subaccount);
         setContract(contract);
         getCollections();
     }
@@ -107,26 +108,16 @@ export default function MintNft({ contractX, account, wallet }) {
     };
 
     const uploadFile = async () => {
-       
+
+        if(nft.media){
         setLoader(true)
         const created = await client.add(nft.media);
         const url = `https://ipfs.infura.io/ipfs/${created.path}`;
         setLoader(false);
 
         mintNFT(url);
-    }
-
-    const uploadFile1 = async () => {
-        if (nft.media) {
-            setLoader(true);
-            storage.ref(nft.media.name).put(nft.media).then(() => {
-                storage.ref(nft.media.name).getDownloadURL().then((url) => {
-                    mintNFT(url);
-                    setLoader(false);
-                });
-            });
-        } else {
-            toast("Media is reqired.", { type: "error" })
+        }else{
+            toast("Please select file", {type: "error"})
         }
     }
 
@@ -139,9 +130,9 @@ export default function MintNft({ contractX, account, wallet }) {
                 toast("Wallet is not connected, Please connect the near wallet and try again!", { type: 'error' });
                 return;
             } else {
-                
+
             }
-            
+
             var nftData = {
                 token_id: nft.token,
                 metadata: {
@@ -160,30 +151,23 @@ export default function MintNft({ contractX, account, wallet }) {
                 },
                 receiver_id: "rough.testnet",
                 perpetual_royalties: null,
-                price: "10"
+                price: nft.price
             };
-            
+
             const user = await getUserForUpdateDb();
             await user.functions.add_new_nft_listing(
-                nft.title, 
-                nft.token, 
-                mediaLink, 
-                mediaLink, 
-                "10", 
-                nft.collection.contractId, 
-                accountId, 
-                nft.collection.name, 
-                nft.description, 
+                nft.title,
+                nft.token,
+                mediaLink,
+                mediaLink,
+                nft.price,
+                nft.collection.contractId,
+                accountId,
+                nft.collection.name,
+                nft.description,
                 "image"
-            )
+            );
 
-            // var data = {};
-            // data.nftData = nftData;
-            // data.createdDate = new Date().toDateString(); 
-            // data.authorId = authorId;
-            // data._id = new ObjectID();
-            // await mongodb.collection('nfts').insertOne(data);
-            
             const response = await contract.nft_mint(
                 nftData,
                 GAS,
@@ -206,14 +190,25 @@ export default function MintNft({ contractX, account, wallet }) {
         });
     };
 
-    const handleChangeCollection = (e) =>{
+    const handleChangeCollection = (e) => {
         setNft((prev) => {
             return { ...prev, "collection": e };
         });
+        
+        const subaccount = e.label.toLowerCase().replace(/ /g, "_");
+        init1(subaccount);
     }
 
     const handleFileChange = (file) => {
         setNft((prev) => { return { ...prev, "media": file } });
+
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                setImage({ image: e.target.result });
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const onSizeError = (error) => {
@@ -232,38 +227,37 @@ export default function MintNft({ contractX, account, wallet }) {
     //     }
     // ];
 
+    const { SingleValue, Option } = components;
 
-const { SingleValue, Option } = components;
+    const IconSingleValue = (props) => (
+        <SingleValue {...props}>
+            <img src={props.data.image} style={{ height: '30px', width: '30px', borderRadius: '50%', marginRight: '10px' }} />
+            {props.data.label}
+        </SingleValue>
+    );
 
-const IconSingleValue = (props) => (
-    <SingleValue {...props}>
-        <img src={props.data.image} style={{ height: '30px', width: '30px', borderRadius: '50%', marginRight: '10px' }}/>
-        {props.data.label}
-    </SingleValue>
-);
+    const IconOption = (props) => (
+        <Option {...props}>
+            <img src={props.data.image} style={{ height: '30px', width: '30px', borderRadius: '50%', marginRight: '10px' }} />
+            {props.data.label}
+        </Option>
+    );
 
-const IconOption = (props) => (
-    <Option {...props}>
-        <img src={props.data.image} style={{ height: '30px', width: '30px', borderRadius: '50%', marginRight: '10px' }}/>
-        {props.data.label}
-    </Option>
-);
-
-// Step 3
-const customStyles = {
-    option: (provided) => ({
-        ...provided,
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-    }),
-    singleValue: (provided) => ({
-        ...provided,
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-    }),
-}
+    // Step 3
+    const customStyles = {
+        option: (provided) => ({
+            ...provided,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+        }),
+        singleValue: (provided) => ({
+            ...provided,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+        }),
+    }
 
 
     return (
@@ -272,7 +266,7 @@ const customStyles = {
                 <div className="py-3 title">Mint NFT</div>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
 
-                {/* <form id="contact" action="" method="post"> */}
+                    {/* <form id="contact" action="" method="post"> */}
                     <div className="row">
                         <div className="col-sm-6">
                             <div className="pb-3">
@@ -302,7 +296,7 @@ const customStyles = {
                                     onChange={handleChange}
                                     required
                                 />
-                            <Form.Control.Feedback type="invalid">
+                                <Form.Control.Feedback type="invalid">
                                     Name is required.
                             </Form.Control.Feedback>
                             </div>
@@ -341,17 +335,34 @@ const customStyles = {
                             <div className="border-bottom-2"></div>
                             <div className="font-size-14 color-gray pt-2">Amount of tokens</div>
 
+                           
+
                             <div className="pt-4">
                                 {/* <div className="font-size-18 text-light py-3">Collection</div> */}
                                 <Select placeholder="Choose a collection"
                                     styles={customStyles}
-                                    components={{SingleValue: IconSingleValue, Option: IconOption }}
+                                    components={{ SingleValue: IconSingleValue, Option: IconOption }}
                                     options={options}
                                     name="collection"
                                     defaultValue={nft.collection}
                                     onChange={handleChangeCollection}
+                                    //validate="required"
+                                    required
                                 />
+                                <div style={{ display: !nft.collection ? "block" : "none" }} className="color-red"> Please select collection.</div>
+                            {/* <Form.Control.Feedback type="invalid" >
+                                Please select collection.
+                            </Form.Control.Feedback> */}
+                            </div>
+                            {/* <div className="border-bottom-2"></div> */}
 
+                            <div>
+                                <div className="font-size-18 text-light py-3">Price</div>
+                                <input type="number" className="profile-input pb-3 w-100" placeholder='E. g. 10”'
+                                    name="price"
+                                    defaultValue={nft.price}
+                                    onChange={handleChange}
+                                />
                             </div>
                             <div className="border-bottom-2"></div>
 
@@ -393,7 +404,7 @@ const customStyles = {
                                         <div className="font-size-18 text-light py-3">Royalties</div>
                                         <input type="text" className="profile-input pb-3 w-100"
                                             placeholder='10%'
-                                            
+
                                         />
                                     </div>
                                     <div className="border-bottom-2"></div>
@@ -416,7 +427,7 @@ const customStyles = {
                                 <div className="col-sm-6">
                                     <div>
                                         <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. Size'
-                                            
+
                                         />
                                     </div>
                                     <div className="border-bottom-2"></div>
@@ -424,7 +435,7 @@ const customStyles = {
                                 <div className="col-sm-6">
                                     <div>
                                         <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. M'
-                                            
+
                                         />
                                     </div>
                                     <div className="border-bottom-2"></div>
@@ -433,12 +444,12 @@ const customStyles = {
                             <div className="row pt-3 pb-5 bid-mobile-100">
                                 <div className="col-sm-6">
                                     <button type="submit" className="btn-submit text-light font-w-700 text-light-mode"
-                                        // onClick={() => {
-                                        //     // setCreateBtn("Initializing contract 🚀🚀🚀");
-                                        //     handleSubmit().then(() => {
-                                        //         // setCreateBtn("Deploy contract and initialize");
-                                        //     });
-                                        // }}
+                                    // onClick={() => {
+                                    //     // setCreateBtn("Initializing contract 🚀🚀🚀");
+                                    //     handleSubmit().then(() => {
+                                    //         // setCreateBtn("Deploy contract and initialize");
+                                    //     });
+                                    // }}
                                     >Create item</button>
                                 </div>
                                 <div className="col-sm-6 text-end">
@@ -451,8 +462,8 @@ const customStyles = {
                         </div>
                         <div className="col-sm-6 mobile-none">
                             <div className="pb-2">Preview</div>
-                            <div className="img-preview-box font-size-16">
-                                <div className="no-img-txt color-gray">
+                            <div className="img-preview-box font-size-16 bg-options" style={{ backgroundImage: `url('${image?.image}')` }}>
+                                <div className={"no-img-txt color-gray " + (image?.image ? 'd-none' : '')} >
                                     Upload file to preview your
                                     brand new NFT
                                 </div>

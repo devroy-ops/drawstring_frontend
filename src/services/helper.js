@@ -83,13 +83,12 @@ const initMarketplaceContract = async (wallet) => {
   }
 }
 
-
-const init = async (wallet, author) => {
+const init = async (wallet, subaccount) => {
   try {
     // Load the NFT from the subaccount created in the deploy function
     return await new nearAPI.Contract(
       wallet.account(),
-      `${author.userName}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
+      `${subaccount}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
       {
         // View methods
         viewMethods: [

@@ -102,14 +102,14 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
               />} />
               
               <Route path="/users" component={Users} element={<Users />} />
-              <Route path="/authors" component={Authors} element={<Authors 
+              {/* <Route path="/authors" component={Authors} element={<Authors 
                 contractX={contractX}
                 currentUser={currentUser}
                 account={account}
                 wallet={wallet}
                 nearConfig={nearConfig}
-              />} />
-              <Route path="/authors/:authorId" component={Author} element={<Author />} />
+              />} /> */}
+              {/* <Route path="/authors/:authorId" component={Author} element={<Author />} /> */}
               <Route path="/users/:userId" component={EditProfile} element={<EditProfile 
                 contractX={contractX}
                 currentUser={currentUser}
@@ -118,20 +118,36 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 nearConfig={nearConfig}
               />} />
               <Route path="/product" component={Product} element={<Product />} />
+              <Route exact="true" path="/collections" component={Collections} element={<Collections 
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
+{/* 
               <Route exact="true" path="/collections/:authorId" component={Collections} element={<Collections 
                 contractX={contractX}
                 currentUser={currentUser}
                 account={account}
                 wallet={wallet}
                 nearConfig={nearConfig}
-              />} />
-              <Route exact="true" path="/nfts/:authorId" component={Nfts} element={<Nfts 
+              />} /> */}
+
+              <Route exact="true" path="/nfts" component={Nfts} element={<Nfts 
                 contractX={contractX}
                 currentUser={currentUser}
                 account={account}
                 wallet={wallet}
                 nearConfig={nearConfig}
               />} />
+              {/* <Route exact="true" path="/nfts/:authorId" component={Nfts} element={<Nfts 
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} /> */}
               <Route path="/createcollection" component={CreateCollection} element={<CreateCollection 
                 // {...props}
                 contractX={contractX}
@@ -150,7 +166,15 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 nearConfig={nearConfig}
               />} />
 
-            <Route path="/createcollection/:authorId" component={CreateCollection} element={<CreateCollection 
+            {/* <Route path="/createcollection/:authorId" component={CreateCollection} element={<CreateCollection 
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} /> */}
+
+              <Route path="/viewcollection/:collectionId" component={ViewCollection} element={<ViewCollection 
                 contractX={contractX}
                 currentUser={currentUser}
                 account={account}
@@ -158,39 +182,22 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 nearConfig={nearConfig}
               />} />
 
-              <Route path="/viewcollection" component={ViewCollection} element={<ViewCollection 
+              {/* <Route path="/viewcollection/:authorId/:collectionId" component={ViewCollection} element={<ViewCollection 
                 contractX={contractX}
                 currentUser={currentUser}
                 account={account}
                 wallet={wallet}
                 nearConfig={nearConfig}
-              />} />
+              />} /> */}
 
-              <Route path="/viewcollection/:authorId/:collectionId" component={ViewCollection} element={<ViewCollection 
-                contractX={contractX}
-                currentUser={currentUser}
-                account={account}
-                wallet={wallet}
-                nearConfig={nearConfig}
-              />} />
-
-              <Route path="/mintnft" component={MintNft} element={<MintNft 
+              {/* <Route path="/mintnft/:authorId" component={MintNft} element={<MintNft 
                 // {...props}
                 contractX={contractX}
                 currentUser={currentUser}
                 account={account}
                 wallet={wallet}
                 nearConfig={nearConfig}
-              />} />
-
-              <Route path="/mintnft/:authorId" component={MintNft} element={<MintNft 
-                // {...props}
-                contractX={contractX}
-                currentUser={currentUser}
-                account={account}
-                wallet={wallet}
-                nearConfig={nearConfig}
-              />} />
+              />} /> */}
 
               
             </Route>

@@ -1,8 +1,7 @@
 
 const CONTRACT_NAME = process.env.CONTRACT_NAME || "stingy.testnet";
 
-
-module.exports = function getConfig() {
+const getConfig = ()=>{
 	let config = {
 		networkId: "testnet",
 		nodeUrl: "https://rpc.testnet.near.org",
@@ -60,3 +59,5 @@ module.exports = function getConfig() {
 
 	return config;
 };
+
+export default getConfig;
