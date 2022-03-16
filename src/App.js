@@ -101,7 +101,7 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 nearConfig={nearConfig}
               />} />
               
-              <Route path="/users" component={Users} element={<Users />} />
+              <Route path="/myprofile" component={Users} element={<Users />} />
               {/* <Route path="/authors" component={Authors} element={<Authors 
                 contractX={contractX}
                 currentUser={currentUser}
@@ -110,7 +110,7 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 nearConfig={nearConfig}
               />} /> */}
               {/* <Route path="/authors/:authorId" component={Author} element={<Author />} /> */}
-              <Route path="/users/:userId" component={EditProfile} element={<EditProfile 
+              <Route path="/editprofile" component={EditProfile} element={<EditProfile 
                 contractX={contractX}
                 currentUser={currentUser}
                 account={account}
