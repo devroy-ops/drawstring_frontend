@@ -465,6 +465,15 @@ form.login-info .form-inline input {
   background: #383838 !important;
 }
 
+.color-red{
+  color: red;
+}
+
+.bg-options{
+  background-repeat: no-repeat;
+  background-size: 100%;}
+
+
 /* Light Mode css */
 
 

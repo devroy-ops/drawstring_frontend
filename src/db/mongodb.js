@@ -19,9 +19,11 @@ const app1 = new Realm.App({ id: APP_ID1 });
 const CLUSTER_NAME = "mongodb-atlas";
 const DATABASE_NAME = "DrawstringMarketplace";
 // const COLLECTION_NAME = "authors";
-
-const mongo =  app.currentUser.mongoClient(CLUSTER_NAME);
-const mongodb =  mongo.db(DATABASE_NAME);
+getValidAccessToken();
+var mongo;
+var mongodb;
+// const mongo =  app.currentUser.mongoClient(CLUSTER_NAME);
+// const mongodb =  mongo.db(DATABASE_NAME);
 
 const apiKey = "TlNAc6GuyjKmHR2r1010Uyv8w6xK0G3pjHkVW0u97ZA0efQMTH9KR3sO9WOvJ2eT";
 
@@ -60,20 +62,21 @@ const getUser = async () => {
     // });
 }
 
-
-// async function getValidAccessToken() {
-//     // Guarantee that there's a logged in user with a valid access token
-//     if (!app.currentUser) {
-//         // If no user is logged in, log in an anonymous user. The logged in user will have a valid
-//         // access token.
-//         await app.logIn(Realm.Credentials.anonymous());
-//     } else {
-//         // An already logged in user's access token might be stale. To guarantee that the token is
-//         // valid, we refresh the user's custom data which also refreshes their access token.
-//         await app.currentUser.refreshCustomData();
-//     }
-//     return app.currentUser.accessToken;
-// }
+async function getValidAccessToken() {
+    // Guarantee that there's a logged in user with a valid access token
+    if (!app.currentUser) {
+        // If no user is logged in, log in an anonymous user. The logged in user will have a valid
+        // access token.
+        await app.logIn(Realm.Credentials.anonymous());
+    } else {
+        // An already logged in user's access token might be stale. To guarantee that the token is
+        // valid, we refresh the user's custom data which also refreshes their access token.
+        await app.currentUser.refreshCustomData();
+    }
+    mongo =  app.currentUser.mongoClient(CLUSTER_NAME);
+    mongodb =  mongo.db(DATABASE_NAME);
+    return app.currentUser.accessToken;
+}
 
 // const client = new ApolloClient({
 //     link: new HttpLink({
