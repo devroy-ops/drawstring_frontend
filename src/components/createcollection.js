@@ -74,6 +74,8 @@ export default function CreateCollection({ contractX, account, wallet }) {
                 if (!isContractInitialized) {
                     localStorage.setItem(subaccount + "_isContractInitialized", true);
                     initializeContract();
+                }else{
+                    toast("Collection created successfully.", {type: "success"});
                 }
             }
         }

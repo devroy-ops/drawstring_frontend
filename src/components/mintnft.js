@@ -61,6 +61,10 @@ export default function MintNft({ contractX, account, wallet }) {
         let contract = await init(wallet, subaccount);
         setContract(contract);
         getCollections();
+
+        // var transactionHashes = searchParams.get("transactionHashes");
+        // if (transactionHashes) {
+        // }
     }
 
     useEffect(() => {
