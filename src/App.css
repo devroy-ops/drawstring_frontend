@@ -19,6 +19,10 @@ body{
   height: 40vmin;
   pointer-events: none;
 }
+.logo{
+  width: 75px;
+  height: 50px;
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
