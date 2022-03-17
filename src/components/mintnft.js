@@ -37,7 +37,7 @@ export default function MintNft({ contractX, account, wallet }) {
         walletaddress: ""
     }
     ]);
-
+    const accountId = wallet.getAccountId();
     // Receive data from TableRow 
     //  const handleChange = data => {
     //     talbeRows[data.index] = data
@@ -135,8 +135,6 @@ export default function MintNft({ contractX, account, wallet }) {
     const mintNFT = async (mediaLink) => {
         try {
 
-            var accountId = wallet.getAccountId();
-
             if (!accountId) {
                 toast("Wallet is not connected, Please connect the near wallet and try again!", { type: 'error' });
                 return;
@@ -160,7 +158,7 @@ export default function MintNft({ contractX, account, wallet }) {
                     referance: null, // URL to a JSON file with more info
                     referance_hash: null,
                 },
-                receiver_id: "rough.testnet",
+                receiver_id: accountId,
                 perpetual_royalties: null,
                 price: parseInt(nft.price)
             };
@@ -181,7 +179,7 @@ export default function MintNft({ contractX, account, wallet }) {
             );
 
             const response = await contract.nft_mint(
-                nftData,
+                nftData,           
                 GAS,
                 mint_txFee
             );
