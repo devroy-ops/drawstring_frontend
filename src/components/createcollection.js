@@ -2,7 +2,7 @@ import '../App.css';
 import * as nearAPI from "near-api-js";
 import React, { useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import '../styles/createcollection.css';
 import { init, author, GAS, deploy_txFee } from "../services/helper";
 // import { getUser, mongodb, mongoUser } from '../db/mongodb';
@@ -63,7 +63,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
     // const { authorId } = useParams();
 
     const [searchParams, setSearchParams] = useSearchParams();
-
+    let navigate = useNavigate();
     const init1 = async () => {
         var transactionHashes = searchParams.get("transactionHashes");
         if (transactionHashes) {
@@ -75,6 +75,9 @@ export default function CreateCollection({ contractX, account, wallet }) {
                     localStorage.setItem(subaccount + "_isContractInitialized", true);
                     initializeContract();
                 }else{
+                    let col = JSON.parse(localStorage.getItem("collection"));
+                    const subaccount = col.name.toLowerCase().replace(/ /g, "_");
+                    navigate(`/viewcollection/${subaccount}`);
                     toast("Collection created successfully.", {type: "success"});
                 }
             }

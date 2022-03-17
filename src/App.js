@@ -2,10 +2,9 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Home from './components/home';
-import Users from './components/users';
+import Users from './components/profile';
 import EditProfile from './components/editprofile';
 import Collections from './components/collections';
-import Product from './components/product';
 import CreateCollection from './components/createcollection';
 import ViewCollection from './components/viewcollection';
 import Header from './components/global/header';
@@ -19,6 +18,9 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Nfts from './components/nfts';
 import MintNft from './components/mintnft';
+import Profile from './components/profile';
+import Nft from './components/viewnft';
+import Terms from './components/terms';
 
 // const routing = (
 //   <AuthProvider>
@@ -41,7 +43,6 @@ import MintNft from './components/mintnft';
 //             <Route exact="true" path="/collections" component={Collections} element={<Collections />} />
 //             <Route path="/users" component={Users} element={<Users />} />
 //             <Route path="/users/:userId" component={EditProfile} element={<EditProfile />} />
-//             <Route path="/product" component={Product} element={<Product />} />
 //             <Route path="/createcollection" component={CreateCollection} element={<CreateCollection />} />
 //             <Route path="/viewcollection" component={ViewCollection} element={<ViewCollection />} />
 //           </Route>}
@@ -100,8 +101,14 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 wallet={wallet}
                 nearConfig={nearConfig}
               />} />
-              
-              <Route path="/myprofile" component={Users} element={<Users />} />
+              <Route path="/terms" component={Terms} element={<Terms />} />
+              <Route path="/myprofile" component={Profile} element={<Profile 
+                contractX={contractX}
+                currentUser={currentUser}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
               {/* <Route path="/authors" component={Authors} element={<Authors 
                 contractX={contractX}
                 currentUser={currentUser}
@@ -117,7 +124,7 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 wallet={wallet}
                 nearConfig={nearConfig}
               />} />
-              <Route path="/product" component={Product} element={<Product />} />
+              <Route path="/nft" component={Nft} element={<Nft />} />
               <Route exact="true" path="/collections" component={Collections} element={<Collections 
                 contractX={contractX}
                 currentUser={currentUser}

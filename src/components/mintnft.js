@@ -1,7 +1,7 @@
 import '../App.css';
 import React, { useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import '../styles/createcollection.css';
 import { init, author, GAS, mint_txFee, transfer_txFee, txFee, storage1 } from "../services/helper";
 import { Loader } from "../services/ui";
@@ -13,6 +13,8 @@ import { Form } from 'react-bootstrap';
 import { components } from 'react-select';
 import Select from 'react-select';
 import dp from '../images/header/dp.svg';
+import logo1 from '../images/collection/logo1.png';
+
 import { create } from "ipfs-http-client";
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
@@ -54,6 +56,7 @@ export default function MintNft({ contractX, account, wallet }) {
     // const { authorId } = useParams();
 
     const [searchParams, setSearchParams] = useSearchParams();
+    let navigate = useNavigate();
 
     const init1 = async (subaccount) => {
         // var authors = await author(authorId);
@@ -62,9 +65,13 @@ export default function MintNft({ contractX, account, wallet }) {
         setContract(contract);
         getCollections();
 
-        // var transactionHashes = searchParams.get("transactionHashes");
-        // if (transactionHashes) {
-        // }
+        var transactionHashes = searchParams.get("transactionHashes");
+        if (transactionHashes) {
+            // let nft = JSON.parse(localStorage.getItem("nft"));
+            // const id = nft.id;
+            navigate(`/nft`);
+            toast("Nft minted successfully.", {type: "success"});
+        }
     }
 
     useEffect(() => {
@@ -77,7 +84,7 @@ export default function MintNft({ contractX, account, wallet }) {
         const response = await user.functions.get_collections();
         setCollections(response);
 
-        const options = [];
+        const options = [{label: "drawstring_top_level.testnet", value: "drawstring_top_level.testnet", image: logo1}];
         response.forEach(col => {
             options.push({
                 label: col.name,
@@ -155,16 +162,17 @@ export default function MintNft({ contractX, account, wallet }) {
                 },
                 receiver_id: "rough.testnet",
                 perpetual_royalties: null,
-                price: nft.price
+                price: parseInt(nft.price)
             };
 
             const user = await getUserForUpdateDb();
+
             await user.functions.add_new_nft_listing(
                 nft.title,
                 nft.token,
                 mediaLink,
                 mediaLink,
-                nft.price,
+                parseInt(nft.price),
                 nft.collection.contractId,
                 accountId,
                 nft.collection.name,
@@ -185,13 +193,16 @@ export default function MintNft({ contractX, account, wallet }) {
     };
 
     const handleChange = (e) => {
+        
         setNft((prev) => {
-            // if (e.target.name === "media") {
-            //     return { ...prev, [e.target.name]: e };
-            // } else {
             return { ...prev, [e.target.name]: e.target.value };
-            //}
         });
+
+        if(e.target.name === "title"){
+            setNft((prev) => {
+                return { ...prev, "token": e.target.value.toLowerCase().replace(/ /g, "-") + "-token" };
+            });
+        }
     };
 
     const handleChangeCollection = (e) => {
@@ -305,7 +316,7 @@ export default function MintNft({ contractX, account, wallet }) {
                             </Form.Control.Feedback>
                             </div>
                             <div className="border-bottom-2"></div>
-                            <div>
+                            {/* <div>
                                 <div className="font-size-18 text-light py-3">Token</div>
                                 <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “nft-token”'
                                     type="text"
@@ -318,7 +329,7 @@ export default function MintNft({ contractX, account, wallet }) {
                                     Token is required.
                                 </Form.Control.Feedback>
                             </div>
-                            <div className="border-bottom-2"></div>
+                            <div className="border-bottom-2"></div> */}
                             <div>
                                 <div className="font-size-18 text-light py-3">Description <span className="color-gray"> (Optional)</span></div>
                                 <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “Redeemable T-Shirt withLogo”'
@@ -362,7 +373,7 @@ export default function MintNft({ contractX, account, wallet }) {
 
                             <div>
                                 <div className="font-size-18 text-light py-3">Price</div>
-                                <input type="number" className="profile-input pb-3 w-100" placeholder='E. g. 10”'
+                                <input type="number" min="1" className="profile-input pb-3 w-100" placeholder='E. g. 10”'
                                     name="price"
                                     defaultValue={nft.price}
                                     onChange={handleChange}

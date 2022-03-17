@@ -471,8 +471,12 @@ form.login-info .form-inline input {
 
 .bg-options{
   background-repeat: no-repeat;
-  background-size: 100%;}
+  background-size: 100%;
+}
 
+.terms-condition li{
+  padding-top: 30px;
+}
 
 /* Light Mode css */
 

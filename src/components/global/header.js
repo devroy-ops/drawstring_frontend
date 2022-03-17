@@ -103,7 +103,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
 
         <ul className="navbar-nav me-auto mb-2 mb-lg-0 create-signin-btn">
           <li className="nav-item">
-            <NavLink exact="true" activeclassname="active" to="/createcollection" className="create-link">Create</NavLink>
+            <NavLink exact="true" activeclassname="active" to="/mintnft" className="create-link">Create</NavLink>
           </li>
           <li className="nav-item">
 
@@ -136,7 +136,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
         </ul>
 
         {User && (
-          <Dropdown>
+          <Dropdown align="end">
             <Dropdown.Toggle variant="" id="dropdown-basic">
               <div
                 type="button"

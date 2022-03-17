@@ -1,11 +1,12 @@
 .img-preview-box{
-    width: 370px;
+    /* width: 370px; */
     height: 598px;
     background: #1C1C1C;
     border: 2px solid #3D3D3D;
     box-sizing: border-box;
     border-radius: 8px;
     position: relative;
+    background-repeat: no-repeat;
 }
 
 .no-img-txt {

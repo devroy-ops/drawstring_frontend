@@ -60,7 +60,7 @@ const Home = ({ contractX, account, wallet }) => {
     const getNfts = async () => {
         setLoader(true);
 
-         const user = await getUser();
+        const user = await getUser();
         // const featured = await user.functions.get_featured();
          const allListedNfts = await user.functions.get_all_listed_nfts();
          console.log(allListedNfts)
@@ -361,7 +361,7 @@ const Home = ({ contractX, account, wallet }) => {
                     </div>
 
                     <div className="row home_explore">
-                        {nfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
+                        {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
                             return (
                                 <div className="col-sm-3 pb-4" key={index}>
                                     <div className="top-sec-box">
