@@ -10,7 +10,7 @@ import night from '../../images/header/night.svg';
 import { ThemeContext, themes } from '../../theame/theameContext';
 // import { AuthContext } from "../../auth/auth";
 import { db, auth } from "../../db/firebase";
-
+import logo from '../../images/header/logo.png'
 import { NearContext } from '../../contexts';
 import { getUser } from "../../db/mongodb";
 
@@ -69,7 +69,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
 
     <nav className="navbar sticky-top navbar-expand-lg navbar-light menu border-bottom-2">
       <div className="container ps-lg-0">
-        <NavLink exact="true" activeclassname="active" to="/" className="navbar-brand text-light text-transform-uppercase font-size-18"><span className="color-theme">d<i>raw</i></span>s<i>tring</i></NavLink>
+        <NavLink exact="true" activeclassname="active" to="/" className="navbar-brand text-light text-transform-uppercase font-size-18"><span className="color-theme"><img className="logo" src={logo} alt="logo" /></span></NavLink>
         <button className="navbar-toggler desk-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
@@ -82,21 +82,18 @@ export default function Header({ currentUser, wallet, nearConfig }) {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/" className="nav-link active">Explore</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/" className="nav-link active">Discover</NavLink>
               {/* collections */}
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate('/myprofile') }} className="nav-link">My profile</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate('/myprofile') }} className="nav-link">Profile</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/users" className="nav-link">Activity</NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/" className="nav-link">How it works</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/" className="nav-link">Wtf?</NavLink>
               {/* viewcollection */}
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/product" className="nav-link">Community</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/product" className="nav-link">About</NavLink>
             </li>
           </ul>
         </div>
