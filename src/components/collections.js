@@ -9,13 +9,16 @@ import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
 import { FileUploader } from "react-drag-drop-files";
+import { ObjectID } from 'bson';
+import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
+
 const fileTypes = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
 
 const Collections = ({ contractX, account, wallet }) => {
 
-    let contract;
+    // var contract;
     const [collections, setCollections] = useState([]);
-    const [contracts, setContract] = useState();
+    var [contract, setContract] = useState();
     const [isLoading, setLoader] = useState(false);
 
     const { authorId } = useParams();
@@ -25,16 +28,48 @@ const Collections = ({ contractX, account, wallet }) => {
         var auther = await author(authorId);
         contract = await init(wallet, auther);
         setContract(contract);
-        const response = await viewNFTs();
+        const response = await viewCollection(); //viewNFTs();
+
         setCollections(response);
         setLoader(false);
     };
 
+    const getCollections = async() =>{
+        setLoader(true);
+        const user = await getUser();
+        const response = await user.functions.get_collections();
+        console.log(response)
+        setCollections(response);
+        setLoader(false);
+    }
+
     useEffect(() => {
-        return init1();
+        //return init1();
+        return getCollections();
     }, []);
 
     let navigate = useNavigate();
+
+    const viewCollection = async () => {
+        try {
+          const user = await getUser();
+          const response = await user.functions.get_collections();
+          console.log(response);
+          return response;
+        } catch (error) {
+          console.log(error);
+        }
+      };
+
+    const viewCollection1 = async () => {
+        try {
+          const response = await contract.nft_metadata({});
+          console.log(response);
+          return response;
+        } catch (error) {
+          console.log(error);
+        }
+      };
 
     const viewNFTs = async () => {
         try {
@@ -53,7 +88,8 @@ const Collections = ({ contractX, account, wallet }) => {
     };
 
     const routeChange = (collectionId) => {
-        let path = `/viewcollection/${authorId}/${collectionId}`;
+        let path = `/viewcollection/${collectionId}`;
+        //let path = `/nfts/${authorId}`;
         navigate(path);
     }
 
@@ -131,14 +167,15 @@ const Collections = ({ contractX, account, wallet }) => {
 
             var data = {};
             data.nftData = nftData;
-            const docId = db.collection('nfts').doc().id;
-            data.docId = docId;
-            data.createdDate = fb.firestore.FieldValue.serverTimestamp();
+            // const docId = db.collection('nfts').doc().id;
+            // data.docId = docId;
+            data.createdDate = new Date().toDateString(); //fb.firestore.FieldValue.serverTimestamp();
             data.authorId = authorId;
-
-            await db.collection("nfts").doc(docId).set(data);
-
-            const response = await contracts.nft_mint(
+            data._id = new ObjectID();
+            // await db.collection("nfts").doc(docId).set(data);
+            await mongodb.collection('nfts').insertOne(data);
+            
+            const response = await contract.nft_mint(
                 nftData,
                 GAS,
                 mint_txFee
@@ -165,46 +202,6 @@ const Collections = ({ contractX, account, wallet }) => {
     };
 
     const onSizeError = (error) => {
-        debugger;
-    }
-
-    // const initializeContract = async (contract) => {
-    //     try {
-    //         // Create a collection by initializing the NFT contract
-    //         const response = await contract.new({
-    //             owner_id: account.accountId,
-    //             metadata: {
-    //                 "spec": null,
-    //                 "name": null,
-    //                 "symbol": null,
-    //                 "icon": null,
-    //                 "base_uri": null,
-    //                 "referance": null,
-    //                 "referance_hash": null,
-    //             },
-    //         }, GAS);
-    //         console.log(response);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
-
-    const checkApis = async () => {
-        try {
-            debugger;
-            // const response = await contract.storage_minimum_balance({})
-            const response = await contract.storage_deposit(
-                {
-                    "account_id": account.accountId
-                },
-                GAS,
-                txFee
-            )
-            debugger;
-            return response;
-        } catch (error) {
-            console.log(error);
-        }
     }
 
     return (
@@ -212,15 +209,15 @@ const Collections = ({ contractX, account, wallet }) => {
             {isLoading ? <Loader /> : null}
             <div className="">
                 <div className=" title text-light pb-3 container px-0">
-                    {/* NFT Collections */}
-                    <div className="row">
+                    NFT Collections
+                    {/* <div className="row">
                         <div className="col-sm-6">
                             NFT Collections
                         </div>
                         <div className="col-sm-6 text-end">
                             <button type="button" className="btn red-btn" onClick={handleShow}>Mint NFT</button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="table-responsive">
                     <table className="table table-dark table-striped font-size-14 collection-table">
@@ -244,9 +241,9 @@ const Collections = ({ contractX, account, wallet }) => {
                                 return (
                                     <tr key={index}>
                                         <td></td>
-                                        <td> <img src={collection.metadata.media ? collection.metadata.media : collection1} width="42" height="42" className="border-radius-50" alt="nft media"/> {collection.metadata.title}</td>
-                                        <td>{collection.token_id}</td>
-                                        <td></td>
+                                        <td> <img src={collection.img ? collection.img : collection1} width="42" height="42" className="border-radius-50" alt="nft media"/> {collection.name}</td>
+                                        <td>{collection.spec}</td>
+                                        <td>{collection.symbol}</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
@@ -259,8 +256,8 @@ const Collections = ({ contractX, account, wallet }) => {
                                         <td>$28 369</td>
                                         <td>360,00</td>
                                         <td>$52 852</td>
-                                        <td>$159 196 200</td> */}
-                                        <td> <button type="button" className="btn btn-danger" onClick={() => routeChange(collection.token_id)}>Show Data</button> </td>
+                                        <td>$159 196 200</td> */ collection.token_id}
+                                        <td> <button type="button" className="btn btn-danger" onClick={() => routeChange()}>Show Data</button> </td>
                                     </tr>
                                 )
                             })

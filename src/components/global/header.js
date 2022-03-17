@@ -1,19 +1,24 @@
 // import React from "react";
-import React, { useCallback, useContext } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import '../../styles/header.css';
 import search from '../../images/header/search.svg';
 import day from '../../images/header/day.svg';
 import dp from '../../images/header/dp.svg';
-
+import { Dropdown } from 'react-bootstrap'
 import night from '../../images/header/night.svg';
 import { ThemeContext, themes } from '../../theame/theameContext';
 // import { AuthContext } from "../../auth/auth";
 import { db, auth } from "../../db/firebase";
 
-export default function Header({ currentUser, nearConfig, wallet }) {
+import { NearContext } from '../../contexts';
+import { getUser } from "../../db/mongodb";
+
+export default function Header({ currentUser, wallet, nearConfig }) {
 
   const [darkMode, setDarkMode] = React.useState(true);
+  const { signIn, signOut } = useContext(NearContext);
+  const [profile, setProfile] = useState({});
 
   // var networkId = "testnet"; //mainnet
   // const near = new window.nearApi.Near({
@@ -34,18 +39,27 @@ export default function Header({ currentUser, nearConfig, wallet }) {
   // if (currentUser) {
   // }
 
-  const handleUser = (e) => {
-    if (currentUser) {
-      (function signOut() {
-        wallet.signOut();
-        window.location.replace(
-          window.location.origin + window.location.pathname
-        );
-      })();
-    } else if (!currentUser) {
-      (function signIn() {
-        wallet.requestSignIn(nearConfig.contractName, "Drawstring");
-      })();
+  const user = wallet.getAccountId();
+  let User = wallet.isSignedIn();
+  const handleUser = async (e) => {
+    if (User) {
+      signOut()
+    } else if (!User) {
+      signIn()
+
+    }
+  }
+
+  useEffect(() => {
+    return getProfile();
+  }, [])
+
+  const getProfile = async () => {
+    if (user) {
+      const muser = await getUser();
+      const pro = await muser.functions.get_profile(user);
+      console.log(pro)
+      setProfile(pro);
     }
   };
 
@@ -72,7 +86,7 @@ export default function Header({ currentUser, nearConfig, wallet }) {
               {/* collections */}
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/users/123" onClick={(e)=>{e.preventDefault(); !currentUser ? handleUser() : navigate('/users/123')}} className="nav-link">My profile</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate('/myprofile') }} className="nav-link">My profile</NavLink>
             </li>
             <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/users" className="nav-link">Activity</NavLink>
@@ -89,7 +103,7 @@ export default function Header({ currentUser, nearConfig, wallet }) {
 
         <ul className="navbar-nav me-auto mb-2 mb-lg-0 create-signin-btn">
           <li className="nav-item">
-            <NavLink exact="true" activeclassname="active" to="/authors" className="create-link">Create</NavLink>
+            <NavLink exact="true" activeclassname="active" to="/mintnft" className="create-link">Create</NavLink>
           </li>
           <li className="nav-item">
 
@@ -106,15 +120,44 @@ export default function Header({ currentUser, nearConfig, wallet }) {
               }} className="login-link">Sign in</a>
             )} */}
 
-            {!currentUser && (
-              <a href="#" onClick={(e)=> {e.preventDefault(); handleUser();}} className="login-link">Sign in</a>
+            {!User && (
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleUser()
+                }}
+                className="login-link"
+              >
+                Sign in
+              </a>
             )}
-
           </li>
         </ul>
 
-        {currentUser && (
-          <button type="button" className="btn toggle-link p-0 height-width me-3" onClick={handleUser}><img src={dp} /></button>
+        {User && (
+          <Dropdown align="end">
+            <Dropdown.Toggle variant="" id="dropdown-basic">
+              <div
+                type="button"
+                className="btn toggle-link p-0 height-width me-3"
+              >
+                <img src={(profile && profile.profile_pic) ? profile?.profile_pic : dp} width="44" className="border-radius-50" />
+              </div>
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item> {user}</Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/createcollection") }}>Create Collection</Dropdown.Item>
+              <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/mintnft") }}>Mint Nft</Dropdown.Item>
+              <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/myprofile") }}>My Profile</Dropdown.Item>
+              <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/editprofile") }}>Edit Profile</Dropdown.Item>
+              {/* <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/collections") }}>View Collections</Dropdown.Item>
+              <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/nfts") }}>View Nfts</Dropdown.Item> */}
+              <Dropdown.Divider />
+              <Dropdown.Item onClick={handleUser} className="text-center">Sign out</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
         )}
 
         {/* {accountId && (

@@ -99,6 +99,7 @@ body{
   border: 5px solid #FFFFFF;
   box-sizing: border-box;
   border-radius: 50%;
+  background-size: 100% 100%;
 }
 
 .edit-prifile-pic-text{
@@ -444,7 +445,38 @@ form.login-info .form-inline input {
   border-radius: 50%;
 }
 
+.css-1s2u09g-control, .css-1pahdxg-control:hover, .css-1s2u09g-control:hover{
+  background: #C51254 !important;
+  border: none !important;
+}
+.css-b62m3t-container [class*="-control"] {
+  background: #C51254 !important;
+}
 
+.css-14el2xx-placeholder, .css-6j8wv5-Input{
+  color: #FFFFFF !important;
+}
+
+.css-4ljt47-MenuList{
+  background: #2A2A2A !important;
+}
+
+.css-vdoepe-option{
+  background: #383838 !important;
+}
+
+.color-red{
+  color: red;
+}
+
+.bg-options{
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+
+.terms-condition li{
+  padding-top: 30px;
+}
 
 /* Light Mode css */
 

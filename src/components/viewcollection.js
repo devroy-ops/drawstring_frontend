@@ -24,6 +24,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 import React, { useEffect, useState } from "react";
 import { init, author } from "../services/helper";
 import { Loader } from "../services/ui";
+import { getUser, getUserForUpdateDb } from '../db/mongodb';
 
 const ViewCollection = ({ contractX, account, wallet }) => {
 
@@ -31,30 +32,22 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     const [collection, setCollection] = useState({});
     const [contracts, setContract] = useState();
     const [isLoading, setLoader] = useState(false);
+    const [listedNfts, setListedNfts] = useState([]);
 
     const handleSelect = (selectedTab) => {
         setActive(parseInt(selectedTab))
     }
 
-    const { authorId, collectionId } = useParams();
+    const { collectionId } = useParams();
 
-    const init1 = async () => {
-        setLoader(true);
-        var auther = await author(authorId);
-        contract = await init(wallet, auther);
-        setContract(contract);
-        const response = await viewCollection();
-        setCollection(response);
-
-        setLoader(false);
-    };
 
     useEffect(() => {
-        return init1()
+        //return init1()
+        getAllListedNfts();
+        return viewCollection();
     }, []);
 
     let contract;
-
 
     /**
    * View the metadata of the contract(collection) using the contract.nft_metadata
@@ -70,15 +63,34 @@ const ViewCollection = ({ contractX, account, wallet }) => {
         }
     };
 
+    const getAllListedNfts = async () => {
+        setLoader(true);
+        const user = await getUser();
+        const allListedNfts = await user.functions.get_all_listed_nfts();
+        console.log(allListedNfts)
+        setListedNfts(allListedNfts);
+        setLoader(false);
+    }
+
+    const addLike = async (nft, index) => {
+        const newItems = [...listedNfts];
+        newItems[index].likes = newItems[index].likes ? newItems[index].likes + 1 : 1;
+        setListedNfts(newItems);
+
+        const walletId = wallet.getAccountId();
+        const user = await getUserForUpdateDb();
+        await user.functions.add_like(walletId, nft.id, nft.contract_id);
+    }
+
     return (
         <div className="bg-darkmode">
-             {isLoading ? <Loader /> : null}
+            {isLoading ? <Loader /> : null}
             <div className="pos-rel pb-5">
                 <div className="bg-users height-240">
 
                 </div>
                 <div className="container pb-5 px-0">
-                    <img src={collection?.metadata?.media ? collection?.metadata?.media : collection1} className="avtar-position" width="182" height="182"/>
+                    <img src={collection?.metadata?.media ? collection?.metadata?.media : collection1} className="avtar-position" width="182" height="182" />
                 </div>
             </div>
             <div className="container pb-5 px-0">
@@ -137,7 +149,46 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                                 <div className="row pt-2 view-collection-on-tab">
-                                    <div className="col-sm-3 pb-4">
+                                    {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
+                                        return (
+                                            <div className="col-sm-3 pb-4" key={index}>
+                                                <div className="top-sec-box">
+                                                    <div className="row py-2 px-3">
+                                                        <div className="col-sm-8">
+                                                            <div className="d-flex">
+                                                                <div className="explore-dot bg-pink"></div>
+                                                                <div className="explore-dot bg-blue"></div>
+                                                                <div className="explore-dot bg-green"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-sm-4 ">
+                                                            <div className="explore-dot bg-black float-end">
+                                                                <img src={more} className="pb-1" alt="more icon" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <img src={nft.media_link} className="w-100" height="270" alt="nft media" />
+                                                    <div className="text-light font-size-18 p-3">
+                                                        <div>{nft.name}</div>
+                                                        <div className="row pt-2 bid-mobile-100">
+                                                            <div className="col-sm-6">
+                                                                {nft.price} ETN <span className="color-gray">1/1</span>
+                                                            </div>
+                                                            <div className="col-sm-6 text-end">
+                                                                <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
+                                                            </div>
+                                                        </div>
+                                                        <div className="pt-1">
+                                                            <button type="button" className="btn heart-btn p-0" onClick={() => addLike(nft, index)}><img src={heart} alt="heart icon" /> <span className="color-gray">{nft.likes}</span></button>
+                                                            {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                    )}
+                                    {/* <div className="col-sm-3 pb-4">
                                         <div className="top-sec-box">
                                             <div className="row py-2 px-3">
                                                 <div className="col-sm-8">
@@ -400,7 +451,7 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </Tab>

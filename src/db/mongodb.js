@@ -1,38 +1,57 @@
 import * as Realm from "realm-web";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+// import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 
 const APP_ID = "drawstringrealmapp-vafye";
+const APP_ID1 = "drawstringwriteapp-gwzcp";
 
 const app = new Realm.App({ id: APP_ID });
+const app1 = new Realm.App({ id: APP_ID1 });
 
 
-
-
-const graphqlUri = `http://localhost:3000/api/client/v2.0/app/${APP_ID}/graphql`;
+// const graphqlUri = `http://localhost:3000/api/client/v2.0/app/${APP_ID}/graphql`;
 // const graphqlUri = `https://realm.mongodb.com/api/client/v2.0/app/${APP_ID}/graphql`;
 // Local apps should use a local URI!
 // const graphqlUri = `https://us-east-1.aws.stitch.mongodb.com/api/client/v2.0/app/${APP_ID}/graphql`
 // const graphqlUri = `https://eu-west-1.aws.stitch.mongodb.com/api/client/v2.0/app/${APP_ID}/graphql`
 // const graphqlUri = `https://ap-southeast-1.aws.stitch.mongodb.com/api/client/v2.0/app/${APP_ID}/graphql`
 
-user();
 
 const CLUSTER_NAME = "mongodb-atlas";
 const DATABASE_NAME = "DrawstringMarketplace";
-const COLLECTION_NAME = "authors";
+// const COLLECTION_NAME = "authors";
+getValidAccessToken();
+var mongo;
+var mongodb;
+// const mongo =  app.currentUser.mongoClient(CLUSTER_NAME);
+// const mongodb =  mongo.db(DATABASE_NAME);
 
-async function user(){
+const apiKey = "TlNAc6GuyjKmHR2r1010Uyv8w6xK0G3pjHkVW0u97ZA0efQMTH9KR3sO9WOvJ2eT";
+
+const getUserForUpdateDb = async () => {
+    const credentials = Realm.Credentials.apiKey(apiKey);
+    try {
+      // Authenticate the user
+      const user = await app1.logIn(credentials);
+      // `App.currentUser` updates to match the logged in user
+      console.assert(user.id === app1.currentUser.id);
+      return user;
+    } catch (err) {
+      console.error("Failed to log in", err);
+    }
+    
+}
+
+const getUser = async () => {
     const credentials = Realm.Credentials.anonymous();
     // Authenticate the user
     const user = await app.logIn(credentials);
+    //const featured = await user.functions.get_featured();
+    //mongoUser = user;
+    return user;
+    
+    //const collection = mongo.db(DATABASE_NAME).collection(COLLECTION_NAME);
 
-//const featured = await user.functions.get_featured();
-
-    const mongo = app.currentUser.mongoClient(CLUSTER_NAME);
-    const collection = mongo.db(DATABASE_NAME).collection(COLLECTION_NAME);
-    debugger;
-
-    //const result = await collection.
+    //const result = await collection.find();
 
     // const result = await collection.insertOne({
     //     id: 2,
@@ -41,7 +60,6 @@ async function user(){
     //     userName: "white",
     //     description: "perennial",
     // });
-    debugger;
 }
 
 async function getValidAccessToken() {
@@ -55,22 +73,24 @@ async function getValidAccessToken() {
         // valid, we refresh the user's custom data which also refreshes their access token.
         await app.currentUser.refreshCustomData();
     }
+    mongo =  app.currentUser.mongoClient(CLUSTER_NAME);
+    mongodb =  mongo.db(DATABASE_NAME);
     return app.currentUser.accessToken;
 }
 
-const client = new ApolloClient({
-    link: new HttpLink({
-        uri: graphqlUri,
-        // We define a custom fetch handler for the Apollo client that lets us authenticate GraphQL requests.
-        // The function intercepts every Apollo HTTP request and adds an Authorization header with a valid
-        // access token before sending the request.
-        fetch: async (uri, options) => {
-            const accessToken = await getValidAccessToken();
-            options.headers.Authorization = `Bearer ${accessToken}`;
-            return fetch(uri, options);
-        },
-    }),
-    cache: new InMemoryCache(),
-});
+// const client = new ApolloClient({
+//     link: new HttpLink({
+//         uri: graphqlUri,
+//         // We define a custom fetch handler for the Apollo client that lets us authenticate GraphQL requests.
+//         // The function intercepts every Apollo HTTP request and adds an Authorization header with a valid
+//         // access token before sending the request.
+//         // fetch: async (uri, options) => {
+//         //     const accessToken = await getValidAccessToken();
+//         //     options.headers.Authorization = `Bearer ${accessToken}`;
+//         //     return fetch(uri, options);
+//         // },
+//     }),
+//     cache: new InMemoryCache(),
+// });
 
-export { graphqlUri, client };
+export { mongodb, getUser, getUserForUpdateDb };//graphqlUri, client,
