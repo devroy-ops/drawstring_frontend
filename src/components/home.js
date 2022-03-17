@@ -10,6 +10,7 @@ import blockchain from '../images/home/blockchain.svg';
 import category from '../images/home/category.svg';
 import saletype from '../images/home/saletype.svg';
 import price from '../images/home/price.svg';
+import logo from '../../src/images/header/logo.png'
 import sort from '../images/home/sort.svg';
 import more from '../images/home/more.svg';
 import heart from '../images/home/heart.svg';
@@ -220,7 +221,7 @@ const Home = ({ contractX, account, wallet }) => {
                                             <div className="row p-3">
                                                 <div className="col-sm-4">
                                                     <div className="numbers float-start">0{index + 1}</div>
-                                                    <div className="r-text float-end">R</div>
+                                                    <div><img className='logo' src={logo} alt="" /></div>
                                                 </div>
                                                 <div className="col-sm-8 text-light font-size-18">
                                                     <div className="collect-name">{nft?.nftData?.metadata?.title}</div>
