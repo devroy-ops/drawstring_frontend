@@ -54,22 +54,22 @@ function Footer() {
                   </ul>
                 </div>
                 <div className="col-lg-4 col-md-6 mb-4 mb-md-0">
-                  <h5 className="footer-link-title mb-3">About</h5>
+                  <h5 className="footer-link-title mb-3"><NavLink exact="true" activeclassname="active" to="/about" className="text-white footer-links">About</NavLink></h5>
                   <ul className="list-unstyled">
                     <li className="pb-2">
-                      <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Blog</NavLink>
+                      <NavLink exact="true" activeclassname="active" to="/blog" className="text-white footer-links">Blog</NavLink>
                     </li>
                     <li className="pb-2">
-                      <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Email</NavLink>
+                      <a className="text-white footer-links" href="mailto:info@drawstring.io">Email</a>
                     </li>
                     <li className="pb-2">
-                      <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Near Protocol</NavLink>
+                      <NavLink exact="true" activeclassname="active" to="/near" className="text-white footer-links">Near Protocol</NavLink>
                     </li>
                     <li className="pb-2">
                       <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Subscribe</NavLink>
                     </li>
                     <li className="pb-2">
-                      <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Twitter</NavLink>
+                      <a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT">Twitter</a>
                     </li>
                     <li className="pb-2">
                       <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Discord</NavLink>

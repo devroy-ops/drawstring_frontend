@@ -110,6 +110,23 @@ ul.navbar-nav.me-auto {
     flex-grow: 0;
     margin: 0px 22px;
 } */
+.create{
+    border-radius: 50px;
+    padding: 0;
+    text-decoration: none;
+    color: white !important;
+    font-weight: 700;
+    font-size: 20px;
+    margin-right: 0;
+    width: 98px !important;
+    display: inline-block;
+    height: 44px;
+    line-height: 44px;
+    text-align: center;
+    background: -webkit-linear-gradient(#C51254, #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
 .create-link {
     background: #C51254;
