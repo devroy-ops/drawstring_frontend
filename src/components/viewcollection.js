@@ -43,7 +43,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
 
     useEffect(() => {
         //return init1()
-        getAllListedNfts();
         return viewCollection();
     }, []);
 
@@ -54,14 +53,34 @@ const ViewCollection = ({ contractX, account, wallet }) => {
    */
     const viewCollection = async () => {
         try {
-            const response = await contract.nft_token({ token_id: collectionId });
-            console.log(response);
+            setLoader(true);
+
+            const user = await getUser();
+            const collection = await user.functions.get_collection_with_id(collectionId);
+            console.log(collection);
+            setCollection(collection[0]);
+            const response = await user.functions.get_nfts_in_collection(collectionId);
+            console.log(response)
+            debugger;
+            setListedNfts(response);
+            
+            setLoader(false);
 
             return response;
         } catch (error) {
             console.log(error);
         }
     };
+
+    // const viewCollection = async () => {
+    //     try {
+    //         const response = await contract.nft_token({ token_id: collectionId });
+    //         console.log(response);
+    //         return response;
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
 
     const getAllListedNfts = async () => {
         setLoader(true);
@@ -90,11 +109,11 @@ const ViewCollection = ({ contractX, account, wallet }) => {
 
                 </div>
                 <div className="container pb-5 px-0">
-                    <img src={collection?.metadata?.media ? collection?.metadata?.media : collection1} className="avtar-position" width="182" height="182" />
+                    <img src={collection?.img ? collection?.img : collection1} className="avtar-position" width="182" height="182" />
                 </div>
             </div>
             <div className="container pb-5 px-0">
-                <div className="text-light font-size-32 font-w-700">{collection?.metadata?.title}</div>
+                <div className="text-light font-size-32 font-w-700">{collection?.name}</div>
                 <div className="text-light pt-2">
                     <div className="copy-btn"> #27513 0x47BE...6f4f  <img src={copy_icon} className="float-end" /></div>
                 </div>

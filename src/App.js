@@ -124,7 +124,9 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 wallet={wallet}
                 nearConfig={nearConfig}
               />} />
-              <Route path="/nft" component={Nft} element={<Nft />} />
+              <Route path="/nft/:collectionId/:tokenId" component={Nft} element={<Nft 
+               wallet={wallet}
+              />} />
               <Route exact="true" path="/collections" component={Collections} element={<Collections 
                 contractX={contractX}
                 currentUser={currentUser}

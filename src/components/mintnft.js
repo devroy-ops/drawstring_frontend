@@ -67,9 +67,9 @@ export default function MintNft({ contractX, account, wallet }) {
 
         var transactionHashes = searchParams.get("transactionHashes");
         if (transactionHashes) {
-            // let nft = JSON.parse(localStorage.getItem("nft"));
-            // const id = nft.id;
-            navigate(`/nft`);
+            const nft = JSON.parse(localStorage.getItem("nft"));
+            debugger
+            navigate(`/nft/${nft.contractId}/${nft.tokenId}`);
             toast("Nft minted successfully.", {type: "success"});
         }
     }
@@ -167,15 +167,18 @@ export default function MintNft({ contractX, account, wallet }) {
 
             const user = await getUserForUpdateDb();
 
+            var data = {contractId: nft.collection.value, tokenId: nft.token};
+            localStorage.setItem("nft", JSON.stringify(data));
+
             await user.functions.add_new_nft_listing(
                 nft.title,
                 nft.token,
                 mediaLink,
                 mediaLink,
                 parseInt(nft.price),
-                nft.collection.contractId,
+                nft.collection.value,
                 accountId,
-                nft.collection.name,
+                nft.collection.label,
                 nft.description,
                 "image"
             );
