@@ -257,7 +257,7 @@ const Collections = ({ contractX, account, wallet }) => {
                                         <td>360,00</td>
                                         <td>$52 852</td>
                                         <td>$159 196 200</td> */ collection.token_id}
-                                        <td> <button type="button" className="btn btn-danger" onClick={() => routeChange()}>Show Data</button> </td>
+                                        <td> <button type="button" className="btn btn-danger" onClick={() => routeChange(collection.contractId)}>Show Data</button> </td>
                                     </tr>
                                 )
                             })

@@ -93,7 +93,8 @@ function Footer() {
             </div>
             <div className="col-6 text-end font-size-16">
             <NavLink exact="true" activeclassname="active" to="/terms" className="text-white">Terms of Service</NavLink>
-            <NavLink exact="true" activeclassname="active" to="/" className="text-white">Privacy policy</NavLink>
+             {/*<NavLink exact="true" activeclassname="active" to="/" className="text-white">Privacy policy</NavLink>*/}
+
 
               {/* <a href="#" className="text-white">Terms </a> <a href="#" className="text-white">Privacy policy</a> */}
             </div>

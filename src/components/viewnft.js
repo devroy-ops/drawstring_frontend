@@ -1,6 +1,6 @@
 import '../App.css';
 import { useParams } from "react-router-dom";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import product from '../images/product/product.svg';
 import creater from '../images/product/creater.svg';
 import collection from '../images/product/collection.svg';
@@ -8,23 +8,58 @@ import heart from '../images/home/heart.svg';
 import more from '../images/home/more.svg';
 import copy_icon from '../images/users/copy_icon.svg';
 import { Tabs, Tab } from 'react-bootstrap';
+import { getUser, getUserForUpdateDb } from '../db/mongodb';
+import { Loader } from '../services/ui';
 
-const Nft = () => {
+const Nft = ({ wallet }) => {
     const [activeTab, setActiveTab] = useState(1);
+    const [isLoading, setLoader] = useState(false);
+    const [nft, setNft] = useState({});
 
     const handleSelect = (selectedTab) => {
         setActiveTab(parseInt(selectedTab))
     }
 
+    const { collectionId, tokenId } = useParams();
+
+    useEffect(() => {
+        return getNft();
+    }, []);
+
+    const getNft = async () => {
+        setLoader(true);
+        const user = await getUser();
+        const nft = await user.functions.get_nft_by_token_id(tokenId, collectionId);
+        console.log("nft ", nft);
+        setNft(nft[0]);
+        setLoader(false);
+    }
+
+    const addLike = async () => {
+
+        nft.likes = nft.likes ? nft.likes + 1 : 1;
+        setNft({ ...nft });
+
+        const walletId = wallet.getAccountId();
+        const user = await getUserForUpdateDb();
+        await user.functions.add_like(walletId, nft.id, nft.contract_id);
+    }
+
     return (
         <div className="bg-darkmode pt-4 product-pages">
+            {isLoading ? <Loader /> : null}
+
             <div className="container text-light px-0">
                 <div className="row mobile-reverce">
                     <div className="col-sm-6">
                         <div className="d-flex">
-                            <div className="title">Product Name</div>
+                            <div className="title">
+                                {/* Product Name */}
+                                {nft.name}
+                            </div>
                             <div>
-                                <button type="button" className="btn heart-btn pt-3 px-5"><img src={heart} /> <span className="color-gray">18</span></button>
+                                <button type="button" className="btn heart-btn pt-3 px-5" onClick={addLike}><img src={heart} /> <span className="color-gray">{nft.likes}</span></button>
+
                             </div>
                             <div className="explore-dot bg-black float-end mt-3"><img src={more} className="pb-1" /></div>
                         </div>
@@ -84,7 +119,7 @@ const Nft = () => {
                                         </div>
 
                                         <div className="pb-5 pt-4">
-                                            <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for 28.45 ETH</button>
+                                            <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for {nft.price} ETH</button>
                                             <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button>
                                         </div>
                                     </Tab>
@@ -98,7 +133,9 @@ const Nft = () => {
                     </div>
                     <div className="col-sm-6">
                         {/* <div className="min-height-468">  */}
-                        <img src={product} className="img-fluid border-bg product-profile-img" />
+                        <img src={nft.media_link} className="img-fluid border-bg product-profile-img" />
+                        {/* <img src={product} className="img-fluid border-bg product-profile-img" /> */}
+
                         {/* </div> */}
                     </div>
                 </div>
