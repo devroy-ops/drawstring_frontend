@@ -57,7 +57,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
     const [collection, setCollection] = useState({
         spec: "nft-1.0.0", // nft-1.0.0
         name: "", // Chemical Rain
-        symbol: "", //CHM-10
+        symbol: "CHM-10", //CHM-10
     });
 
     // const { authorId } = useParams();
@@ -172,7 +172,8 @@ export default function CreateCollection({ contractX, account, wallet }) {
         try {
             setLoader(true);
             getUserForUpdateDb().then(user => {
-                user.functions.add_collection(col.name, col.fileUrl, account.accountId).then(async () => {
+                // account.accountId
+                user.functions.add_collection(col.name, col.fileUrl, subaccount).then(async () => {
                     setLoader(false);
                     //Create a collection by initializing the NFT contract
                     const response = await contract.new({
@@ -251,7 +252,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
     };
 
     const uploadFile = async () => {
-        debugger;
         if (file) {
             setLoader(true)
             const created = await client.add(file);
@@ -270,35 +270,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
             toast("File is required", {type: "error"})
         }
     }
-
-
-    const uploadFile1 = async () => {
-        if (collection.icon) {
-
-            const reader = new FileReader();
-
-            reader.addEventListener("load", function () {
-                // convert image file to base64 string
-                //preview.src = reader.result;
-                //initializeContract(reader.result);
-            }, false);
-
-            if (collection.icon) {
-                reader.readAsDataURL(collection.icon);
-            }
-
-            //setLoader(true);
-            // storage.ref(collection.icon.name).put(collection.icon).then(() => {
-            //     storage.ref(collection.icon.name).getDownloadURL().then((url) => {
-            //         initializeContract(url);
-            //         setLoader(false);
-            //     });
-            // });
-        } else {
-            toast("Media is reqired.", { type: "error" })
-        }
-    }
-
 
     const handleChange = (e) => {
         setCollection((prev) => {
@@ -365,7 +336,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             </div>
                             <div className="border-bottom-2"></div> */}
 
-                            <div>
+                            {/* <div>
                                 <div className="font-size-18 text-light py-3">Symbol</div>
                                 <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “CHM-10”'
                                     name="symbol"
@@ -379,7 +350,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                     Symbol is required.
                             </Form.Control.Feedback>
                             </div>
-                            <div className="border-bottom-2"></div>
+                            <div className="border-bottom-2"></div> */}
 
                             <div>
                                 <div className="font-size-18 text-light py-3">Description <span className="color-gray"> (Optional)</span></div>
