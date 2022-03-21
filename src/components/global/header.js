@@ -13,13 +13,21 @@ import { db, auth } from "../../db/firebase";
 import logo from '../../images/header/logo.png'
 import { NearContext } from '../../contexts';
 import { getUser } from "../../db/mongodb";
+import { scroller } from "react-scroll";
 
-export default function Header({ currentUser, wallet, nearConfig }) {
+export default function Header({currentUser, wallet, nearConfig }) {
 
   const [darkMode, setDarkMode] = React.useState(true);
   const { signIn, signOut } = useContext(NearContext);
   const [profile, setProfile] = useState({});
 
+ const scrollToSection = () => {
+    scroller.scrollTo("explore", {
+      duration: 500,
+      delay: 0,
+      smooth: "easeInOutQuart",
+    });
+  };
   // var networkId = "testnet"; //mainnet
   // const near = new window.nearApi.Near({
   //   networkId: networkId,
@@ -82,14 +90,14 @@ export default function Header({ currentUser, wallet, nearConfig }) {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/" className="nav-link active">Discover</NavLink>
+              <div onClick={() => { scrollToSection() }} className="nav-link discover active">Discover</div>
               {/* collections */}
             </li>
             <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate('/myprofile') }} className="nav-link">Profile</NavLink>
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/" className="nav-link">Wtf?</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">Wtf?</NavLink>
               {/* viewcollection */}
             </li>
             <li className="nav-item">
@@ -100,7 +108,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
 
         <ul className="navbar-nav me-auto mb-2 mb-lg-0 create-signin-btn">
           <li className="nav-item">
-            <NavLink exact="true" activeclassname="active" to="/mintnft" className="create-link">Create</NavLink>
+            <NavLink exact="true" activeclassname="active" to="/mintnft" className="create">Create</NavLink>
           </li>
           <li className="nav-item">
 

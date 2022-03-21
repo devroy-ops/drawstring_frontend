@@ -1,6 +1,7 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { useRef } from 'react'
 import Home from './components/home';
 import Users from './components/profile';
 import EditProfile from './components/editprofile';
@@ -20,7 +21,10 @@ import Nfts from './components/nfts';
 import MintNft from './components/mintnft';
 import Profile from './components/profile';
 import Nft from './components/viewnft';
+import About from './components/about';
 import Terms from './components/terms';
+import Blog from './components/blog';
+import Near from './components/nearprotocol';
 
 // const routing = (
 //   <AuthProvider>
@@ -64,6 +68,7 @@ import Terms from './components/terms';
 //     </Router>
 //   </AuthProvider>
 // );
+
 
 function App({ contractX, currentUser, nearConfig, wallet, account }) {
   //return routing;
@@ -125,6 +130,9 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 nearConfig={nearConfig}
               />} />
               <Route path="/nft" component={Nft} element={<Nft />} />
+              <Route path="/about" component={About} element={<About />} />
+              <Route path="/blog" component={Blog} element={<Blog />} />
+              <Route path="/near" component={Near} element={<Near />} />
               <Route exact="true" path="/collections" component={Collections} element={<Collections 
                 contractX={contractX}
                 currentUser={currentUser}

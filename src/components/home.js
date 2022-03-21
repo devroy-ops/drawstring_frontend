@@ -17,7 +17,7 @@ import heart from '../images/home/heart.svg';
 import { db } from "../db/firebase";
 import React, { useEffect, useState } from "react";
 import { Loader } from "../services/ui";
-// import { Dropdown } from 'react-bootstrap';
+import { Dropdown } from 'react-bootstrap';
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
 import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
@@ -25,34 +25,12 @@ import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 import * as Realm from 'realm-web'
 const app = new Realm.App({ id: "drawstringrealmapp-vafye"});
 
-const Home = ({ contractX, account, wallet }) => {
+const Home = ({contractX, account, wallet }) => {
     var [nfts, setNfts] = useState([]);
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
-    const [topNfts, setTopNfts] = useState([])
-    const [featuredNfts, setFeaturedNfts] = useState([])
-    const [allListing, setAllListing] = useState([])
-    
-    useEffect(() => {
-        return getNFTs()
-      }, [])
-    
-      const getNFTs = async () => {
-        const credentials = Realm.Credentials.anonymous()
-        const user = await app.logIn(credentials) // Authenticate the user
-    
-        const featured = await user.functions.get_featured()
-        setFeaturedNfts(featured)
-    
-        const top = await user.functions.get_top_collections()
-        setTopNfts(top)
 
-        const allNftListing = await user.functions.get_all_listed_nfts()
-        setAllListing(allNftListing)
-      }
-      console.log(topNfts);
-      console.log(featuredNfts);
-      console.log(allListing);
+    
 
     useEffect(() => {
         return getNfts();
@@ -348,16 +326,65 @@ const Home = ({ contractX, account, wallet }) => {
                     </div>
 
                     <div className="row title text-light pb-4 mt-60">
-                        <div className="col-sm-9">
+                        <div className="explore col-sm-9">
                             Explore
-                        <img src={blockchain} className="ps-4" alt="blockchain icon"/><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} alt="dropdown icon"/>
-                            <img src={category} className="ps-4" alt="category icon"/><span className="font-size-14 vertical-align px-2"> Category </span><img src={arrow_down} alt="dropdown icon"/>
-                            <img src={images} className="ps-4" alt="images icon"/><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} alt="dropdown icon"/>
-                            <img src={saletype} className="ps-4" alt="saletype icon"/><span className="font-size-14 vertical-align px-2"> Sale type </span><img src={arrow_down} alt="dropdown icon"/>
-                            <img src={price} className="ps-4" alt="price icon"/><span className="font-size-14 vertical-align px-2"> Price range </span><img src={arrow_down} alt="dropdown icon"/>
+                        {/* <img src={blockchain} className="ps-4" alt="blockchain icon"/><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} alt="dropdown icon"/> */}
+                        <div className='row'>
+                            <Dropdown className="col-sm-3" align="end">
+                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
+                                <img src={category} className="ps-4" alt="category icon"/><span className="font-size-14 vertical-align px-2"> Category </span><img src={arrow_down} alt="dropdown icon"/>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                <Dropdown.Item>Music</Dropdown.Item>
+                                <Dropdown.Item>Video</Dropdown.Item>
+                                <Dropdown.Item>Animation</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <Dropdown className="col-sm-3" align="end">
+                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
+                                <img src={images} className="ps-4" alt="images icon"/><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} alt="dropdown icon"/>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                <Dropdown.Item>Music</Dropdown.Item>
+                                <Dropdown.Item>Video</Dropdown.Item>
+                                <Dropdown.Item>Animation</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <Dropdown className="col-sm-3" align="end">
+                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
+                                <img src={saletype} className="ps-4" alt="saletype icon"/><span className="font-size-14 vertical-align px-2"> Sale type </span><img src={arrow_down} alt="dropdown icon"/>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                <Dropdown.Item>Auction</Dropdown.Item>
+                                <Dropdown.Item>On Sale</Dropdown.Item>
+                                <Dropdown.Item>Not on Sale</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                            <Dropdown className="col-sm-3" align="end">
+                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
+                                <img src={price} className="ps-4" alt="price icon"/><span className="font-size-14 vertical-align px-2"> Price range </span><img src={arrow_down} alt="dropdown icon"/>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                <Dropdown.Item>Free</Dropdown.Item>
+                                <Dropdown.Item>0 - 1 Near</Dropdown.Item>
+                                <Dropdown.Item>1-10 Near</Dropdown.Item>
+                                <Dropdown.Item>10+ Near</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </div>
                         </div>
                         <div className="col-sm-3 text-end">
-                            <img src={sort} className="ps-4" alt="sort icon"/><span className="font-size-14 vertical-align px-2"> Sort By </span><img src={arrow_down} alt="dropdown icon"/>
+                        <Dropdown className="col-sm-3" align="end">
+                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
+                                <img src={images} className="ps-4" alt="images icon"/><span className="font-size-14 vertical-align px-2"> sort by </span><img src={arrow_down} alt="dropdown icon"/>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                <Dropdown.Item>Newest</Dropdown.Item>
+                                <Dropdown.Item>Longest Price</Dropdown.Item>
+                                <Dropdown.Item>Highest Price</Dropdown.Item>
+                                <Dropdown.Item>Active Auctions</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </div>
                     </div>
 
