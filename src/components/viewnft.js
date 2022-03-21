@@ -48,6 +48,7 @@ const Nft = ({ wallet }) => {
     return (
         <div className="bg-darkmode pt-4 product-pages">
             {isLoading ? <Loader /> : null}
+
             <div className="container text-light px-0">
                 <div className="row mobile-reverce">
                     <div className="col-sm-6">
@@ -58,6 +59,7 @@ const Nft = ({ wallet }) => {
                             </div>
                             <div>
                                 <button type="button" className="btn heart-btn pt-3 px-5" onClick={addLike}><img src={heart} /> <span className="color-gray">{nft.likes}</span></button>
+
                             </div>
                             <div className="explore-dot bg-black float-end mt-3"><img src={more} className="pb-1" /></div>
                         </div>
@@ -133,6 +135,7 @@ const Nft = ({ wallet }) => {
                         {/* <div className="min-height-468">  */}
                         <img src={nft.media_link} className="img-fluid border-bg product-profile-img" />
                         {/* <img src={product} className="img-fluid border-bg product-profile-img" /> */}
+
                         {/* </div> */}
                     </div>
                 </div>

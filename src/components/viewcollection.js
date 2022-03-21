@@ -43,6 +43,7 @@ const ViewCollection = ({ contractX, account, wallet }) => {
 
     useEffect(() => {
         //return init1()
+        getAllListedNfts();
         return viewCollection();
     }, []);
 
@@ -110,6 +111,7 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                 </div>
                 <div className="container pb-5 px-0">
                     <img src={collection?.img ? collection?.img : collection1} className="avtar-position" width="182" height="182" />
+
                 </div>
             </div>
             <div className="container pb-5 px-0">
