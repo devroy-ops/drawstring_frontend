@@ -2,7 +2,8 @@ import logo from '../logo.svg';
 import '../App.css';
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from 'react';
-import avtar from '../images/users/avtar.svg';
+import avtar from '../images/users/avatar.svg';
+import twitter from '../images/users/twitterlogo.svg';
 import bg_users from '../images/users/bg_users.svg';
 import copy_icon from '../images/users/copy_icon.svg';
 import upload from '../images/users/upload.svg';
@@ -92,8 +93,8 @@ const Profile = ({ contractX, account, wallet }) => {
             <div className="container pb-5 px-0">
                 <div className="text-light font-size-32 font-w-700">{author?.display_name}</div>
                 <div className="d-flex text-light">
-                    <div className="pt-1 pe-4 font-size-24">{author?.twitter} </div>
-                    <div className="copy-btn"> #27513 0x47BE...6f4f  <img src={copy_icon} className="float-end" /></div>
+                    <div className="pt-1 pe-4 font-size-24"> <a href={author?.twitter} target="_blank" rel="noopener noreferrer"><img src={twitter} alt="twitter link" width="30" height="30" /></a> </div>
+                    <div className="copy-btn"> {wallet.getAccountId()} <img src={copy_icon} className="float-end" /></div>
                 </div>
 
                 <div className="row pt-3">
@@ -102,13 +103,13 @@ const Profile = ({ contractX, account, wallet }) => {
                         {/* Author's name is a travel and documentary photographer based in Quebec, Canada. She documents streets, cultures and landscapes. */}
                 </div>
                 </div>
-                <div className="d-flex text-light pt-4 font-size-18 color-white">
+                {/* <div className="d-flex text-light pt-4 font-size-18 color-white">
                     <div className="pe-5">150 followers</div>
                     <div>150 following</div>
-                </div>
+                </div> */}
                 <div className="d-flex py-4">
-                    <button type="button" className="btn follow-btn">Follow</button>
-                    <button type="button" className="btn mx-4 up-btn"><img src={upload} /></button>
+                    {/* <button type="button" className="btn follow-btn">Follow</button> */}
+                    <button type="button" onClick={() => {navigator.clipboard.writeText(`http://localhost:3000/${wallet.getAccountId()}`)}} className="btn mx-4 up-btn"><img src={upload} /></button>
                     <button type="button" className="btn more-btn"><img src={more} /></button>
                 </div>
             </div>
@@ -120,7 +121,7 @@ const Profile = ({ contractX, account, wallet }) => {
                             <div className="pb-4">
                                 <div className="row title text-light pt-3">
                                     <div className="col-sm-9">
-                                        <img src={blockchain} className="" /><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} />
+                                        {/* <img src={blockchain} className="" /><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} /> */}
                                         <img src={category} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Category </span><img src={arrow_down} />
                                         <img src={images} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} />
                                         <img src={saletype} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Sale type </span><img src={arrow_down} />
