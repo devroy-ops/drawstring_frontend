@@ -107,7 +107,7 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 nearConfig={nearConfig}
               />} />
               <Route path="/terms" component={Terms} element={<Terms />} />
-              <Route path="/myprofile" component={Profile} element={<Profile 
+              <Route path={`/user/${wallet.getAccountId()}`} component={Profile} element={<Profile 
                 contractX={contractX}
                 currentUser={currentUser}
                 account={account}

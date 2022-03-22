@@ -1,6 +1,10 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import logo from '../../images/header/logo.png'
+import twitter from '../../images/home/twitter.svg'
+import telegram from '../../images/home/telegram.svg'
+import discord from '../../images/home/discord.svg'
+import instagram from '../../images/home/instagram.svg'
 import '../../styles/footer.css';
 
 function Footer() {
@@ -18,12 +22,10 @@ function Footer() {
                 </p>
 
               <div className="slide-dots">
-                <div className="dot"></div>
-                <div className="dot"></div>
-                <div className="dot"></div>
-                <div className="dot"></div>
-                <div className="dot"></div>
-                <div className="dot"></div>
+                <div><a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT"><img src={twitter} width="30" height="30" alt="twitter" /></a></div>
+                <div><a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT"><img src={instagram} width="30" height="30" alt="instagram" /></a></div>
+                <div><a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT"><img src={discord} width="30" height="30" alt="discord" /></a></div>
+                <div><a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT"><img src={telegram} width="30" height="30" alt="telegram" /></a></div>
               </div>
             </div>
             <div className="col-lg-7 col-md-6">
@@ -68,7 +70,7 @@ function Footer() {
                     <li className="pb-2">
                       <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Subscribe</NavLink>
                     </li>
-                    <li className="pb-2">
+                    {/* <li className="pb-2">
                       <a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT">Twitter</a>
                     </li>
                     <li className="pb-2">
@@ -79,7 +81,7 @@ function Footer() {
                     </li>
                     <li className="pb-2">
                       <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Instagram</NavLink>
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               </div>

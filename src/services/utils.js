@@ -93,11 +93,13 @@ export async function initContracts() {
     nearConfig,
     walletConnection,
     near,
-	contractX,
+  	contractX,
     account,
   };
 }
-
+export function balance() {
+   return available;
+};
 export function logout() {
   window.walletConnection.signOut();
   // reload page

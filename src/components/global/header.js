@@ -14,6 +14,7 @@ import logo from '../../images/header/logo.png'
 import { NearContext } from '../../contexts';
 import { getUser } from "../../db/mongodb";
 import { scroller } from "react-scroll";
+import {balance} from "../../services/utils";
 
 export default function Header({currentUser, wallet, nearConfig }) {
 
@@ -46,19 +47,24 @@ export default function Header({currentUser, wallet, nearConfig }) {
   // const { currentUser } = useContext(AuthContext);
   // if (currentUser) {
   // }
-
+ 
+ 
+let available = balance()
+ 
+  let navigate = useNavigate();
   const user = wallet.getAccountId();
   let User = wallet.isSignedIn();
   const handleUser = async (e) => {
     if (User) {
-      signOut()
+      signOut().then(()=> navigate("/"));
+      
     } else if (!User) {
-      signIn()
-
+      signIn().then(()=> navigate("/"));
     }
   }
 
   useEffect(() => {
+    console.log(available, 'available');
     return getProfile();
   }, [])
 
@@ -71,7 +77,7 @@ export default function Header({currentUser, wallet, nearConfig }) {
     }
   };
 
-  let navigate = useNavigate();
+
 
   return (
 
@@ -94,7 +100,7 @@ export default function Header({currentUser, wallet, nearConfig }) {
               {/* collections */}
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate('/myprofile') }} className="nav-link">Profile</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate(`/user/${wallet.getAccountId()}`) }} className="nav-link">Profile</NavLink>
             </li>
             <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">Wtf?</NavLink>
@@ -153,9 +159,11 @@ export default function Header({currentUser, wallet, nearConfig }) {
             <Dropdown.Menu>
               <Dropdown.Item> {user}</Dropdown.Item>
               <Dropdown.Divider />
+              <Dropdown.Item>{parseFloat(available).toFixed(2)} NEAR</Dropdown.Item>
+              <Dropdown.Divider />
               <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/createcollection") }}>Create Collection</Dropdown.Item>
               <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/mintnft") }}>Mint Nft</Dropdown.Item>
-              <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/myprofile") }}>My Profile</Dropdown.Item>
+              <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate(`/user/${wallet.getAccountId()}`) }}>My Profile</Dropdown.Item>
               <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/editprofile") }}>Edit Profile</Dropdown.Item>
               {/* <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/collections") }}>View Collections</Dropdown.Item>
               <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/nfts") }}>View Nfts</Dropdown.Item> */}

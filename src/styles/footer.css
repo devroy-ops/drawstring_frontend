@@ -40,7 +40,7 @@ footer.menu.text-white {
     margin-left: 60px;
 }
 .row.footer-btm {
-    margin-top: 70px;
+    margin-top: 30px;
 }
 @media screen and (max-width:1025px) {
     footer.menu.text-white {

@@ -241,21 +241,6 @@ const EditProfile = ({ contractX, account, wallet }) => {
                     </div>
                 </div>
                 <div className="border-bottom-2"></div>
-                <div className="container">
-                    <div className="font-size-18 text-light py-3">Verification</div>
-                    <div className="d-flex">
-                        <div className="profile-input pb-3 me-5 w-25">
-                            <div className="desc-text">
-                                Proceed with verification process
-                                to get more visibility and gain trust
-                                on Rarible Marketplace.
-                                Pleace allow up to several weeks for
-                                the process.
-                    </div>
-                        </div>
-                        <div className="color-pink">Get verified</div>
-                    </div>
-                </div>
 
                 <div className="container pb-5 pt-4">
                     <button type="submit" className="btn-submit text-light text-light-mode">Update profile</button>
