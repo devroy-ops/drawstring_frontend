@@ -59,7 +59,6 @@ body{
   }
 }
 
-
 .border-top-none{
   border-top: none !important;
 }
@@ -485,6 +484,10 @@ form.login-info .form-inline input {
 
 .terms-condition li{
   padding-top: 30px;
+}
+
+button:focus{
+  box-shadow: none !important;
 }
 
 /* Light Mode css */

@@ -10,6 +10,7 @@ import copy_icon from '../images/users/copy_icon.svg';
 import { Tabs, Tab } from 'react-bootstrap';
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 import { Loader } from '../services/ui';
+import { init } from '../services/helper';
 
 const Nft = ({ wallet }) => {
     const [activeTab, setActiveTab] = useState(1);
@@ -23,26 +24,41 @@ const Nft = ({ wallet }) => {
     const { collectionId, tokenId } = useParams();
 
     useEffect(() => {
-        return getNft();
+
+        return init(wallet, collectionId).then((contract)=>{
+            viewNFTs(contract);
+        });
+        //return getNft();
     }, []);
 
-    const getNft = async () => {
-        setLoader(true);
-        const user = await getUser();
-        const nft = await user.functions.get_nft_by_token_id(tokenId, collectionId);
-        console.log("nft ", nft);
-        setNft(nft[0]);
-        setLoader(false);
-    }
+    // const getNft = async () => {
+    //     setLoader(true);
+    //     const user = await getUser();
+    //     const nft = await user.functions.get_nft_by_token_id(tokenId, collectionId);
+    //     console.log("nft ", nft);
+    //     setNft(nft[0]);
+    //     setLoader(false);
+    // }
+
+    const viewNFTs = async (contract) => {
+        try {
+            const response = await contract.nft_token({ "token_id": tokenId});
+            console.log(response);
+            setNft(response);
+            return response;
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const addLike = async () => {
 
-        nft.likes = nft.likes ? nft.likes + 1 : 1;
-        setNft({ ...nft });
+        // nft.likes = nft.likes ? nft.likes + 1 : 1;
+        // setNft({ ...nft });
 
-        const walletId = wallet.getAccountId();
-        const user = await getUserForUpdateDb();
-        await user.functions.add_like(walletId, nft.id, nft.contract_id);
+        // const walletId = wallet.getAccountId();
+        // const user = await getUserForUpdateDb();
+        // await user.functions.add_like(walletId, nft.id, nft.contract_id);
     }
 
     return (
@@ -55,7 +71,7 @@ const Nft = ({ wallet }) => {
                         <div className="d-flex">
                             <div className="title">
                                 {/* Product Name */}
-                                {nft.name}
+                                {nft.metadata?.title}
                             </div>
                             <div>
                                 <button type="button" className="btn heart-btn pt-3 px-5" onClick={addLike}><img src={heart} /> <span className="color-gray">{nft.likes}</span></button>
@@ -119,7 +135,7 @@ const Nft = ({ wallet }) => {
                                         </div>
 
                                         <div className="pb-5 pt-4">
-                                            <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for {nft.price} ETH</button>
+                                            <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for {nft.metadata?.price} ETH</button>
                                             <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button>
                                         </div>
                                     </Tab>
@@ -133,7 +149,7 @@ const Nft = ({ wallet }) => {
                     </div>
                     <div className="col-sm-6">
                         {/* <div className="min-height-468">  */}
-                        <img src={nft.media_link} className="img-fluid border-bg product-profile-img" />
+                        <img src={nft.metadata?.media} className="img-fluid border-bg product-profile-img" />
                         {/* <img src={product} className="img-fluid border-bg product-profile-img" /> */}
 
                         {/* </div> */}
