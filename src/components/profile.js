@@ -52,9 +52,9 @@ const Profile = ({ contractX, account, wallet }) => {
     const getProfile = async () => {
         setLoader(true);
         const user = await getUser();
-        debugger;
         const response = await user.functions.get_profile(accountId);
         console.log(response);
+        debugger
         setAuthor(response);
         setLoader(false);
 
@@ -84,11 +84,11 @@ const Profile = ({ contractX, account, wallet }) => {
         <div className="bg-darkmode ueser-pages">
             {isLoading ? <Loader /> : null}
             <div className="pos-rel pb-5">
-                <div className="bg-users height-240">
+                <div className="bg-profile height-240 banner-bg" style={{ backgroundImage: `url('${author?.bannerImageUrl}')` }}>
 
                 </div>
                 <div className="container pb-5 px-0">
-                    <img src={author?.profile_pic ? author?.profile_pic : avtar} className="avtar-position" width="186" height="186"/>
+                    <img src={author?.profile_pic} className="avtar-position edit-profile-pic-input" width="186" height="186"/>
                 </div>
             </div>
             <div className="container pb-5 px-0">

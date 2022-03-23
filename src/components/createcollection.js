@@ -180,7 +180,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                         owner_id: account.accountId,
                         metadata: {
                             "spec": col.spec,
-                            "name": col.name,
+                            "name": col.name.toLowerCase(),
                             "symbol": col.symbol,
                             "icon": col.fileUrl,
                             "base_uri": null,
