@@ -51,7 +51,7 @@ const Home = ({contractX, account, wallet }) => {
 
         const user = await getUser();
         // const featured = await user.functions.get_featured();
-         const allListedNfts = await user.functions.get_all_listed_nfts();
+         const allListedNfts = await user.functions.get_all_listed_nfts(40, 0);
          console.log(allListedNfts)
          setListedNfts(allListedNfts);
         // const top = await user.functions.get_top_collections();

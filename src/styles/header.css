@@ -80,8 +80,12 @@ ul.navbar-nav.me-auto {
 
 .search-icon{
     position: absolute;
-    right: 16px;
-    top: 14px;
+    right: 5px;
+    top: 4px;
+    padding: 10px;
+    cursor: pointer;
+    /* right: 16px;
+    top: 14px; */
 }
 /* 
 .menu-links-row{
