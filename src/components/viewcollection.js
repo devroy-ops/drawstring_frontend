@@ -86,7 +86,7 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     const getAllListedNfts = async () => {
         setLoader(true);
         const user = await getUser();
-        const allListedNfts = await user.functions.get_all_listed_nfts();
+        const allListedNfts = await user.functions.get_all_listed_nfts(40, 0);
         console.log(allListedNfts)
         setListedNfts(allListedNfts);
         setLoader(false);

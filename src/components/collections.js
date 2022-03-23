@@ -23,21 +23,10 @@ const Collections = ({ contractX, account, wallet }) => {
 
     const { authorId } = useParams();
 
-    const init1 = async () => {
-        setLoader(true);
-        var auther = await author(authorId);
-        contract = await init(wallet, auther);
-        setContract(contract);
-        const response = await viewCollection(); //viewNFTs();
-
-        setCollections(response);
-        setLoader(false);
-    };
-
     const getCollections = async() =>{
         setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_collections();
+        const response = await user.functions.get_collections(40, 0);
         console.log(response)
         setCollections(response);
         setLoader(false);

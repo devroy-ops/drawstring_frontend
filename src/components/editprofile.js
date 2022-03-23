@@ -14,9 +14,16 @@ const EditProfile = ({ contractX, account, wallet }) => {
    
     const accountId = wallet.getAccountId();
 
+    // profile image
     const [file, setFile] = useState();
     const [image, setImage] = useState();
     const [isProfilePicChanged, setProfilePicChanged] = useState(false);
+
+    //banner image
+    const [bannerFile, setBannerFile] = useState();
+    const [bannerImage, setBannerImage] = useState();
+    const [isBannerChanged, setBannerChanged] = useState(false);
+   
     const [isAuthor, setIsAuthor] = useState(false);
     const [isLoading, setLoader] = useState(false);
     const [validated, setValidated] = useState(false);
@@ -27,7 +34,9 @@ const EditProfile = ({ contractX, account, wallet }) => {
         bio: "",
         twitterUsername: "",
         siteOrPortfolioLink: "",
-        email: ""
+        email: "",
+        bannerImageUrl:"",
+        profile_pic:""
     });
 
     useEffect(() => {
@@ -41,6 +50,7 @@ const EditProfile = ({ contractX, account, wallet }) => {
        setLoader(false); 
         if (response) {
             setImage({image:response.profile_pic});
+            setBannerImage({bannerImage:response.bannerImageUrl});
             setIsAuthor(true);
             setAuthor({
                 userName:response.display_name,
@@ -49,20 +59,13 @@ const EditProfile = ({ contractX, account, wallet }) => {
                 twitterUsername: response.twitter,
                 siteOrPortfolioLink: response.personal_site,
                 email: response.email,
+                bannerImageUrl: response.bannerImageUrl,
+                profile_pic: response.profile_pic
             });
         } else {
             setIsAuthor(false);
         }
 
-        // mongodb.collection('authors').findOne({ 'userName': accountId }).then(res => {
-        //     setLoader(false);
-        //     if (res) {
-        //         setIsAuthor(true);
-        //         setAuthor(res);
-        //     }else{
-        //         setIsAuthor(false);
-        //     }
-        // })
     }
 
     const handleChange = (e) => {
@@ -91,8 +94,31 @@ const EditProfile = ({ contractX, account, wallet }) => {
         setProfilePicChanged(true);
     }
 
+    const fileSelectHandler1 = (event) => {
+
+        if (event.target.files && event.target.files[0]) {
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                setBannerImage({ bannerImage: e.target.result });
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+        
+        // set file for save into ipfs
+        const reader1 = new FileReader();
+        reader1.readAsArrayBuffer(event.target.files[0]);
+        reader1.onloadend = () => {
+            setBannerFile(Buffer(reader1.result));
+        };
+        setBannerChanged(true);
+    }
+
     const upload = () => {
         document.getElementById("selectImage").click();
+    }
+
+    const upload1 = () => {
+        document.getElementById("selectImage1").click();
     }
 
     const handleSubmit = (event) => {
@@ -104,16 +130,24 @@ const EditProfile = ({ contractX, account, wallet }) => {
             if(isProfilePicChanged){
                 uploadFile();
             }else{
-                saveAuthor(image.image)
+                saveAuthor()
             }
         }
         setValidated(true);
 
     };
 
+    const uploadBanner = async () =>{
+        setLoader(true);
+        const created = await client.add(bannerFile);
+        const url = `https://ipfs.infura.io/ipfs/${created.path}`;
+        setLoader(false);
+        return url;
+    }
+
     const uploadFile = async () => {
        
-        setLoader(true)
+        setLoader(true);
         const created = await client.add(file);
         const url = `https://ipfs.infura.io/ipfs/${created.path}`;
         setLoader(false);
@@ -121,48 +155,31 @@ const EditProfile = ({ contractX, account, wallet }) => {
         saveAuthor(url);
     }
 
-    const saveAuthor = async (profile_picture_url) => {
+    const saveAuthor = async (profile_picture_url="") => {
+        debugger;
+        var bannerImageUrl="";
+        if(isBannerChanged){
+            bannerImageUrl = await uploadBanner();
+        }
         debugger;
         setLoader(true);
         const user = await getUserForUpdateDb();
         await user.functions.update_profile(
             accountId,
             author.email,
-            profile_picture_url,
+            profile_picture_url ? profile_picture_url : author.profile_pic,
             author.userName,
             author.customUrl,
             author.bio,
             author.twitterUsername,
-            author.siteOrPortfolioLink
+            author.siteOrPortfolioLink,
+            bannerImageUrl ? bannerImageUrl : author.bannerImageUrl
         ).then(res => {
             toast("Your profile updated successfully!", { type: 'success' });
         }, error => {
             toast(error, { type: 'error' });
         });
         setLoader(false);
-
-     
-        // var data = author;
-        // setLoader(true);
-        // if (!isAuthor) {
-        //     data.createdDate = new Date().toDateString();
-        //     data._id = new ObjectID();
-        //     mongodb.collection('authors').insertOne(data).then((res)=>{
-        //         setLoader(false);
-        //         toast("Your profile updated successfully!", { type: 'success' });
-        //         getProfile();
-        //     }, error=>{
-        //         toast(error, { type: 'error' });
-        //     });
-        // } else {
-        //     mongodb.collection('authors').findOneAndUpdate({ 'userName': accountId }, data).then((res)=>{
-        //         setLoader(false);
-        //         toast("Your profile updated successfully!", { type: 'success' });
-        //         getProfile();
-        //     }, error=>{
-        //         toast(error, { type: 'error' });
-        //     });
-        // }
     }
 
     return (
@@ -172,11 +189,14 @@ const EditProfile = ({ contractX, account, wallet }) => {
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
 
                 <div className="pos-rel pb-5">
-                    <div className="bg-profile height-240">
+                    {console.log(bannerImage)}
+                    <div className="bg-profile height-240 banner-bg" onClick={upload1} style={{ backgroundImage: `url('${bannerImage?.bannerImage}')` }}>
+                    <div className="edit-prifile-pic-text"> Change Banner (We recomended an image of at least 1200x240) </div>
+                        <input id='selectImage1' hidden type="file" onChange={fileSelectHandler1} accept="image/*" />
                     </div>
                     <div className="container pb-5">
                         {/* <img src={avtar} className="avtar-position" /> */}
-                        <div className="avtar-position edit-profile-pic-input" onClick={upload} style={{ backgroundImage: `url('${image?.image}')` }}>
+                        <div className="avtar-position edit-profile-pic-input" onClick={upload} style={{ backgroundImage: `url('${image?.image}')`}}>
                             <div className="pos-rel" style={{ width: '180px', height: '180px' }}>
                                 <div className="edit-prifile-pic-text"> Choose file </div>
                                 <input id='selectImage' hidden type="file" onChange={fileSelectHandler} accept="image/*" />

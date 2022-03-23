@@ -59,7 +59,6 @@ body{
   }
 }
 
-
 .border-top-none{
   border-top: none !important;
 }
@@ -487,17 +486,32 @@ form.login-info .form-inline input {
   padding-top: 30px;
 }
 
-/* Light Mode css */
+button:focus{
+  box-shadow: none !important;
+}
 
+.banner-bg{
+  background-repeat: no-repeat !important;
+  background-size: 100% !important;
+}
+
+
+/* Light Mode css */
+/* 
+.white-content .edit-profile-pic-input{
+  background: #F3F3F3 !important;
+} */
 
 .white-content .navbar.sticky-top, .white-content .search-box input, 
-.white-content .edit-profile-pic-input, .white-content .bg-darkmode,
+ .white-content .bg-darkmode,
 .white-content .img-preview-box{
   background: #FFFFFF !important;
 }
 
 .white-content .nav-link, .white-content .text-light, .white-content .login-link,
- .white-content .text-white, .white-content .bid-btn, .white-content .follow-btn{
+ .white-content .text-white, .white-content .bid-btn, .white-content .follow-btn,
+ .modal-body .nav-link
+ {
   color: #232323 !important;
 }
 
@@ -524,7 +538,9 @@ form.login-info .form-inline input {
   border-top: 2px solid #C4C4C4;
 }
 
-.white-content .first-box, .white-content .top-sec-box, .white-content .properties-box{
+.white-content .first-box, .white-content .top-sec-box, .white-content .properties-box,
+.modal-body .properties-box
+{
   background: #F3F3F3;
   border: 1px solid #C4C4C4;
 }
@@ -543,7 +559,9 @@ form.login-info .form-inline input {
   color: #717171;
 }
 
-.white-content .tabs-links .nav-tabs .nav-link.active, .white-content .tabs-links .nav-tabs .nav-link:hover{
+.white-content .tabs-links .nav-tabs .nav-link.active, .white-content .tabs-links .nav-tabs .nav-link:hover,
+.modal-body .tabs-links .nav-tabs .nav-link.active, .modal-body .tabs-links .nav-tabs .nav-link:hover
+{
   background-color: #FFFFFF !important;
 }
 

@@ -35,7 +35,7 @@ const Nfts = ({ contractX, account, wallet }) => {
     const getAllNfts = async() =>{
         setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_all_listed_nfts();
+        const response = await user.functions.get_all_listed_nfts(40, 0);
         console.log(response);
         setNfts(response);
         setLoader(false);

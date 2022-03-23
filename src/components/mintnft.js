@@ -68,7 +68,12 @@ export default function MintNft({ contractX, account, wallet }) {
         var transactionHashes = searchParams.get("transactionHashes");
         if (transactionHashes) {
             const nft = JSON.parse(localStorage.getItem("nft"));
-            debugger
+
+            // if(!nft.isApproved){
+            //     nft.isApproved = true;
+            //     localStorage.setItem("nft", JSON.stringify(nft));
+            // }
+            
             navigate(`/nft/${nft.contractId}/${nft.tokenId}`);
 
             toast("Nft minted successfully.", {type: "success"});
@@ -139,10 +144,8 @@ export default function MintNft({ contractX, account, wallet }) {
             if (!accountId) {
                 toast("Wallet is not connected, Please connect the near wallet and try again!", { type: 'error' });
                 return;
-            } else {
-
             }
-
+            debugger;
             var nftData = {
                 token_id: nft.token,
                 metadata: {
@@ -150,7 +153,7 @@ export default function MintNft({ contractX, account, wallet }) {
                     description: nft.description,
                     media: mediaLink,
                     media_hash: null,
-                    copies: null,
+                    copies: parseInt(nft.copies),
                     issued_at: null, // Unix epoch in milliseconds
                     expires_at: null,
                     starts_at: null, // When token starts being valid, Unix epoch in milliseconds
@@ -166,7 +169,7 @@ export default function MintNft({ contractX, account, wallet }) {
 
             const user = await getUserForUpdateDb();
 
-            var data = {contractId: nft.collection.value, tokenId: nft.token};
+            var data = {contractId: nft.collection.value, tokenId: nft.token};// price: nft.price, isApproved: false
             localStorage.setItem("nft", JSON.stringify(data));
 
 
