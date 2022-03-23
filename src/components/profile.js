@@ -26,6 +26,7 @@ import explore6 from '../images/home/explore6.svg';
 import explore7 from '../images/home/explore7.svg';
 import explore8 from '../images/home/explore8.svg';
 import heart from '../images/home/heart.svg';
+import { toast } from 'react-toastify';
 import { Tabs, Tab } from 'react-bootstrap';
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 import { Loader } from '../services/ui';
@@ -109,7 +110,8 @@ const Profile = ({ contractX, account, wallet }) => {
                 </div> */}
                 <div className="d-flex py-4">
                     {/* <button type="button" className="btn follow-btn">Follow</button> */}
-                    <button type="button" onClick={() => {navigator.clipboard.writeText(`http://localhost:3000/${wallet.getAccountId()}`)}} className="btn mx-4 up-btn"><img src={upload} /></button>
+                    <button type="button" onClick={() => {navigator.clipboard.writeText(`${window.location.origin.toString() + "/" + wallet.getAccountId()}`);
+                    toast("copied user profile url", {type: "success"})}} className="btn mx-4 up-btn"><img src={upload} /></button>
                     <button type="button" className="btn more-btn"><img src={more} /></button>
                 </div>
             </div>

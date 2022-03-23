@@ -242,7 +242,7 @@ const EditProfile = ({ contractX, account, wallet }) => {
                     <div className="d-flex">
                         {/* "@author_name" */}
                         <input type="text" defaultValue={author.twitterUsername} onChange={handleChange} name="twitterUsername" placeholder="Enter twitter user name" className="profile-input pb-3 me-5 w-25" />
-                        <div className="color-pink">Veriefied Twitter</div>
+                        {/* <div className="color-pink">Veriefied Twitter</div> */}
                     </div>
                 </div>
                 <div className="border-bottom-2"></div>
@@ -257,7 +257,7 @@ const EditProfile = ({ contractX, account, wallet }) => {
                     <div className="d-flex">
                         {/* "Enter your email" */}
                         <input type="text" defaultValue={author.email} onChange={handleChange} name="email" placeholder="Enter your email" className="profile-input pb-3 me-5 w-25" />
-                        <div className="color-pink">Confirm</div>
+                        {/* <div className="color-pink">Confirm</div> */}
                     </div>
                 </div>
                 <div className="border-bottom-2"></div>

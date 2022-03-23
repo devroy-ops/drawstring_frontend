@@ -34,9 +34,7 @@ export async function initContracts() {
   const account = await near.account(currentUser.accountId);
   const balance = await account.getAccountBalance()
    available = formatNearAmount(balance.available);
-  console.log(available, 'my balance');
   const user = walletConnection.getAccountId()
-  console.log(user, 'user');
  
   // await account.addKey("8hSHprDq2StXwMtNd43wDTXQYsjXcD4MJTXQYsjXcc");
   const keys = await account.getAccessKeys();
