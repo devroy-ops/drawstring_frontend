@@ -330,7 +330,7 @@ const Home = ({contractX, account, wallet }) => {
                             Explore
                         {/* <img src={blockchain} className="ps-4" alt="blockchain icon"/><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} alt="dropdown icon"/> */}
                         <div className='row'>
-                            <Dropdown className="col-sm-3" align="end">
+                            {/* <Dropdown className="col-sm-3" align="end">
                                 <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
                                 <img src={category} className="ps-4" alt="category icon"/><span className="font-size-14 vertical-align px-2"> Category </span><img src={arrow_down} alt="dropdown icon"/>
                                 </Dropdown.Toggle>
@@ -339,7 +339,7 @@ const Home = ({contractX, account, wallet }) => {
                                 <Dropdown.Item>Video</Dropdown.Item>
                                 <Dropdown.Item>Animation</Dropdown.Item>
                                 </Dropdown.Menu>
-                            </Dropdown>
+                            </Dropdown> */}
                             <Dropdown className="col-sm-3" align="end">
                                 <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
                                 <img src={images} className="ps-4" alt="images icon"/><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} alt="dropdown icon"/>
@@ -350,7 +350,7 @@ const Home = ({contractX, account, wallet }) => {
                                 <Dropdown.Item>Animation</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                            <Dropdown className="col-sm-3" align="end">
+                            {/* <Dropdown className="col-sm-3" align="end">
                                 <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
                                 <img src={saletype} className="ps-4" alt="saletype icon"/><span className="font-size-14 vertical-align px-2"> Sale type </span><img src={arrow_down} alt="dropdown icon"/>
                                 </Dropdown.Toggle>
@@ -359,7 +359,7 @@ const Home = ({contractX, account, wallet }) => {
                                 <Dropdown.Item>On Sale</Dropdown.Item>
                                 <Dropdown.Item>Not on Sale</Dropdown.Item>
                                 </Dropdown.Menu>
-                            </Dropdown>
+                            </Dropdown> */}
                             <Dropdown className="col-sm-3" align="end">
                                 <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
                                 <img src={price} className="ps-4" alt="price icon"/><span className="font-size-14 vertical-align px-2"> Price range </span><img src={arrow_down} alt="dropdown icon"/>
@@ -373,7 +373,7 @@ const Home = ({contractX, account, wallet }) => {
                             </Dropdown>
                         </div>
                         </div>
-                        <div className="col-sm-3 text-end">
+                        {/* <div className="col-sm-3 text-end">
                         <Dropdown className="col-sm-3" align="end">
                                 <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
                                 <img src={images} className="ps-4" alt="images icon"/><span className="font-size-14 vertical-align px-2"> sort by </span><img src={arrow_down} alt="dropdown icon"/>
@@ -385,7 +385,7 @@ const Home = ({contractX, account, wallet }) => {
                                 <Dropdown.Item>Active Auctions</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown>
-                        </div>
+                        </div> */}
                     </div>
 
                     <div className="row home_explore">

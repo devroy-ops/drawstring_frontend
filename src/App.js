@@ -234,7 +234,7 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 <Route component={Notfound} /> */}
 
           </Routes>
-          <Footer />
+          <Footer wallet={wallet} />
         </div>
       </Router>
     </AuthProvider>

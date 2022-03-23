@@ -7,7 +7,7 @@ import discord from '../../images/home/discord.svg'
 import instagram from '../../images/home/instagram.svg'
 import '../../styles/footer.css';
 
-function Footer() {
+function Footer({wallet}) {
   return (
     <div>
       <footer className="menu text-white text-center text-lg-start border-top-2">
@@ -32,26 +32,23 @@ function Footer() {
               <div className="row">
                 <div className="col-lg-4 col-md-6 mb-4 mb-md-0">
                   <h5 className="footer-link-title mb-3">Explore</h5>
-                  <ul className="list-unstyled">
+                  {/* <ul className="list-unstyled">
                     <li className="pb-2">
                       <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Music</NavLink>
                     </li>
                     <li className="pb-2">
                       <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">Games</NavLink>
                     </li>
-                  </ul>
+                  </ul> */}
                 </div>
                 <div className="col-lg-4 col-md-6 mb-4 mb-md-0">
                   <h5 className="footer-link-title mb-3">My Account</h5>
                   <ul className="list-unstyled">
                     <li className="pb-2">
-                      <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">My collections</NavLink>
+                      <NavLink exact="true" activeclassname="active" to={`/user/${wallet.getAccountId()}`} className="text-white footer-links">My Profile</NavLink>
                     </li>
                     <li className="pb-2">
-                      <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">My favorites</NavLink>
-                    </li>
-                    <li className="pb-2">
-                      <NavLink exact="true" activeclassname="active" to="/" className="text-white footer-links">My account settings</NavLink>
+                      <NavLink exact="true" activeclassname="active" to="/editprofile" className="text-white footer-links">Edit Profile</NavLink>
                     </li>
                   </ul>
                 </div>
