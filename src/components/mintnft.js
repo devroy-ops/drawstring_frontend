@@ -1,5 +1,5 @@
 import '../App.css';
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import '../styles/createcollection.css';
@@ -14,7 +14,6 @@ import { components } from 'react-select';
 import Select from 'react-select';
 import dp from '../images/header/dp.svg';
 import logo1 from '../images/collection/logo1.png';
-
 import { create } from "ipfs-http-client";
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
@@ -30,7 +29,6 @@ export default function MintNft({ contractX, account, wallet }) {
     const [collections, setCollections] = useState([]);
     const [options, setOptions] = useState([]);
     const [image, setImage] = useState();
-
     const [talbeRows, setRows] = useState([{
         index: 0,
         royalty: "",
@@ -64,7 +62,6 @@ export default function MintNft({ contractX, account, wallet }) {
         let contract = await init(wallet, subaccount);
         setContract(contract);
         getCollections();
-
         var transactionHashes = searchParams.get("transactionHashes");
         if (transactionHashes) {
             const nft = JSON.parse(localStorage.getItem("nft"));
@@ -87,10 +84,10 @@ export default function MintNft({ contractX, account, wallet }) {
     const getCollections = async () => {
         setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_collections();
+        const response = await user.functions.get_collections(3,0);
         setCollections(response);
 
-        const options = [{label: "drawstring_top_level.testnet", value: "drawstring_top_level.testnet", image: logo1}];
+        const options = [{label: "Drawstring", value: "High_On_Drip", image: logo1}];
         response.forEach(col => {
             options.push({
                 label: col.name,
@@ -112,7 +109,7 @@ export default function MintNft({ contractX, account, wallet }) {
     });
 
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
@@ -145,7 +142,6 @@ export default function MintNft({ contractX, account, wallet }) {
                 toast("Wallet is not connected, Please connect the near wallet and try again!", { type: 'error' });
                 return;
             }
-            debugger;
             var nftData = {
                 token_id: nft.token,
                 metadata: {

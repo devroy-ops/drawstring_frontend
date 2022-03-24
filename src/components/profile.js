@@ -40,7 +40,6 @@ const Profile = ({ contractX, account, wallet }) => {
     const [author, setAuthor] = useState({});
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
-
     const handleSelect = (selectedTab) => {
         setActiveTab(parseInt(selectedTab))
     }
