@@ -33,7 +33,7 @@ const Home = ({contractX, account, wallet }) => {
     var [nfts, setNfts] = useState([]);
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
-    
+    const [count, setCount] = useState(10)
     const [nft, setNft] = useState({});
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -44,14 +44,14 @@ const Home = ({contractX, account, wallet }) => {
 
     useEffect(() => {
         return getNfts();
-    }, []);
+    }, [count]);
 
     const getNfts = async () => {
         setLoader(true);
 
         const user = await getUser();
         // const featured = await user.functions.get_featured();
-         const allListedNfts = await user.functions.get_all_listed_nfts(40, 0);
+         const allListedNfts = await user.functions.get_all_listed_nfts(count, 0);
          console.log(allListedNfts)
          setListedNfts(allListedNfts);
         // const top = await user.functions.get_top_collections();
@@ -74,6 +74,9 @@ const Home = ({contractX, account, wallet }) => {
         const walletId = wallet.getAccountId();
         const user = await getUserForUpdateDb();
         await user.functions.add_like(walletId,nft.id, nft.contract_id);
+    }
+    const loadMore = () => {
+        setCount((prev)=> prev + 10)
     }
 
     let carousel;
@@ -288,6 +291,11 @@ const Home = ({contractX, account, wallet }) => {
                             )
                         }
                         )}
+                                <div className='load'>
+                                <button onClick={loadMore} className="load-more">
+                                    {isLoading ? 'Loading...' : 'Load More'}
+                                </button>
+                                </div>
                     </div>
                 </div>
             </div>
