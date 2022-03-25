@@ -200,7 +200,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
     // const deployAndInitializeContract = async (iconUrl) => {
     //     try {
-    //         debugger;
     //         const result = await account.signAndSendTransaction({
     //             receiverId: "rough.testnet",//account.accountId,
     //             actions: [
@@ -260,7 +259,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
             let col = collection;
             col.fileUrl = url;
-            debugger;
 
             localStorage.setItem("collection", JSON.stringify(col));
 

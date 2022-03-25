@@ -19,32 +19,26 @@ const Nfts = ({ contractX, account, wallet }) => {
     const [nfts, setNfts] = useState([]);
     var [contract, setContract] = useState();
     const [isLoading, setLoader] = useState(false);
+    const [count, setCount] = useState(0);
 
     const { authorId } = useParams();
-
-    // const init1 = async () => {
-    //     setLoader(true);
-    //     var auther = await author(authorId);
-    //     contract = await init(wallet, auther);
-    //     setContract(contract);
-    //     const response = await viewNFTs();
-    //     setCollections(response);
-    //     setLoader(false);
-    // };
 
     const getAllNfts = async() =>{
         setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_all_listed_nfts(40, 0);
+        const response = await user.functions.get_all_listed_nfts(10, count*10);
         console.log(response);
-        setNfts(response);
+        setNfts([...nfts, ...response]);
         setLoader(false);
     }
 
+    const loadMore = () => {
+        setCount((prev)=> prev + 1)
+    }
+
     useEffect(() => {
-        //return init1();
         return getAllNfts();
-    }, []);
+    }, [count]);
 
     let navigate = useNavigate();
 
@@ -69,117 +63,6 @@ const Nfts = ({ contractX, account, wallet }) => {
         let path = `/nft/${collectionId}/${tokenId}`;
         navigate(path);
     }
-
-    // const [show, setShow] = useState(false);
-    // const handleClose = () => setShow(false);
-    // const handleShow = () => setShow(true);
-
-    // const [validated, setValidated] = useState(false);
-
-    // const [nft, setNft] = useState({
-    //     token: "",
-    //     title: "",
-    //     media: "",
-    //     description: ""
-    // });
-
-    // const handleSubmit = (event) => {
-    //     event.preventDefault();
-    //     const form = event.currentTarget;
-    //     if (form.checkValidity() === false) {
-    //         event.stopPropagation();
-    //     } else {
-    //         //mintNFT();
-    //         uploadFile();
-    //     }
-    //     setValidated(true);
-    // };
-
-    // const uploadFile = async () => {
-    //     if (nft.media) {
-    //         setLoader(true);
-    //         storage.ref(nft.media.name).put(nft.media).then(() => {
-    //             storage.ref(nft.media.name).getDownloadURL().then((url) => {
-    //                 mintNFT(url);
-    //                 setLoader(false);
-    //             });
-    //         });
-    //     } else {
-    //         toast("Media is reqired.", { type: "error" })
-    //     }
-    // }
-
-    // const mintNFT = async (mediaLink) => {
-    //     try {
-
-    //         var accountId = wallet.getAccountId();
-
-    //         if (!accountId) {
-    //             toast("Wallet is not connected, Please connect the near wallet and try again!", { type: 'error' });
-    //             return;
-    //         } else {
-    //             handleClose();
-    //         }
-
-    //         var nftData = {
-    //             token_id: nft.token,
-    //             metadata: {
-    //                 title: nft.title,
-    //                 description: nft.description,
-    //                 media: mediaLink,
-    //                 media_hash: null,
-    //                 copies: null,
-    //                 issued_at: null, // Unix epoch in milliseconds
-    //                 expires_at: null,
-    //                 starts_at: null, // When token starts being valid, Unix epoch in milliseconds
-    //                 updated_at: null, // When token was last updated, Unix epoch in milliseconds
-    //                 extra: null, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
-    //                 referance: null, // URL to a JSON file with more info
-    //                 referance_hash: null,
-    //             },
-    //             receiver_id: "rough.testnet",
-    //             perpetual_royalties: null,
-    //             price: "$2593251"
-    //         };
-
-    //         var data = {};
-    //         data.nftData = nftData;
-    //         // const docId = db.collection('nfts').doc().id;
-    //         // data.docId = docId;
-    //         data.createdDate = new Date().toDateString(); //fb.firestore.FieldValue.serverTimestamp();
-    //         data.authorId = authorId;
-    //         data._id = new ObjectID();
-    //         // await db.collection("nfts").doc(docId).set(data);
-    //         await mongodb.collection('nfts').insertOne(data);
-            
-    //         const response = await contract.nft_mint(
-    //             nftData,
-    //             GAS,
-    //             mint_txFee
-    //         );
-
-    //         console.log(response);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
-
-    // const handleChange = (e) => {
-    //     setNft((prev) => {
-    //         if (e.target.name === "media") {
-    //             return { ...prev, [e.target.name]: e };
-    //         } else {
-    //             return { ...prev, [e.target.name]: e.target.value };
-    //         }
-    //     });
-    // };
-
-    // const handleFileChange = (file) => {
-    //     setNft((prev) => { return { ...prev, "media": file } });
-    // };
-
-    // const onSizeError = (error) => {
-    // }
 
     return (
         <div className="menu">
@@ -242,6 +125,12 @@ const Nfts = ({ contractX, account, wallet }) => {
                             }
                         </tbody>
                     </table>
+
+                    <div className='load'>
+                        <button onClick={loadMore} className="load-more">
+                            {isLoading ? 'Loading...' : 'Load More'}
+                        </button>
+                    </div>
                 </div>
             </div>
 

@@ -62,7 +62,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
             setCollection(collection[0]);
             const response = await user.functions.get_nfts_in_collection(collectionId);
             console.log(response)
-            debugger;
             setListedNfts(response);
             
             setLoader(false);
