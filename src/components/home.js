@@ -33,7 +33,7 @@ const Home = ({contractX, account, wallet }) => {
     var [nfts, setNfts] = useState([]);
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
-    const [count, setCount] = useState(10)
+    const [count, setCount] = useState(0)
     const [nft, setNft] = useState({});
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -51,9 +51,9 @@ const Home = ({contractX, account, wallet }) => {
 
         const user = await getUser();
         // const featured = await user.functions.get_featured();
-         const allListedNfts = await user.functions.get_all_listed_nfts(count, 0);
+         const allListedNfts = await user.functions.get_all_listed_nfts(10, count*10);
          console.log(allListedNfts)
-         setListedNfts(allListedNfts);
+         setListedNfts([...listedNfts, ...allListedNfts]);
         // const top = await user.functions.get_top_collections();
 
         mongodb.collection('nfts').find().then(nftss=>{
@@ -76,7 +76,7 @@ const Home = ({contractX, account, wallet }) => {
         await user.functions.add_like(walletId,nft.id, nft.contract_id);
     }
     const loadMore = () => {
-        setCount((prev)=> prev + 10)
+        setCount((prev)=> prev + 1)
     }
 
     let carousel;

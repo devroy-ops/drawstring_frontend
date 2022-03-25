@@ -86,8 +86,15 @@ export default function Header({ currentUser, wallet, nearConfig }) {
     }
   }
 
+  const gotoHome = async() =>{
+    navigate("/");
+  }
+
   const searchValue = (option) => {
-    navigate(`/${option}?searchString=${searchString}`);
+    gotoHome().then(()=>{
+      navigate(`/${option}?searchString=${searchString}`, {state: {}});
+    })
+    
   }
 
   const handleChange = (e) => {
@@ -124,9 +131,9 @@ export default function Header({ currentUser, wallet, nearConfig }) {
             <Dropdown.Menu show={isMenuOpened}>
               <Dropdown.Header>Select at least one option for search</Dropdown.Header>
               <Dropdown.Divider />
-              <Dropdown.Item onClick={()=>searchValue('collections')} >Collection</Dropdown.Item>
-              <Dropdown.Item onClick={()=>searchValue('nfts')}>Nft</Dropdown.Item>
-              <Dropdown.Item onClick={()=>searchValue('users')}>User</Dropdown.Item>
+              <Dropdown.Item onClick={()=>searchValue('nfts')}>Nfts</Dropdown.Item>
+              <Dropdown.Item onClick={()=>searchValue('users')}>Users</Dropdown.Item>
+              <Dropdown.Item onClick={()=>searchValue('collections')} >Collections</Dropdown.Item>
              </Dropdown.Menu>
              </Dropdown>
           </div>
@@ -140,12 +147,12 @@ export default function Header({ currentUser, wallet, nearConfig }) {
             <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate(`/user/${wallet.getAccountId()}`) }} className="nav-link">Profile</NavLink>
             </li>
-            {/* <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">Wtf?</NavLink>
-
-            </li> */}
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">About</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">Wtf?</NavLink>
+              {/* viewcollection */}
+            </li>
+            <li className="nav-item">
+              <NavLink exact="true" activeclassname="active" to="/product" className="nav-link">About</NavLink>
             </li>
           </ul>
         </div>

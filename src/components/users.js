@@ -9,31 +9,32 @@ const Users = () => {
     const [users, setUsers] = useState([]);
     const [isLoading, setLoader] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
-    const [count, setCount] = useState(10);
-
+    const [count, setCount] = useState(0);
+    const [searchString, setSearchString] = useState("");
+    
     useEffect(() => {
         return getUsers();
-    }, []);
+    }, [count]);
 
     const getUsers = async () => {
         try {
             setLoader(true);
-
-            var searchString = searchParams.get("searchString") || '';
-            debugger;
+            const searchString = searchParams.get("searchString") || '';
+            setSearchString(searchString);
             const user = await getUserForUpdateDb();
-            const response = await user.functions.search_profiles_by_name(10, count*10, searchString);
-            // const top = await user.functions.search_collections_by_name(100, 0, '');
-            debugger;
+            const response = await user.functions.search_profiles_by_name(10, count * 10, searchString);
+            console.log("users ", response)
             setUsers([...users, ...response]);
             setLoader(false);
         } catch (error) {
+            setLoader(false);
+            setUsers([]);
             console.log(error);
         }
     }
 
     const loadMore = () => {
-        setCount((prev)=> prev + 1)
+        setCount((prev) => prev + 1)
     }
 
 
@@ -43,7 +44,14 @@ const Users = () => {
             <div className="">
                 <div className="title text-light pb-3 container px-0">
                     <div className="row">
-                        Users
+                        <div className="col-sm-6">
+                            Users
+                        </div>
+                        <div className="col-sm-6 text-end">
+                             {searchString && (
+                                <div> Search Results for "{searchString}"</div>
+                            )}
+                        </div>
                     </div>
 
                 </div>
@@ -52,30 +60,47 @@ const Users = () => {
                         <thead>
                             <tr>
                                 <th width="11%"></th>
-                                <th>First Name</th>
-                                <th>Last Name</th>
+                                <td></td>
                                 <th>User Name</th>
+                                <th>Twitter</th>
+                                <th>Personal site</th>
+                                <th>Custom url</th>
+                                {/* <th>Bio</th> */}
+                                <th>Email</th>
+                                <th>Wallet Id</th>
+
                             </tr>
                         </thead>
 
-                        {/* <tbody className="border-top-none">
+                        <tbody className="border-top-none">
                             {users && users.length > 0 && users.map((user, index) => {
                                 return (
                                     <tr key={index}>
-                                        <td > <img src={collection1} alt="author media"/> {user.firstName}</td>
-                                        <td>{user.lastName}</td>
-                                        <td>{user.userName}</td>
+                                        <td></td>
+                                        <td > <img src={user.profile_pic} alt="author media" width="42" height="42" className="border-radius-50"/> {user.firstName}</td>
+                                        <td>{user.display_name}</td>
+                                        <td>{user.twitter}</td>
+                                        <td>{user.personal_site}</td>
+                                        <td>{user.custom_url}</td>
+                                        {/* <td>{user.bio}</td> */}
+                                        <td>{user.email}</td>
+                                        <td>{user.walletId}</td>
                                     </tr>
                                 )
                             })
                             }
-                        </tbody> */}
+                        </tbody>
                     </table>
-                    <div className='load'>
-                        <button onClick={loadMore} className="load-more">
-                            {isLoading ? 'Loading...' : 'Load More'}
-                        </button>
-                    </div>
+                    {users && users.length == 0 && (
+                        <div className='text-light text-center'>No data found</div>
+                    )}
+                    {users && users.length > 0 && (
+                        <div className='load'>
+                            <button onClick={loadMore} className="load-more">
+                                {isLoading ? 'Loading...' : 'Load More'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

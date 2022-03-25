@@ -35,7 +35,7 @@ const NftDetailModal=({nftData, isModalOpen, handleClose, walletId})=>{
                         {/* <div className="copy-btn pt-2 mt-3 mb-4"> #27513  0x47BE...6f4f <img src={copy_icon} className="float-end" /></div> */}
 
                         <div className="d-flex font-size-18 mt-4 mb-3 onsel-mob-text-16" >
-                            <div className="me-5">On sale for 6.09 Near</div>
+                            <div className="me-5">On sale for {nftData?.price} Near</div>
                             {/* <div>Highest bid 7 WETH</div> */}
                         </div>
 

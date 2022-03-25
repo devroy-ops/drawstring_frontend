@@ -26,7 +26,7 @@ export default function MintNft({ contractX, account, wallet }) {
     const [currentAuthor, setAuthor] = useState({});
     var [contract, setContract] = useState({});
     const [isLoading, setLoader] = useState(false);
-    const [colCount, setColCount] = useState(3)
+    const [colCount, setColCount] = useState(0)
     const [collections, setCollections] = useState([]);
     const [options, setOptions] = useState([]);
     const [image, setImage] = useState();
@@ -85,11 +85,13 @@ export default function MintNft({ contractX, account, wallet }) {
     const getCollections = async () => {
         setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_collections(colCount,0);
-        setCollections(response);
+        const response = await user.functions.get_collections(5, colCount*5);
+
+        var allCollections = [...collections, ...response];
+        setCollections(allCollections);
 
         const options = [{label: "Drawstring", value: "High_On_Drip", image: logo1}];
-        response.forEach(col => {
+        allCollections.forEach(col => {
             options.push({
                 label: col.name,
                 value: col.contractId,
@@ -100,7 +102,7 @@ export default function MintNft({ contractX, account, wallet }) {
         setLoader(false);
     }
     const loadMore = (options) => {
-        setColCount((prev) => prev + 3)
+        setColCount((prev) => prev + 1)
         console.log(options);
     }
 
@@ -252,8 +254,10 @@ export default function MintNft({ contractX, account, wallet }) {
     const CustomMenu = (props) => {
         return (
             <components.MenuList  {...props}>
-                <button className='load-col' onClick={()=> {loadMore()}}>{isLoading ? 'Loading...' : 'Load More'}</button>
                 {props.children}
+                <div className='text-center d-grid gap-2'>
+                    <button className='load-col' onClick={()=> {loadMore()}}>{isLoading ? 'Loading...' : 'Load More'}</button>
+                </div>
             </components.MenuList >
         ) }
 
