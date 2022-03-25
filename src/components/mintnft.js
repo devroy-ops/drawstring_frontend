@@ -26,6 +26,7 @@ export default function MintNft({ contractX, account, wallet }) {
     const [currentAuthor, setAuthor] = useState({});
     var [contract, setContract] = useState({});
     const [isLoading, setLoader] = useState(false);
+    const [colCount, setColCount] = useState(3)
     const [collections, setCollections] = useState([]);
     const [options, setOptions] = useState([]);
     const [image, setImage] = useState();
@@ -79,12 +80,12 @@ export default function MintNft({ contractX, account, wallet }) {
 
     useEffect(() => {
         return init1();
-    }, []);
+    }, [colCount]);
 
     const getCollections = async () => {
         setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_collections(3,0);
+        const response = await user.functions.get_collections(colCount,0);
         setCollections(response);
 
         const options = [{label: "Drawstring", value: "High_On_Drip", image: logo1}];
@@ -98,6 +99,11 @@ export default function MintNft({ contractX, account, wallet }) {
         setOptions(options);
         setLoader(false);
     }
+    const loadMore = (options) => {
+        setColCount((prev) => prev + 3)
+        console.log(options);
+    }
+
 
     const [validated, setValidated] = useState(false);
 
@@ -243,8 +249,15 @@ export default function MintNft({ contractX, account, wallet }) {
     //         image: dp,
     //     }
     // ];
+    const CustomMenu = (props) => {
+        return (
+            <components.MenuList  {...props}>
+                <button className='load-col' onClick={()=> {loadMore()}}>{isLoading ? 'Loading...' : 'Load More'}</button>
+                {props.children}
+            </components.MenuList >
+        ) }
 
-    const { SingleValue, Option } = components;
+    const { SingleValue, Option, Menu } = components;
 
     const IconSingleValue = (props) => (
         <SingleValue {...props}>
@@ -259,6 +272,7 @@ export default function MintNft({ contractX, account, wallet }) {
             {props.data.label}
         </Option>
     );
+
 
     // Step 3
     const customStyles = {
@@ -357,7 +371,7 @@ export default function MintNft({ contractX, account, wallet }) {
                                 {/* <div className="font-size-18 text-light py-3">Collection</div> */}
                                 <Select placeholder="Choose a collection"
                                     styles={customStyles}
-                                    components={{ SingleValue: IconSingleValue, Option: IconOption }}
+                                    components={{ SingleValue: IconSingleValue, Option: IconOption, Menu: CustomMenu  }}
                                     options={options}
                                     name="collection"
                                     defaultValue={nft.collection}
