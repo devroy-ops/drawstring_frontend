@@ -45,7 +45,7 @@ const EditProfile = ({ contractX, account, wallet }) => {
 
     const getProfile = async () => {
     setLoader(true);        
-      const user = await getUser();
+      const user = await getUserForUpdateDb();
        const response = await user.functions.get_profile(accountId);
        setLoader(false); 
         if (response) {
@@ -156,12 +156,10 @@ const EditProfile = ({ contractX, account, wallet }) => {
     }
 
     const saveAuthor = async (profile_picture_url="") => {
-        debugger;
         var bannerImageUrl="";
         if(isBannerChanged){
             bannerImageUrl = await uploadBanner();
         }
-        debugger;
         setLoader(true);
         const user = await getUserForUpdateDb();
         await user.functions.update_profile(

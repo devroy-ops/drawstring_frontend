@@ -1,7 +1,7 @@
 import '../App.css';
 import '../styles/collection.css';
 import collection1 from '../images/collection/collection1.svg';
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { init, author, GAS, mint_txFee, transfer_txFee, txFee, storage1 } from "../services/helper";
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
@@ -20,177 +20,34 @@ const Collections = ({ contractX, account, wallet }) => {
     const [collections, setCollections] = useState([]);
     var [contract, setContract] = useState();
     const [isLoading, setLoader] = useState(false);
+    const [count, setCount] = useState(10);
 
     const { authorId } = useParams();
 
     const getCollections = async() =>{
         setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_collections(40, 0);
+        const response = await user.functions.get_collections(10, count*10);
         console.log(response)
-        setCollections(response);
+        setCollections([...collections, ...response]);
         setLoader(false);
     }
 
     useEffect(() => {
         //return init1();
         return getCollections();
-    }, []);
+    }, [count]);
+
+    const loadMore = () => {
+        setCount((prev)=> prev + 1)
+    }
 
     let navigate = useNavigate();
-
-    const viewCollection = async () => {
-        try {
-          const user = await getUser();
-          const response = await user.functions.get_collections();
-          console.log(response);
-          return response;
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
-    const viewCollection1 = async () => {
-        try {
-          const response = await contract.nft_metadata({});
-          console.log(response);
-          return response;
-        } catch (error) {
-          console.log(error);
-        }
-      };
-
-    const viewNFTs = async () => {
-        try {
-            const response = await contract.nft_tokens({ from_index: "0", limit: 100 });
-            console.log(response);
-
-            return response;
-        } catch (error) {
-
-            toast(error.toString(), { type: "error" });
-
-            navigate(-1);
-
-            console.log(error);
-        }
-    };
 
     const routeChange = (collectionId) => {
         let path = `/viewcollection/${collectionId}`;
         //let path = `/nfts/${authorId}`;
         navigate(path);
-    }
-
-    const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-
-    const [validated, setValidated] = useState(false);
-
-    const [nft, setNft] = useState({
-        token: "",
-        title: "",
-        media: "",
-        description: ""
-    });
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const form = event.currentTarget;
-        if (form.checkValidity() === false) {
-            event.stopPropagation();
-        } else {
-            //mintNFT();
-            uploadFile();
-        }
-        setValidated(true);
-    };
-
-    const uploadFile = async () => {
-        if (nft.media) {
-            setLoader(true);
-            storage.ref(nft.media.name).put(nft.media).then(() => {
-                storage.ref(nft.media.name).getDownloadURL().then((url) => {
-                    mintNFT(url);
-                    setLoader(false);
-                });
-            });
-        } else {
-            toast("Media is reqired.", { type: "error" })
-        }
-    }
-
-    const mintNFT = async (mediaLink) => {
-        try {
-
-            var accountId = wallet.getAccountId();
-
-            if (!accountId) {
-                toast("Wallet is not connected, Please connect the near wallet and try again!", { type: 'error' });
-                return;
-            } else {
-                handleClose();
-            }
-
-            var nftData = {
-                token_id: nft.token,
-                metadata: {
-                    title: nft.title,
-                    description: nft.description,
-                    media: mediaLink,
-                    media_hash: null,
-                    copies: null,
-                    issued_at: null, // Unix epoch in milliseconds
-                    expires_at: null,
-                    starts_at: null, // When token starts being valid, Unix epoch in milliseconds
-                    updated_at: null, // When token was last updated, Unix epoch in milliseconds
-                    extra: null, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
-                    referance: null, // URL to a JSON file with more info
-                    referance_hash: null,
-                },
-                receiver_id: "rough.testnet",
-                perpetual_royalties: null,
-                price: "$2593251"
-            };
-
-            var data = {};
-            data.nftData = nftData;
-            // const docId = db.collection('nfts').doc().id;
-            // data.docId = docId;
-            data.createdDate = new Date().toDateString(); //fb.firestore.FieldValue.serverTimestamp();
-            data.authorId = authorId;
-            data._id = new ObjectID();
-            // await db.collection("nfts").doc(docId).set(data);
-            await mongodb.collection('nfts').insertOne(data);
-            
-            const response = await contract.nft_mint(
-                nftData,
-                GAS,
-                mint_txFee
-            );
-
-            console.log(response);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const handleChange = (e) => {
-        setNft((prev) => {
-            if (e.target.name === "media") {
-                return { ...prev, [e.target.name]: e };
-            } else {
-                return { ...prev, [e.target.name]: e.target.value };
-            }
-        });
-    };
-
-    const handleFileChange = (file) => {
-        setNft((prev) => { return { ...prev, "media": file } });
-    };
-
-    const onSizeError = (error) => {
     }
 
     return (
@@ -253,91 +110,13 @@ const Collections = ({ contractX, account, wallet }) => {
                             }
                         </tbody>
                     </table>
+                    <div className='load'>
+                        <button onClick={loadMore} className="load-more">
+                            {isLoading ? 'Loading...' : 'Load More'}
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <Modal show={show} onHide={handleClose}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add New NFT</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form noValidate validated={validated} onSubmit={handleSubmit}>
-                        <Row className="mb-3">
-                            <Form.Group as={Col} md="6" controlId="validationCustom01">
-                                <Form.Label>NFT Token</Form.Label>
-                                <Form.Control
-                                    required
-                                    type="text"
-                                    placeholder="NFT Token"
-                                    name="token"
-                                    defaultValue={nft.token}
-                                    onChange={handleChange}
-                                />
-                                <Form.Control.Feedback type="invalid">NFT Token is required!</Form.Control.Feedback>
-                            </Form.Group>
-                            <Form.Group as={Col} md="6" controlId="validationCustom02">
-                                <Form.Label>Title</Form.Label>
-                                <Form.Control
-                                    required
-                                    type="text"
-                                    placeholder="Title"
-                                    name="title"
-                                    defaultValue={nft.title}
-                                    onChange={handleChange}
-                                />
-                                <Form.Control.Feedback type="invalid">Title is required!</Form.Control.Feedback>
-                            </Form.Group>
-
-                        </Row>
-
-                        <Row className="mb-3">
-                            <Form.Group as={Col} md="12" controlId="validationCustom03">
-                                <Form.Label>Media</Form.Label>
-                                {/* <Form.Control
-                                    type="file"
-                                    placeholder="Media link"
-                                    required
-                                    name="media"
-                                    //defaultValue={nft.media}
-                                    onChange={handleChange}
-                                /> */}
-                                {/* <input type="file" onChange={handleChange} /> */}
-                                <FileUploader handleChange={handleFileChange} defaultValue={nft.media} name="media" types={fileTypes} label="PNG, GIF, WEBP, SVG. Max 100mb." maxSize="2" onTypeError={onSizeError} required />
-                                <Form.Control.Feedback type="invalid">
-                                    Media is required
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                        </Row>
-
-                        <Row className="mb-3">
-                            <Form.Group as={Col} md="12" controlId="validationCustom04">
-                                <Form.Label>Description</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={3}
-                                    required
-                                    name="description"
-                                    defaultValue={nft.description}
-                                    onChange={handleChange}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    Please provide the nft description.
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                        </Row>
-
-                        {/* <Button type="submit">Submit form</Button> */}
-                        <div className="text-end">
-                            <Button variant="secondary" type="button" onClick={handleClose} className="me-3">
-                                Close
-                            </Button>
-                            <Button variant="primary" type="submit">
-                                Save Changes
-                            </Button>
-                        </div>
-                    </Form>
-                </Modal.Body>
-            </Modal>
         </div>
     );
 }

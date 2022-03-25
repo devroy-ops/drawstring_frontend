@@ -50,10 +50,9 @@ const Profile = ({ contractX, account, wallet }) => {
 
     const getProfile = async () => {
         setLoader(true);
-        const user = await getUser();
+        const user = await getUserForUpdateDb();
         const response = await user.functions.get_profile(accountId);
         console.log(response);
-        debugger
         setAuthor(response);
         setLoader(false);
 
