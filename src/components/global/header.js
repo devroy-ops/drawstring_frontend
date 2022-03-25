@@ -102,12 +102,12 @@ let available = balance()
             <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate(`/user/${wallet.getAccountId()}`) }} className="nav-link">Profile</NavLink>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">Wtf?</NavLink>
-              {/* viewcollection */}
-            </li>
+
+            </li> */}
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/product" className="nav-link">About</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">About</NavLink>
             </li>
           </ul>
         </div>

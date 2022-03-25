@@ -203,9 +203,9 @@ const Home = ({contractX, account, wallet }) => {
                                 <Dropdown.Item>Animation</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown> */}
-                            <Dropdown className="col-sm-3" align="end">
-                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
-                                <img src={images} className="ps-4" alt="images icon"/><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} alt="dropdown icon"/>
+                            <Dropdown className="col-sm-3 ps-2" align="end">
+                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align' id="dropdown-basic">
+                                <img src={images} className="ps-4" alt="images icon"/><span className="font-size-14 vertical-align px-1">Collections</span><img src={arrow_down} alt="dropdown icon"/>
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                 <Dropdown.Item>Music</Dropdown.Item>
@@ -224,8 +224,8 @@ const Home = ({contractX, account, wallet }) => {
                                 </Dropdown.Menu>
                             </Dropdown> */}
                             <Dropdown className="col-sm-3" align="end">
-                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
-                                <img src={price} className="ps-4" alt="price icon"/><span className="font-size-14 vertical-align px-2"> Price range </span><img src={arrow_down} alt="dropdown icon"/>
+                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-4' id="dropdown-basic">
+                                <img src={price} className="ps-4" alt="price icon"/><span className="font-size-14 vertical-align px-6"> Price range </span><img src={arrow_down} alt="dropdown icon"/>
                                 </Dropdown.Toggle>
                                 <Dropdown.Menu>
                                 <Dropdown.Item>Free</Dropdown.Item>
