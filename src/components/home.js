@@ -300,7 +300,7 @@ const Home = ({contractX, account, wallet }) => {
                 </div>
             </div>
 
-           <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose}/>
+           <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} walletId={wallet.getAccountId()}/>
         </div>
     );
 }

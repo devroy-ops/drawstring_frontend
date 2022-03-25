@@ -12,17 +12,21 @@ import { ThemeContext, themes } from '../../theame/theameContext';
 import { db, auth } from "../../db/firebase";
 import logo from '../../images/header/logo.png'
 import { NearContext } from '../../contexts';
-import { getUser } from "../../db/mongodb";
+import { getUser, getUserForUpdateDb } from "../../db/mongodb";
 import { scroller } from "react-scroll";
-import {balance} from "../../services/utils";
+import { balance } from "../../services/utils";
 
-export default function Header({currentUser, wallet, nearConfig }) {
+export default function Header({ currentUser, wallet, nearConfig }) {
 
   const [darkMode, setDarkMode] = React.useState(true);
   const { signIn, signOut } = useContext(NearContext);
   const [profile, setProfile] = useState({});
+  const [searchString, setSearchBoxValue] = useState('');
+  const [isMenuOpened, setMenuOpen] = useState(false);
 
- const scrollToSection = () => {
+  const navigate = useNavigate();
+
+  const scrollToSection = () => {
     scroller.scrollTo("explore", {
       duration: 500,
       delay: 0,
@@ -47,19 +51,18 @@ export default function Header({currentUser, wallet, nearConfig }) {
   // const { currentUser } = useContext(AuthContext);
   // if (currentUser) {
   // }
- 
- 
-let available = balance()
- 
-  let navigate = useNavigate();
+
+
+  let available = balance()
+
   const user = wallet.getAccountId();
   let User = wallet.isSignedIn();
   const handleUser = async (e) => {
     if (User) {
-      signOut().then(()=> navigate("/"));
-      
+      signOut().then(() => navigate("/"));
+
     } else if (!User) {
-      signIn().then(()=> navigate("/"));
+      signIn().then(() => navigate("/"));
     }
   }
 
@@ -70,14 +73,28 @@ let available = balance()
 
   const getProfile = async () => {
     if (user) {
-      const muser = await getUser();
+      const muser = await getUserForUpdateDb();
       const pro = await muser.functions.get_profile(user);
       console.log(pro)
       setProfile(pro);
     }
   };
 
+  const handleKeyUp = (event) => {
+    if (event.key === 'Enter') {
+      setMenuOpen(true);
+    }
+  }
 
+  const searchValue = (option) => {
+    navigate(`/${option}?searchString=${searchString}`);
+  }
+
+  const handleChange = (e) => {
+    setSearchBoxValue(
+      e.target.value
+    );
+  };
 
   return (
 
@@ -88,9 +105,30 @@ let available = balance()
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="search-box mx-3 tab-none">
-          <input type="text" placeholder="Collection, item or user" />
+          <input type="text" placeholder="Collection, item or user"
+            name="searchString"
+            value={searchString}
+            onChange={(e) => {
+              handleChange(e);
+            }}
+            onKeyUp={handleKeyUp}
+            required
+          />
           <div>
-            <img src={search} className="search-icon" />
+            {/* <img src={search} className="search-icon" onClick={searchValue} /> */}
+            <Dropdown align="end">
+            <Dropdown.Toggle id="dropdown-button-dark" variant="dark" className="search-icon">
+              <img src={search} />
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu show={isMenuOpened}>
+              <Dropdown.Header>Select at least one option for search</Dropdown.Header>
+              <Dropdown.Divider />
+              <Dropdown.Item onClick={()=>searchValue('collections')} >Collection</Dropdown.Item>
+              <Dropdown.Item onClick={()=>searchValue('nfts')}>Nft</Dropdown.Item>
+              <Dropdown.Item onClick={()=>searchValue('users')}>User</Dropdown.Item>
+             </Dropdown.Menu>
+             </Dropdown>
           </div>
         </div>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">

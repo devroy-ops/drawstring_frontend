@@ -320,7 +320,6 @@ export default function MintNft({ contractX, account, wallet }) {
                             <div>
                                 <div className="font-size-18 text-light py-3">Name</div>
                                 <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “Redeemable T-Shirt withLogo”'
-                                    type="text"
                                     name="title"
                                     defaultValue={nft.title}
                                     onChange={handleChange}

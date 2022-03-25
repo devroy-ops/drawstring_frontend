@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { useRef } from 'react'
 import Home from './components/home';
-import Users from './components/profile';
+import Users from './components/users';
 import EditProfile from './components/editprofile';
 import Collections from './components/collections';
 import CreateCollection from './components/createcollection';
@@ -107,6 +107,7 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 nearConfig={nearConfig}
               />} />
               <Route path="/terms" component={Terms} element={<Terms />} />
+              <Route path="/users" component={Users} element={<Users />} />
               <Route path={`/user/${wallet.getAccountId()}`} component={Profile} element={<Profile 
                 contractX={contractX}
                 currentUser={currentUser}

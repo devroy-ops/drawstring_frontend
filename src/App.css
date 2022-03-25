@@ -507,6 +507,10 @@ button:focus{
   background-size: 100% !important;
 }
 
+.modal-content{
+  background: rgb(240,240,240);
+}
+
 
 /* Light Mode css */
 /* 
