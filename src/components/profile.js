@@ -1,30 +1,30 @@
-import logo from '../logo.svg';
+// import logo from '../logo.svg';
 import '../App.css';
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from 'react';
-import avtar from '../images/users/avatar.svg';
+// import avtar from '../images/users/avatar.svg';
 import twitter from '../images/users/twitterlogo.svg';
-import bg_users from '../images/users/bg_users.svg';
+// import bg_users from '../images/users/bg_users.svg';
 import copy_icon from '../images/users/copy_icon.svg';
 import upload from '../images/users/upload.svg';
 import more from '../images/home/more.svg';
 import '../styles/user.css';
 import { NavLink } from "react-router-dom";
-import blockchain from '../images/home/blockchain.svg';
+// import blockchain from '../images/home/blockchain.svg';
 import category from '../images/home/category.svg';
 import saletype from '../images/home/saletype.svg';
 import price from '../images/home/price.svg';
 import sort from '../images/home/sort.svg';
 import images from '../images/home/images.svg';
 import arrow_down from '../images/home/arrow_down.svg';
-import explore1 from '../images/home/explore1.svg';
-import explore2 from '../images/home/explore2.svg';
-import explore3 from '../images/home/explore3.svg';
-import explore4 from '../images/home/explore4.svg';
-import explore5 from '../images/home/explore5.svg';
-import explore6 from '../images/home/explore6.svg';
-import explore7 from '../images/home/explore7.svg';
-import explore8 from '../images/home/explore8.svg';
+// import explore1 from '../images/home/explore1.svg';
+// import explore2 from '../images/home/explore2.svg';
+// import explore3 from '../images/home/explore3.svg';
+// import explore4 from '../images/home/explore4.svg';
+// import explore5 from '../images/home/explore5.svg';
+// import explore6 from '../images/home/explore6.svg';
+// import explore7 from '../images/home/explore7.svg';
+// import explore8 from '../images/home/explore8.svg';
 import heart from '../images/home/heart.svg';
 import { toast } from 'react-toastify';
 import { Tabs, Tab } from 'react-bootstrap';
@@ -59,23 +59,23 @@ const Profile = ({ contractX, account, wallet }) => {
         getAllListedNfts();
     }
 
-    const getAllListedNfts = async () =>{
+    const getAllListedNfts = async () => {
         setLoader(true);
         const user = await getUser();
-         const allListedNfts = await user.functions.get_nfts_by_owner(accountId);
-         console.log(allListedNfts);
-         setListedNfts(allListedNfts);
-         setLoader(false);
+        const allListedNfts = await user.functions.get_nfts_by_owner(accountId);
+        console.log(allListedNfts);
+        setListedNfts(allListedNfts);
+        setLoader(false);
     }
 
-    const addLike = async (nft, index) =>{
+    const addLike = async (nft, index) => {
         const newItems = [...listedNfts];
         newItems[index].likes = newItems[index].likes ? newItems[index].likes + 1 : 1;
         setListedNfts(newItems);
 
         const walletId = wallet.getAccountId();
         const user = await getUserForUpdateDb();
-        await user.functions.add_like(walletId,nft.id, nft.contract_id);
+        await user.functions.add_like(walletId, nft.id, nft.contract_id);
     }
 
     return (
@@ -86,7 +86,7 @@ const Profile = ({ contractX, account, wallet }) => {
 
                 </div>
                 <div className="container pb-5 px-0">
-                    <img src={author?.profile_pic} className="avtar-position edit-profile-pic-input" width="186" height="186"/>
+                    <img src={author?.profile_pic} className="avtar-position edit-profile-pic-input" width="186" height="186" />
                 </div>
             </div>
             <div className="container pb-5 px-0">
@@ -100,7 +100,7 @@ const Profile = ({ contractX, account, wallet }) => {
                     <div className="col-sm-6 auther-desc mt-2">
                         {author?.bio}
                         {/* Author's name is a travel and documentary photographer based in Quebec, Canada. She documents streets, cultures and landscapes. */}
-                </div>
+                    </div>
                 </div>
                 {/* <div className="d-flex text-light pt-4 font-size-18 color-white">
                     <div className="pe-5">150 followers</div>
@@ -108,8 +108,10 @@ const Profile = ({ contractX, account, wallet }) => {
                 </div> */}
                 <div className="d-flex py-4">
                     {/* <button type="button" className="btn follow-btn">Follow</button> */}
-                    <button type="button" onClick={() => {navigator.clipboard.writeText(`${window.location.origin.toString() + "/" + wallet.getAccountId()}`);
-                    toast("copied user profile url", {type: "success"})}} className="btn mx-4 up-btn"><img src={upload} /></button>
+                    <button type="button" onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin.toString() + "/" + wallet.getAccountId()}`);
+                        toast("copied user profile url", { type: "success" })
+                    }} className="btn mx-4 up-btn"><img src={upload} /></button>
                     <button type="button" className="btn more-btn"><img src={more} /></button>
                 </div>
             </div>
@@ -132,312 +134,53 @@ const Profile = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                                 <div className="row pt-2">
-                                {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
-                            return (
-                                <div className="col-sm-3 pb-4" key={index}>
-                                    <div className="top-sec-box">
-                                        <div className="row py-2 px-3">
-                                            <div className="col-sm-8">
-                                                <div className="d-flex">
-                                                    <div className="explore-dot bg-pink"></div>
-                                                    <div className="explore-dot bg-blue"></div>
-                                                    <div className="explore-dot bg-green"></div>
+                                    {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
+                                        return (
+                                            <div className="col-sm-3 pb-4" key={index}>
+                                                <div className="top-sec-box">
+                                                    <div className="row py-2 px-3">
+                                                        <div className="col-sm-8">
+                                                            <div className="d-flex">
+                                                                <div className="explore-dot bg-pink"></div>
+                                                                <div className="explore-dot bg-blue"></div>
+                                                                <div className="explore-dot bg-green"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-sm-4 ">
+                                                            <div className="explore-dot bg-black float-end">
+                                                                <img src={more} className="pb-1" alt="more icon" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <img src={nft.media_link} className="w-100" height="270" alt="nft media" />
+                                                    <div className="text-light font-size-18 p-3">
+                                                        <div>{nft.name}</div>
+                                                        <div className="row pt-2 bid-mobile-100">
+                                                            <div className="col-sm-6">
+                                                                {nft.price} ETN <span className="color-gray">1/1</span>
+                                                            </div>
+                                                            <div className="col-sm-6 text-end">
+                                                                <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
+                                                            </div>
+                                                        </div>
+                                                        <div className="pt-1">
+                                                            <button type="button" className="btn heart-btn p-0" onClick={() => addLike(nft, index)}><img src={heart} alt="heart icon" /> <span className="color-gray">{nft.likes}</span></button>
+                                                            {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div className="col-sm-4 ">
-                                                <div className="explore-dot bg-black float-end">
-                                                    <img src={more} className="pb-1" alt="more icon"/>
-                                                </div>
-                                            </div>
+                                        )
+                                    }
+                                    )}
+
+                                    {listedNfts && listedNfts.length == 0 && (
+                                        <div className="alert alert-secondary" role="alert">
+                                        No data available
                                         </div>
-                                        <img src={nft.media_link} className="w-100" height="270" alt="nft media"/>
-                                        <div className="text-light font-size-18 p-3">
-                                            <div>{nft.name}</div>
-                                            <div className="row pt-2 bid-mobile-100">
-                                                <div className="col-sm-6">
-                                                    {nft.price} ETN <span className="color-gray">1/1</span>
-                                                </div>
-                                                <div className="col-sm-6 text-end">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                </div>
-                                            </div>
-                                            <div className="pt-1">
-                                                <button type="button" className="btn heart-btn p-0" onClick={()=>addLike(nft, index)}><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></button>
-                                                {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
-                                            </div>
-                                        </div>
-                                    </div>
+                                    )}
+                                    
                                 </div>
-                            )
-                        }
-                        )}
-                                    {/* <div className="col-sm-3 pb-4">
-                                        <div className="top-sec-box">
-                                            <div className="row py-2 px-3">
-                                                <div className="col-sm-8">
-                                                    <div className="d-flex">
-                                                        <div className="explore-dot bg-pink"></div>
-                                                        <div className="explore-dot bg-blue"></div>
-                                                        <div className="explore-dot bg-green"></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-sm-4 ">
-                                                    <div className="explore-dot bg-black float-end">
-                                                        <img src={more} className="pb-1" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <img src={explore1} className="w-100" />
-                                            <div className="text-light font-size-18 p-3">
-                                                <div>Project name</div>
-                                                <div className="row pt-2">
-                                                    <div className="col-sm-6">
-                                                        3.89 ETN <span className="color-gray">1/1</span>
-                                                    </div>
-                                                    <div className="col-sm-6 text-end">
-                                                        <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                    </div>
-                                                </div>
-                                                <div className="pt-1">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} /> <span className="color-gray">18</span></NavLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-3 pb-4">
-                                        <div className="top-sec-box">
-                                            <div className="row py-2 px-3">
-                                                <div className="col-sm-8">
-                                                    <div className="d-flex">
-                                                        <div className="explore-dot bg-pink"></div>
-                                                        <div className="explore-dot bg-blue"></div>
-                                                        <div className="explore-dot bg-green"></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-sm-4 ">
-                                                    <div className="explore-dot bg-black float-end">
-                                                        <img src={more} className="pb-1" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <img src={explore2} className="w-100" />
-                                            <div className="text-light font-size-18 p-3">
-                                                <div>Project name</div>
-                                                <div className="row pt-2">
-                                                    <div className="col-sm-6">
-                                                        3.89 ETN <span className="color-gray">1/1</span>
-                                                    </div>
-                                                    <div className="col-sm-6 text-end">
-                                                        <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                    </div>
-                                                </div>
-                                                <div className="pt-1">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} /> <span className="color-gray">18</span></NavLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-3 pb-4">
-                                        <div className="top-sec-box">
-                                            <div className="row py-2 px-3">
-                                                <div className="col-sm-8">
-                                                    <div className="d-flex">
-                                                        <div className="explore-dot bg-pink"></div>
-                                                        <div className="explore-dot bg-blue"></div>
-                                                        <div className="explore-dot bg-green"></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-sm-4 ">
-                                                    <div className="explore-dot bg-black float-end">
-                                                        <img src={more} className="pb-1" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <img src={explore3} className="w-100" />
-                                            <div className="text-light font-size-18 p-3">
-                                                <div>Project name</div>
-                                                <div className="row pt-2">
-                                                    <div className="col-sm-6">
-                                                        3.89 ETN <span className="color-gray">1/1</span>
-                                                    </div>
-                                                    <div className="col-sm-6 text-end">
-                                                        <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                    </div>
-                                                </div>
-                                                <div className="pt-1">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} /> <span className="color-gray">18</span></NavLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-3 pb-4">
-                                        <div className="top-sec-box">
-                                            <div className="row py-2 px-3">
-                                                <div className="col-sm-8">
-                                                    <div className="d-flex">
-                                                        <div className="explore-dot bg-pink"></div>
-                                                        <div className="explore-dot bg-blue"></div>
-                                                        <div className="explore-dot bg-green"></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-sm-4 ">
-                                                    <div className="explore-dot bg-black float-end">
-                                                        <img src={more} className="pb-1" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <img src={explore4} className="w-100" />
-                                            <div className="text-light font-size-18 p-3">
-                                                <div>Project name</div>
-                                                <div className="row pt-2">
-                                                    <div className="col-sm-6">
-                                                        3.89 ETN <span className="color-gray">1/1</span>
-                                                    </div>
-                                                    <div className="col-sm-6 text-end">
-                                                        <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                    </div>
-                                                </div>
-                                                <div className="pt-1">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} /> <span className="color-gray">18</span></NavLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-3 pb-4">
-                                        <div className="top-sec-box">
-                                            <div className="row py-2 px-3">
-                                                <div className="col-sm-8">
-                                                    <div className="d-flex">
-                                                        <div className="explore-dot bg-pink"></div>
-                                                        <div className="explore-dot bg-blue"></div>
-                                                        <div className="explore-dot bg-green"></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-sm-4 ">
-                                                    <div className="explore-dot bg-black float-end">
-                                                        <img src={more} className="pb-1" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <img src={explore5} className="w-100" />
-                                            <div className="text-light font-size-18 p-3">
-                                                <div>Project name</div>
-                                                <div className="row pt-2">
-                                                    <div className="col-sm-6">
-                                                        3.89 ETN <span className="color-gray">1/1</span>
-                                                    </div>
-                                                    <div className="col-sm-6 text-end">
-                                                        <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                    </div>
-                                                </div>
-                                                <div className="pt-1">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} /> <span className="color-gray">18</span></NavLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-3 pb-4">
-                                        <div className="top-sec-box">
-                                            <div className="row py-2 px-3">
-                                                <div className="col-sm-8">
-                                                    <div className="d-flex">
-                                                        <div className="explore-dot bg-pink"></div>
-                                                        <div className="explore-dot bg-blue"></div>
-                                                        <div className="explore-dot bg-green"></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-sm-4 ">
-                                                    <div className="explore-dot bg-black float-end">
-                                                        <img src={more} className="pb-1" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <img src={explore6} className="w-100" />
-                                            <div className="text-light font-size-18 p-3">
-                                                <div>Project name</div>
-                                                <div className="row pt-2">
-                                                    <div className="col-sm-6">
-                                                        3.89 ETN <span className="color-gray">1/1</span>
-                                                    </div>
-                                                    <div className="col-sm-6 text-end">
-                                                        <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                    </div>
-                                                </div>
-                                                <div className="pt-1">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} /> <span className="color-gray">18</span></NavLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-3 pb-4">
-                                        <div className="top-sec-box">
-                                            <div className="row py-2 px-3">
-                                                <div className="col-sm-8">
-                                                    <div className="d-flex">
-                                                        <div className="explore-dot bg-pink"></div>
-                                                        <div className="explore-dot bg-blue"></div>
-                                                        <div className="explore-dot bg-green"></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-sm-4 ">
-                                                    <div className="explore-dot bg-black float-end">
-                                                        <img src={more} className="pb-1" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <img src={explore7} className="w-100" />
-                                            <div className="text-light font-size-18 p-3">
-                                                <div>Project name</div>
-                                                <div className="row pt-2">
-                                                    <div className="col-sm-6">
-                                                        3.89 ETN <span className="color-gray">1/1</span>
-                                                    </div>
-                                                    <div className="col-sm-6 text-end">
-                                                        <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                    </div>
-                                                </div>
-                                                <div className="pt-1">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} /> <span className="color-gray">18</span></NavLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-sm-3 pb-4">
-                                        <div className="top-sec-box">
-                                            <div className="row py-2 px-3">
-                                                <div className="col-sm-8">
-                                                    <div className="d-flex">
-                                                        <div className="explore-dot bg-pink"></div>
-                                                        <div className="explore-dot bg-blue"></div>
-                                                        <div className="explore-dot bg-green"></div>
-                                                    </div>
-                                                </div>
-                                                <div className="col-sm-4 ">
-                                                    <div className="explore-dot bg-black float-end">
-                                                        <img src={more} className="pb-1" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <img src={explore8} className="w-100" />
-                                            <div className="text-light font-size-18 p-3">
-                                                <div>Project name</div>
-                                                <div className="row pt-2">
-                                                    <div className="col-sm-6">
-                                                        3.89 ETN <span className="color-gray">1/1</span>
-                                                    </div>
-                                                    <div className="col-sm-6 text-end">
-                                                        <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                    </div>
-                                                </div>
-                                                <div className="pt-1">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} /> <span className="color-gray">18</span></NavLink>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div> */}
-                                </div>
-                                {/* <div>Requested topic ID: {userId}</div>
-            <div>Users Page </div> */}
                             </div>
                         </Tab>
                         <Tab eventKey={2} title="Owned  12">Tab 2 content</Tab>

@@ -2,7 +2,7 @@ import '../App.css';
 import '../styles/collection.css';
 import collection1 from '../images/collection/collection1.svg';
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { init, author, GAS, mint_txFee, transfer_txFee, txFee, storage1 } from "../services/helper";
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { Loader } from "../services/ui";
@@ -20,15 +20,21 @@ const Collections = ({ contractX, account, wallet }) => {
     const [collections, setCollections] = useState([]);
     var [contract, setContract] = useState();
     const [isLoading, setLoader] = useState(false);
-    const [count, setCount] = useState(10);
+    const [count, setCount] = useState(0);
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchString, setSearchString] = useState("");
 
     const { authorId } = useParams();
 
-    const getCollections = async() =>{
+
+    const getCollections = async () => {
         setLoader(true);
+        const searchString = searchParams.get("searchString") || '';
+        setSearchString(searchString);
         const user = await getUser();
-        const response = await user.functions.get_collections(10, count*10);
-        console.log(response)
+        const response = await user.functions.search_collections_by_name(10, count * 10, searchString);
+        // const response = await user.functions.get_collections(10, count * 10);
+        console.log(response);
         setCollections([...collections, ...response]);
         setLoader(false);
     }
@@ -39,7 +45,7 @@ const Collections = ({ contractX, account, wallet }) => {
     }, [count]);
 
     const loadMore = () => {
-        setCount((prev)=> prev + 1)
+        setCount((prev) => prev + 1)
     }
 
     let navigate = useNavigate();
@@ -55,15 +61,17 @@ const Collections = ({ contractX, account, wallet }) => {
             {isLoading ? <Loader /> : null}
             <div className="">
                 <div className=" title text-light pb-3 container px-0">
-                    NFT Collections
-                    {/* <div className="row">
+                    {/* NFT Collections */}
+                    <div className="row">
                         <div className="col-sm-6">
                             NFT Collections
                         </div>
                         <div className="col-sm-6 text-end">
-                            <button type="button" className="btn red-btn" onClick={handleShow}>Mint NFT</button>
+                             {searchString && (
+                                <div> Search Results for "{searchString}"</div>
+                            )}
                         </div>
-                    </div> */}
+                    </div>
                 </div>
                 <div className="table-responsive">
                     <table className="table table-dark table-striped font-size-14 collection-table">
@@ -87,7 +95,7 @@ const Collections = ({ contractX, account, wallet }) => {
                                 return (
                                     <tr key={index}>
                                         <td></td>
-                                        <td> <img src={collection.img ? collection.img : collection1} width="42" height="42" className="border-radius-50" alt="nft media"/> {collection.name}</td>
+                                        <td> <img src={collection.img ? collection.img : collection1} width="42" height="42" className="border-radius-50" alt="nft media" /> {collection.name}</td>
                                         <td>{collection.spec}</td>
                                         <td>{collection.symbol}</td>
                                         <td></td>
@@ -110,11 +118,16 @@ const Collections = ({ contractX, account, wallet }) => {
                             }
                         </tbody>
                     </table>
-                    <div className='load'>
-                        <button onClick={loadMore} className="load-more">
-                            {isLoading ? 'Loading...' : 'Load More'}
-                        </button>
-                    </div>
+                    {collections && collections.length == 0 && (
+                        <div className='text-light text-center'>No data found</div>
+                    )}
+                    {collections && collections.length > 0 && (
+                        <div className='load'>
+                            <button onClick={loadMore} className="load-more">
+                                {isLoading ? 'Loading...' : 'Load More'}
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
