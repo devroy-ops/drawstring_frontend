@@ -249,6 +249,13 @@ export default function MintNft({ contractX, account, wallet }) {
     //         image: dp,
     //     }
     // ];
+    const CustomMenu = (props) => {
+        return (
+            <components.MenuList  {...props}>
+                <button className='load-col' onClick={()=> {loadMore()}}>{isLoading ? 'Loading...' : 'Load More'}</button>
+                {props.children}
+            </components.MenuList >
+        ) }
 
     const { SingleValue, Option, Menu } = components;
 
@@ -265,13 +272,7 @@ export default function MintNft({ contractX, account, wallet }) {
             {props.data.label}
         </Option>
     );
-    const CustomMenu = (props) => {
-        return (
-            <components.MenuList  {...props}>
-                <button onClick={()=> {loadMore()}}>{isLoading ? 'Loading...' : 'Load More'}</button>
-                {props.children}
-            </components.MenuList >
-        ) }
+
 
     // Step 3
     const customStyles = {
