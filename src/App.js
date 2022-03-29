@@ -25,6 +25,7 @@ import About from './components/about';
 import Terms from './components/terms';
 import Blog from './components/blog';
 import Near from './components/nearprotocol';
+import Search from './components/searchresult';
 
 // const routing = (
 //   <AuthProvider>
@@ -72,7 +73,6 @@ import Near from './components/nearprotocol';
 
 function App({ contractX, currentUser, nearConfig, wallet, account }) {
   //return routing;
-
   return (
     <AuthProvider>
       <Router>
@@ -108,6 +108,9 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
               />} />
               <Route path="/terms" component={Terms} element={<Terms />} />
               <Route path="/users" component={Users} element={<Users />} />
+              <Route path="/search" component={Users} element={<Search 
+              wallet={wallet}
+              />} />
               <Route path={`/user/${wallet.getAccountId()}`} component={Profile} element={<Profile 
                 contractX={contractX}
                 currentUser={currentUser}

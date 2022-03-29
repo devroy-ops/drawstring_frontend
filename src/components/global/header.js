@@ -1,6 +1,6 @@
 // import React from "react";
 import React, { useCallback, useContext, useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import '../../styles/header.css';
 import search from '../../images/header/search.svg';
 import day from '../../images/header/day.svg';
@@ -17,12 +17,12 @@ import { scroller } from "react-scroll";
 import { balance } from "../../services/utils";
 
 export default function Header({ currentUser, wallet, nearConfig }) {
-
   const [darkMode, setDarkMode] = React.useState(true);
   const { signIn, signOut } = useContext(NearContext);
   const [profile, setProfile] = useState({});
   const [searchString, setSearchBoxValue] = useState('');
   const [isMenuOpened, setMenuOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const navigate = useNavigate();
 
@@ -67,6 +67,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
   }
 
   useEffect(() => {
+    setSearchBoxValue(searchParams.get("searchString") || '');
     console.log(available, 'available');
     return getProfile();
   }, [])
@@ -82,7 +83,11 @@ export default function Header({ currentUser, wallet, nearConfig }) {
 
   const handleKeyUp = (event) => {
     if (event.key === 'Enter') {
-      setMenuOpen(true);
+      //setMenuOpen(true);
+      debugger;
+      gotoHome().then(()=>{
+        navigate(`/search?searchString=${searchString}`);
+      })
     }
   }
 
@@ -92,10 +97,13 @@ export default function Header({ currentUser, wallet, nearConfig }) {
 
   const searchValue = (option) => {
     gotoHome().then(()=>{
-      navigate(`/${option}?searchString=${searchString}`, {state: {}});
+      // navigate(`/${option}?searchString=${searchString}`);
+      navigate(`/search?searchString=${searchString}`);
     })
-    
   }
+
+
+  // setSearchBoxValue(searchParams.get("searchString") || '');
 
   const handleChange = (e) => {
     setSearchBoxValue(
@@ -122,8 +130,8 @@ export default function Header({ currentUser, wallet, nearConfig }) {
             required
           />
           <div>
-            {/* <img src={search} className="search-icon" onClick={searchValue} /> */}
-            <Dropdown align="end">
+            <img src={search} className="search-icon" onClick={searchValue} />
+            {/* <Dropdown align="end">
             <Dropdown.Toggle id="dropdown-button-dark" variant="dark" className="search-icon">
               <img src={search} />
             </Dropdown.Toggle>
@@ -135,7 +143,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
               <Dropdown.Item onClick={()=>searchValue('users')}>Users</Dropdown.Item>
               <Dropdown.Item onClick={()=>searchValue('collections')} >Collections</Dropdown.Item>
              </Dropdown.Menu>
-             </Dropdown>
+             </Dropdown> */}
           </div>
         </div>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
@@ -158,7 +166,18 @@ export default function Header({ currentUser, wallet, nearConfig }) {
 
         <ul className="navbar-nav me-auto mb-2 mb-lg-0 create-signin-btn">
           <li className="nav-item">
-            <NavLink exact="true" activeclassname="active" to="/mintnft" className="create">Create</NavLink>
+
+          <Dropdown align="end">
+            <Dropdown.Toggle id="dropdown-button-dark" variant="dark" className="create">
+              Create
+            </Dropdown.Toggle>
+
+            <Dropdown.Menu>
+              <Dropdown.Item onClick={(e)=>{e.preventDefault(); navigate("/mintnft")}}>Mint Nft</Dropdown.Item>
+              <Dropdown.Item onClick={(e)=>{e.preventDefault(); navigate("/createcollection")}} >Create Collection</Dropdown.Item>
+             </Dropdown.Menu>
+             </Dropdown>
+             {/* <NavLink exact="true" activeclassname="active" to="/mintnft" className="create">Create</NavLink> */}
           </li>
           <li className="nav-item">
 

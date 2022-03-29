@@ -146,6 +146,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
    */
     const deploy = async () => {
         try {
+            debugger;
             // load and deploy smart contract
             const subaccount = collection.name.toLowerCase().replace(/ /g, "_");
             const respons = await contractX.deploy_contract_code(
@@ -173,7 +174,8 @@ export default function CreateCollection({ contractX, account, wallet }) {
             setLoader(true);
             getUserForUpdateDb().then(user => {
                 // account.accountId
-                user.functions.add_collection(col.name, col.fileUrl, subaccount).then(async () => {
+                debugger
+                user.functions.add_collection(col.name.toLowerCase(), col.fileUrl, subaccount).then(async () => {
                     setLoader(false);
                     //Create a collection by initializing the NFT contract
                     const response = await contract.new({
@@ -430,7 +432,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             </div>
 
 
-                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> add more loyalties</button>
+                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> add more royalties</button>
 
                             {/* <div className="row bid-mobile-100">
                                 <div className="col-sm-6">

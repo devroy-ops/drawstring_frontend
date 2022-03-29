@@ -1,61 +1,99 @@
-import { Modal, Tabs, Tab} from 'react-bootstrap';
+import { Modal, Tabs, Tab } from 'react-bootstrap';
 import creater from '../images/product/creater.svg';
 import collection from '../images/product/collection.svg';
 import heart from '../images/home/heart.svg';
 import more from '../images/home/more.svg';
 import copy_icon from '../images/users/copy_icon.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { init } from '../services/helper';
+import { toast } from 'react-toastify';
+import { getUserForUpdateDb } from '../db/mongodb';
 
-const NftDetailModal=({nftData, isModalOpen, handleClose, walletId})=>{
-    const [activeTab, setActiveTab] = useState(1);
-    const handleSelect = (selectedTab) => {
-        setActiveTab(parseInt(selectedTab))
+const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
+    // const [activeTab, setActiveTab] = useState(1);
+    // const handleSelect = (selectedTab) => {
+    //     setActiveTab(parseInt(selectedTab))
+    // }
+    const [isLoading, setLoader] = useState(false);
+    const [nft, setNft] = useState({});
+    const [owner, setOwner] = useState({});
+
+
+    useEffect(() => {
+       return viewNFTs();
+    }, []);
+
+    const viewNFTs = async () => {
+        try {
+            debugger
+            const contract = await init(wallet, nftData.contract_id.toLowerCase());
+            const response = await contract.nft_token({ "token_id": nftData.id });
+            debugger;
+            console.log(response);
+            setNft(response);
+
+            getProfile(response.owner_id)
+            return response;
+        } catch (error) {
+            console.log(error);
+            toast(JSON.stringify(error), { type: "error" });
+        }
+    };
+
+    const getProfile = async (accountId) => {
+        setLoader(true);
+        const user = await getUserForUpdateDb();
+        const response = await user.functions.get_profile(accountId);
+        console.log(response);
+        setOwner(response);
+        setLoader(false);
     }
-    return(
+
+    return (
         <div className="bg-darkmode product-pages">
-             <Modal show={isModalOpen} onHide={handleClose} size="lg">
+            <Modal show={isModalOpen} onHide={handleClose} size="lg">
                 <Modal.Header closeButton>
-                    <Modal.Title>{nftData.name}</Modal.Title>
+                    <Modal.Title>{nft?.metadata?.title}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                <div className="container px-0">
-                <div className="row mobile-reverce">
-                    <div className="col-sm-6">
-                        <div className="d-flex">
-                            {/* <div className="title">
+                    <div className="container px-0">
+                        <div className="row mobile-reverce">
+                            <div className="col-sm-6">
+                                <div className="d-flex">
+                                    {/* <div className="title">
                                 {nftData.name}
                             </div>
                              <div>
                                 <button type="button" className="btn heart-btn pt-3 px-5"><img src={heart} /> <span className="color-gray">{nftData.likes}</span></button>
                             </div>
                             <div className="explore-dot bg-black float-end mt-3"><img src={more} className="pb-1" /></div> */}
-                        </div>
+                                </div>
 
-                        {/* <div className="copy-btn pt-2 mt-3 mb-4"> #27513  0x47BE...6f4f <img src={copy_icon} className="float-end" /></div> */}
+                                {/* <div className="copy-btn pt-2 mt-3 mb-4"> #27513  0x47BE...6f4f <img src={copy_icon} className="float-end" /></div> */}
 
-                        <div className="d-flex font-size-18 mt-4 mb-3 onsel-mob-text-16" >
-                            <div className="me-5">On sale for {nftData?.price} Near</div>
-                            {/* <div>Highest bid 7 WETH</div> */}
-                        </div>
+                                <div className="d-flex font-size-18 mt-4 mb-3 onsel-mob-text-16" >
+                                    <div className="me-5">On sale for {nftData?.price} Near</div>
+                                    {/* <div>Highest bid 7 WETH</div> */}
+                                </div>
 
-                        <div className="row pt-3 tab-col-w-100">
-                            <div className="col-sm-6">
-                                <div className="pb-2">Creator</div>
-                                <div><img src={creater} className="me-2 font-size-18" /> {nftData.owner}</div>
-                            </div>
-                            <div className="col-sm-6">
-                                <div className="pb-2">Collection</div>
-                                <div><img src={collection} className="me-2 font-size-18" /> {nftData.collection_name}</div>
-                            </div>
-                        </div>
+                                <div className="row pt-3 tab-col-w-100">
+                                    <div className="col-sm-6">
+                                        <div className="pb-2">Creator</div>
+                                        <div><img src={creater} className="me-2 font-size-18" /> Creator</div>
+                                    </div>
+                                    <div className="col-sm-6">
+                                        <div className="pb-2">Collection</div>
+                                        <div><img src={collection} className="me-2 font-size-18" /> Collection</div>
+                                    </div>
+                                </div>
 
-                        <div className="pt-4">
-                            <div className="tabs-links mt-4">
-                                {/* <Tabs activeKey={activeTab} onSelect={handleSelect}>
+                                <div className="pt-4">
+                                    <div className="tabs-links mt-4">
+                                        {/* <Tabs activeKey={activeTab} onSelect={handleSelect}>
                                     <Tab eventKey={1} title="Details" className="mt-3"> */}
                                         <div className="font-size-16 pt-3 pb-2">Owner</div>
                                         <div className="d-flex font-size-18">
-                                            <div><img className="mr-2" src={creater} /> 0x3864a2619...c416</div>
+                                            <div><img className="mr-2 border-radius-50" src={owner.profile_pic ? owner.profile_pic : creater} width="48"/> {nft?.owner_id}</div>
                                         </div>
 
                                         <div className="font-size-16 pt-5 pb-2">Properties</div>
@@ -86,27 +124,27 @@ const NftDetailModal=({nftData, isModalOpen, handleClose, walletId})=>{
                                         </div> */}
 
                                         <div className="pb-5 pt-4">
-                                            <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for {nftData?.price} ETH</button>
-                                            {nftData.owner == walletId && (
+                                            <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for {nftData?.price} Near</button>
+                                            {nft?.owner_id == wallet.getAccountId() && (
                                                 <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Remove from sale</button>
                                             )}
                                             {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button> */}
 
-                                            </div>
-                                    {/* </Tab>
+                                        </div>
+                                        {/* </Tab>
                                     <Tab eventKey={2} title="Bids" className="mt-3">Tab 2 content</Tab>
                                     <Tab eventKey={3} title="History" className="mt-3">Tab 3 content</Tab>
                                 </Tabs> */}
 
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div className="col-sm-6">
+                                <img src={nft?.metadata?.media} className="img-fluid border-bg product-profile-img" />
                             </div>
                         </div>
-
                     </div>
-                    <div className="col-sm-6">
-                        <img src={nftData.img} className="img-fluid border-bg product-profile-img" />
-                    </div>
-                </div>
-            </div>
                     {/* <img src={nftData.img} /> */}
                 </Modal.Body>
             </Modal>
