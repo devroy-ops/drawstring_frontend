@@ -86,7 +86,7 @@ const Home = ({contractX, account, wallet }) => {
             {isLoading ? <Loader /> : null}
 
             <div className="pos-rel home_banner-section">
-                <AliceCarousel ref={(el) => (carousel = el)} autoPlay infinite autoPlayInterval="3000" disableButtonsControls="true" disableDotsControls="true">
+                <AliceCarousel ref={(el) => (carousel = el)} disableButtonsControls="true" disableDotsControls="true">
                     {nfts && nfts.length > 0 && nfts.filter(x => x.isMainSlideImage === true).map((nft, index) => {
                         return (
                             <div className="sliderimg" key={index}>
@@ -133,10 +133,10 @@ const Home = ({contractX, account, wallet }) => {
                     )}
                 </AliceCarousel>
 
-                <div>
+                {/* <div>
                     <a href="/#" className="left-icon" onClick={(e) => { e.preventDefault(); carousel.slidePrev() }}><img src={arrow_back} alt="back icon for slider"/></a>
                     <a href="/#" className="right-icon" onClick={(e) => { e.preventDefault(); carousel.slideNext() }}><img src={arrow_fwd} alt="nack icon for slider"/></a>
-                </div>
+                </div> */}
             </div>
 
             <div className="container home_featured mt-60">
