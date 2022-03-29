@@ -71,6 +71,9 @@
     justify-content: center;
     margin-top: 50px;
 }
+.col-name{
+    font-size: 12px;
+}
 .pos-rel{
     position: relative;
 }

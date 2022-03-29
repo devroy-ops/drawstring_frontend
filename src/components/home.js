@@ -51,7 +51,7 @@ const Home = ({contractX, account, wallet }) => {
 
         const user = await getUser();
         // const featured = await user.functions.get_featured();
-         const allListedNfts = await user.functions.get_all_listed_nfts(10, count*10);
+         const allListedNfts = await user.functions.get_all_listed_nfts(12, count*12);
          console.log(allListedNfts)
          setListedNfts([...listedNfts, ...allListedNfts]);
         // const top = await user.functions.get_top_collections();
@@ -190,7 +190,7 @@ const Home = ({contractX, account, wallet }) => {
 
                     <div className="row title text-light pb-4 mt-60">
                         <div className="explore col-sm-9">
-                            Explore
+                            Discover
                         {/* <img src={blockchain} className="ps-4" alt="blockchain icon"/><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} alt="dropdown icon"/> */}
                         <div className='row'>
                             {/* <Dropdown className="col-sm-3" align="end">
@@ -273,18 +273,18 @@ const Home = ({contractX, account, wallet }) => {
                                         <img src={nft.media_link} className="w-100" height="270" alt="nft media" onClick={()=>handleShow(nft)}/>
                                         <div className="text-light font-size-18 p-3">
                                             <div>{nft.name}</div>
+                                            <p className="color-gray col-name">{!nft.collection_name ? "" : nft.collection_name + " collection"}</p>
                                             <div className="row pt-2 bid-mobile-100">
                                                 <div className="col-sm-6">
-                                                    {nft.price} ETN <span className="color-gray">1/1</span>
+                                                    {nft.price} Near <span className="color-gray">1/1</span>
                                                 </div>
-                                                <div className="col-sm-6 text-end">
+                                                {/* <div className="col-sm-6 text-end">
                                                     <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                </div>
+                                                </div> */}
                                             </div>
-                                            <div className="pt-1">
+                                            {/* <div className="pt-1">
                                                 <button type="button" className="btn heart-btn p-0" onClick={()=>addLike(nft, index)}><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></button>
-                                                {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
-                                            </div>
+                                            </div> */}
                                         </div>
                                     </div>
                                 </div>

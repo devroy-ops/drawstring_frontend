@@ -4,11 +4,14 @@
     line-height: 120%;
 }
 
+
+
 .footer-links{
     text-decoration: none !important;
     font-weight: 700;
     font-size: 16px;
     line-height: 120%;
+    list-style: none;
 }
 
 .slide-dots{
@@ -17,6 +20,7 @@
     align-items: flex-start;
     padding: 0px;
     padding-top: 15px;
+    gap: 10px;
 }
 
 .dot{

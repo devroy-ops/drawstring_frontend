@@ -234,14 +234,14 @@ export default function Header({ currentUser, wallet, nearConfig }) {
           </div>
 
         </div>
-        <ThemeContext.Consumer>
+        {/* <ThemeContext.Consumer>
           {({ changeTheme }) => (
             <button type="button" className="btn toggle-link p-0 height-width" onClick={() => {
               setDarkMode(!darkMode);
               changeTheme(darkMode ? themes.light : themes.dark);
             }}><img src={darkMode ? day : night} /></button>
           )}
-        </ThemeContext.Consumer>
+        </ThemeContext.Consumer> */}
         <button className="navbar-toggler desk-none d-block-992" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
