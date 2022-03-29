@@ -51,7 +51,7 @@ const Home = ({contractX, account, wallet }) => {
 
         const user = await getUser();
         // const featured = await user.functions.get_featured();
-         const allListedNfts = await user.functions.get_all_listed_nfts(10, count*10);
+         const allListedNfts = await user.functions.get_all_listed_nfts(12, count*12);
          console.log(allListedNfts)
          setListedNfts([...listedNfts, ...allListedNfts]);
         // const top = await user.functions.get_top_collections();
@@ -299,8 +299,10 @@ const Home = ({contractX, account, wallet }) => {
                     </div>
                 </div>
             </div>
-
-           <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} walletId={wallet.getAccountId()}/>
+                        {show && (
+                            <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet}/>
+                        )}
+           
         </div>
     );
 }
