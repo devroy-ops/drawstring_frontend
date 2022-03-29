@@ -79,11 +79,11 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                 <div className="row pt-3 tab-col-w-100">
                                     <div className="col-sm-6">
                                         <div className="pb-2">Creator</div>
-                                        <div><img src={creater} className="me-2 font-size-18" /> Creator</div>
+                                        <div><img src={creater} className="me-2 font-size-18" />{nftData?.owner}</div>
                                     </div>
                                     <div className="col-sm-6">
                                         <div className="pb-2">Collection</div>
-                                        <div><img src={collection} className="me-2 font-size-18" /> Collection</div>
+                                        <div><img src={collection} className="me-2 font-size-18" />{nftData?.collection_name}</div>
                                     </div>
                                 </div>
 

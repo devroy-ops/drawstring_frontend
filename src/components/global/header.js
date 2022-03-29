@@ -155,12 +155,11 @@ export default function Header({ currentUser, wallet, nearConfig }) {
             <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate(`/user/${wallet.getAccountId()}`) }} className="nav-link">Profile</NavLink>
             </li>
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">Wtf?</NavLink>
-              {/* viewcollection */}
-            </li>
+            </li> */}
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/product" className="nav-link">About</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">About</NavLink>
             </li>
           </ul>
         </div>
@@ -254,14 +253,14 @@ export default function Header({ currentUser, wallet, nearConfig }) {
           </div>
 
         </div>
-        <ThemeContext.Consumer>
+        {/* <ThemeContext.Consumer>
           {({ changeTheme }) => (
             <button type="button" className="btn toggle-link p-0 height-width" onClick={() => {
               setDarkMode(!darkMode);
               changeTheme(darkMode ? themes.light : themes.dark);
             }}><img src={darkMode ? day : night} /></button>
           )}
-        </ThemeContext.Consumer>
+        </ThemeContext.Consumer> */}
         <button className="navbar-toggler desk-none d-block-992" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
