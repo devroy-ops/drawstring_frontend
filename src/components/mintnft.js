@@ -31,11 +31,20 @@ export default function MintNft({ contractX, account, wallet }) {
     const [options, setOptions] = useState([]);
     const [image, setImage] = useState();
     const [talbeRows, setRows] = useState([{
-        index: 0,
         royalty: "",
         walletaddress: ""
     }
     ]);
+    const [validated, setValidated] = useState(false);
+
+    const [nft, setNft] = useState({
+        token: `token-${Date.now()}`,
+        title: "",
+        media: "",
+        description: "",
+        //perpetual_royalties: talbeRows
+    });
+
     const accountId = wallet.getAccountId();
     // Receive data from TableRow 
     //  const handleChange = data => {
@@ -48,7 +57,7 @@ export default function MintNft({ contractX, account, wallet }) {
 
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
-        updatedRows[tableRowIndex] = { index: tableRowIndex, royalty: "", walletaddress: "" }
+        updatedRows[tableRowIndex] = {  royalty: "", walletaddress: "" }
         setRows(updatedRows)
     }
 
@@ -71,26 +80,27 @@ export default function MintNft({ contractX, account, wallet }) {
             //     nft.isApproved = true;
             //     localStorage.setItem("nft", JSON.stringify(nft));
             // }
-            
+
             navigate(`/nft/${nft.contractId}/${nft.tokenId}`);
 
-            toast("Nft minted successfully.", {type: "success"});
+            toast("Nft minted successfully.", { type: "success" });
         }
     }
 
     useEffect(() => {
+        console.log("useeffect aldkjfajlfdjlajdlfkj")
         return init1();
     }, [colCount]);
 
     const getCollections = async () => {
         setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_collections(5, colCount*5);
+        const response = await user.functions.get_collections(5, colCount * 5);
 
         var allCollections = [...collections, ...response];
         setCollections(allCollections);
 
-        const options = [{label: "Drawstring", value: "High_On_Drip", image: logo1}];
+        const options = [{ label: "Drawstring", value: "high_on_drip", image: logo1 }];
         allCollections.forEach(col => {
             options.push({
                 label: col.name,
@@ -107,16 +117,6 @@ export default function MintNft({ contractX, account, wallet }) {
     }
 
 
-    const [validated, setValidated] = useState(false);
-
-    const [nft, setNft] = useState({
-        token: "",
-        title: "",
-        media: "",
-        description: ""
-    });
-
-
     const handleSubmit = async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
@@ -131,15 +131,15 @@ export default function MintNft({ contractX, account, wallet }) {
 
     const uploadFile = async () => {
 
-        if(nft.media){
-        setLoader(true)
-        const created = await client.add(nft.media);
-        const url = `https://ipfs.infura.io/ipfs/${created.path}`;
-        setLoader(false);
+        if (nft.media) {
+            setLoader(true)
+            const created = await client.add(nft.media);
+            const url = `https://ipfs.infura.io/ipfs/${created.path}`;
+            setLoader(false);
 
-        mintNFT(url);
-        }else{
-            toast("Please select file", {type: "error"})
+            mintNFT(url);
+        } else {
+            toast("Please select file", { type: "error" })
         }
     }
 
@@ -150,6 +150,13 @@ export default function MintNft({ contractX, account, wallet }) {
                 toast("Wallet is not connected, Please connect the near wallet and try again!", { type: 'error' });
                 return;
             }
+
+            const perpetualRoyalties = {};
+
+             talbeRows.forEach((item)=>{
+                perpetualRoyalties[item.walletaddress] = parseInt(item.royalty);
+             });
+
             var nftData = {
                 token_id: nft.token,
                 metadata: {
@@ -167,15 +174,14 @@ export default function MintNft({ contractX, account, wallet }) {
                     referance_hash: null,
                 },
                 receiver_id: accountId,
-                perpetual_royalties: null,
+                perpetual_royalties: Object(perpetualRoyalties).keys ? perpetualRoyalties : null,
                 price: parseInt(nft.price)
             };
 
             const user = await getUserForUpdateDb();
-
-            var data = {contractId: nft.collection.value, tokenId: nft.token};// price: nft.price, isApproved: false
+            debugger
+            var data = { contractId: nft.collection.value, tokenId: nft.token };// price: nft.price, isApproved: false
             localStorage.setItem("nft", JSON.stringify(data));
-
 
             await user.functions.add_new_nft_listing(
                 nft.title,
@@ -191,7 +197,7 @@ export default function MintNft({ contractX, account, wallet }) {
             );
 
             const response = await contract.nft_mint(
-                nftData,           
+                nftData,
                 GAS,
                 mint_txFee
             );
@@ -203,25 +209,37 @@ export default function MintNft({ contractX, account, wallet }) {
     };
 
     const handleChange = (e) => {
-        
+
         setNft((prev) => {
             return { ...prev, [e.target.name]: e.target.value };
         });
 
-        if(e.target.name === "title"){
-            setNft((prev) => {
-                return { ...prev, "token": e.target.value.toLowerCase().replace(/ /g, "-") + "-token" };
-            });
-        }
+        // if(e.target.name === "title"){
+        //     setNft((prev) => {
+        //         return { ...prev, "token": e.target.value.toLowerCase().replace(/ /g, "-") + "-token" };
+        //     });
+        // }
     };
+
+    const handleRoyaltyChange = (e, index) =>{
+        debugger;
+        // const items = talbeRows;
+        // items[index][e.target.name] =  e.target.value;
+        // setRows(items);
+
+        var updatedRows = [...talbeRows]
+        updatedRows[index][e.target.name] =  e.target.value;
+        setRows(updatedRows)
+    }
 
     const handleChangeCollection = (e) => {
         setNft((prev) => {
             return { ...prev, "collection": e };
         });
-        
+debugger;
         const subaccount = e.label.toLowerCase().replace(/ /g, "_");
         init1(subaccount);
+
     }
 
     const handleFileChange = (file) => {
@@ -239,27 +257,16 @@ export default function MintNft({ contractX, account, wallet }) {
     const onSizeError = (error) => {
     }
 
-    // const options = [
-    //     {
-    //         label: 'Collection name name',
-    //         value: 0,
-    //         image: dp,
-    //     },
-    //     {
-    //         label: 'Collection name name',
-    //         value: 1,
-    //         image: dp,
-    //     }
-    // ];
     const CustomMenu = (props) => {
         return (
             <components.MenuList  {...props}>
                 {props.children}
                 <div className='text-center d-grid gap-2'>
-                    <button className='load-col' onClick={()=> {loadMore()}}>{isLoading ? 'Loading...' : 'Load More'}</button>
+                    <button className='load-col' onClick={() => { loadMore() }}>{isLoading ? 'Loading...' : 'Load More'}</button>
                 </div>
             </components.MenuList >
-        ) }
+        )
+    }
 
     const { SingleValue, Option, Menu } = components;
 
@@ -293,7 +300,6 @@ export default function MintNft({ contractX, account, wallet }) {
             alignItems: 'center',
         }),
     }
-
 
     return (
         <div className="bg-darkmode">
@@ -332,7 +338,7 @@ export default function MintNft({ contractX, account, wallet }) {
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     Name is required.
-                            </Form.Control.Feedback>
+                                </Form.Control.Feedback>
                             </div>
                             <div className="border-bottom-2"></div>
                             {/* <div>
@@ -369,13 +375,13 @@ export default function MintNft({ contractX, account, wallet }) {
                             <div className="border-bottom-2"></div>
                             <div className="font-size-14 color-gray pt-2">Amount of tokens</div>
 
-                           
+
 
                             <div className="pt-4">
                                 {/* <div className="font-size-18 text-light py-3">Collection</div> */}
                                 <Select placeholder="Choose a collection"
                                     styles={customStyles}
-                                    components={{ SingleValue: IconSingleValue, Option: IconOption, Menu: CustomMenu  }}
+                                    components={{ SingleValue: IconSingleValue, Option: IconOption, Menu: CustomMenu }}
                                     options={options}
                                     name="collection"
                                     defaultValue={nft.collection}
@@ -384,7 +390,7 @@ export default function MintNft({ contractX, account, wallet }) {
                                     required
                                 />
                                 <div style={{ display: !nft.collection ? "block" : "none" }} className="color-red"> Please select collection.</div>
-                            {/* <Form.Control.Feedback type="invalid" >
+                                {/* <Form.Control.Feedback type="invalid" >
                                 Please select collection.
                             </Form.Control.Feedback> */}
                             </div>
@@ -400,7 +406,7 @@ export default function MintNft({ contractX, account, wallet }) {
                             </div>
                             <div className="border-bottom-2"></div>
 
-                            {/* {
+                            {
                                 talbeRows.map((item, index) => {
                                     if (item)
                                         return (
@@ -409,13 +415,11 @@ export default function MintNft({ contractX, account, wallet }) {
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
                                                         <input type="text" className="profile-input pb-3 w-100" placeholder='10%'
-                                                            placeholder="Base URI (optional)"
-                                                            type="url"
-                                                            name="base_uri"
-                                                            value={collection.URI}
-                                                            onChange={(e) => {
-                                                                handleChange(e);
-                                                            }}
+                                                        name="royalty"
+                                                        value={item.royalty}
+                                                        onChange={(e) => {
+                                                            handleRoyaltyChange(e, index);
+                                                        }}
                                                         />
                                                     </div>
                                                     <div className="border-bottom-2"></div>
@@ -424,15 +428,22 @@ export default function MintNft({ contractX, account, wallet }) {
                                                 <div className="col-sm-6">
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Wallet address</div>
-                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|' />
+                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|' 
+                                                            name="walletaddress"
+                                                            value={item.walletaddress}
+                                                            onChange={(e) => {
+                                                                handleRoyaltyChange(e, index);
+                                                            }}
+                                                        />
                                                     </div>
                                                     <div className="border-bottom-2"></div>
                                                 </div>
                                             </div>
                                         )
                                 })
-                            } */}
-                            <div className="row bid-mobile-100">
+                            }
+
+                            {/* <div className="row bid-mobile-100">
                                 <div className="col-sm-6">
                                     <div>
                                         <div className="font-size-18 text-light py-3">Royalties</div>
@@ -451,7 +462,7 @@ export default function MintNft({ contractX, account, wallet }) {
                                     </div>
                                     <div className="border-bottom-2"></div>
                                 </div>
-                            </div>
+                            </div> */}
 
 
                             <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> add more loyalties</button>
