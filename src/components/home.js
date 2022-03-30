@@ -17,7 +17,7 @@ import heart from '../images/home/heart.svg';
 import { db } from "../db/firebase";
 import React, { useEffect, useState } from "react";
 import { Loader } from "../services/ui";
-import { Dropdown } from 'react-bootstrap';
+import { Button, Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
@@ -259,9 +259,24 @@ const Home = ({contractX, account, wallet }) => {
                                         <div className="row py-2 px-3">
                                             <div className="col-sm-8">
                                                 <div className="d-flex">
-                                                    <div className="explore-dot bg-pink"></div>
+                                                    <OverlayTrigger overlay={<Tooltip>Owner: {nft?.owner}</Tooltip>}>
+                                                        <span className="d-inline-block">
+                                                            <div className="explore-dot bg-pink"></div>
+                                                        </span>
+                                                    </OverlayTrigger>
+                                                    <OverlayTrigger overlay={<Tooltip>Creater: {nft?.owner}</Tooltip>}>
+                                                        <span className="d-inline-block">
+                                                            <div className="explore-dot bg-blue"></div>
+                                                        </span>
+                                                    </OverlayTrigger>
+                                                    <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contract_id}</Tooltip>}>
+                                                        <span className="d-inline-block">
+                                                        <div className="explore-dot bg-green"></div>
+                                                        </span>
+                                                    </OverlayTrigger>
+                                                    {/* <div className="explore-dot bg-pink"></div>
                                                     <div className="explore-dot bg-blue"></div>
-                                                    <div className="explore-dot bg-green"></div>
+                                                    <div className="explore-dot bg-green"></div> */}
                                                 </div>
                                             </div>
                                             <div className="col-sm-4 ">

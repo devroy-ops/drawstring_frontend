@@ -15,11 +15,16 @@ import Select from 'react-select';
 import dp from '../images/header/dp.svg';
 import logo1 from '../images/collection/logo1.png';
 import { create } from "ipfs-http-client";
+import { transactions } from 'near-api-js';
+import * as nearAPI from "near-api-js";
+const { utils } = nearAPI;
+
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
-const fileTypes = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
+const fileTypes = ["PNG", "JPEG", "GIF", "WEBP", "SVG", "JPG", "MOV", "AVI", "MP3", "MP4", "WAV", "FLAC"];//["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
 
 var tableRowIndex = 0;
+var propertyRowIndex = 0;
 
 export default function MintNft({ contractX, account, wallet }) {
 
@@ -32,16 +37,24 @@ export default function MintNft({ contractX, account, wallet }) {
     const [image, setImage] = useState();
     const [talbeRows, setRows] = useState([{
         royalty: "",
-        walletaddress: ""
-    }
-    ]);
-    const [validated, setValidated] = useState(false);
+        walletaddress: wallet.getAccountId()
+    }]);
 
+    const [properties, setProperties] = useState([{
+        key: "",
+        value: ""
+    }]);
+
+    const [validated, setValidated] = useState(false);
+    //setOptions([{ label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 },{ label: "Drawstring", value: "high_on_drip", image: logo1 }]);
     const [nft, setNft] = useState({
         token: `token-${Date.now()}`,
         title: "",
         media: "",
         description: "",
+        copies: 1,
+        price: 1,
+        collection: { label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 }
         //perpetual_royalties: talbeRows
     });
 
@@ -57,8 +70,16 @@ export default function MintNft({ contractX, account, wallet }) {
 
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
-        updatedRows[tableRowIndex] = {  royalty: "", walletaddress: "" }
+        updatedRows[tableRowIndex] = { royalty: "", walletaddress: "" }
         setRows(updatedRows)
+    }
+
+    const addNewProperty = (event) => {
+        event.preventDefault()
+        propertyRowIndex = parseFloat(propertyRowIndex) + 1;
+        var allProperties = [...properties]
+        allProperties[propertyRowIndex] = { key: "", value: "" }
+        setProperties(allProperties)
     }
 
     // const { authorId } = useParams();
@@ -100,7 +121,7 @@ export default function MintNft({ contractX, account, wallet }) {
         var allCollections = [...collections, ...response];
         setCollections(allCollections);
 
-        const options = [{ label: "Drawstring", value: "high_on_drip", image: logo1 }];
+        const options = [{ label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 },{ label: "Drawstring", value: "high_on_drip", image: logo1 }];
         allCollections.forEach(col => {
             options.push({
                 label: col.name,
@@ -110,6 +131,8 @@ export default function MintNft({ contractX, account, wallet }) {
         });
         setOptions(options);
         setLoader(false);
+        console.log("collections ", response);
+
     }
     const loadMore = (options) => {
         setColCount((prev) => prev + 1)
@@ -153,10 +176,19 @@ export default function MintNft({ contractX, account, wallet }) {
 
             const perpetualRoyalties = {};
 
-             talbeRows.forEach((item)=>{
-                perpetualRoyalties[item.walletaddress] = parseInt(item.royalty);
-             });
+            talbeRows.forEach((item) => {
+                if (item.royalty) {
+                    perpetualRoyalties[item.walletaddress] = parseInt(item.royalty);
+                }
+            });
 
+            const allProperties = {};
+            properties.forEach((item) => {
+                if (item.key) {
+                    allProperties[item.key] = item.value;
+                }
+            });
+debugger;
             var nftData = {
                 token_id: nft.token,
                 metadata: {
@@ -169,12 +201,12 @@ export default function MintNft({ contractX, account, wallet }) {
                     expires_at: null,
                     starts_at: null, // When token starts being valid, Unix epoch in milliseconds
                     updated_at: null, // When token was last updated, Unix epoch in milliseconds
-                    extra: null, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
+                    extra: Object.keys(allProperties).length > 0 ? JSON.stringify(allProperties) : null, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
                     referance: null, // URL to a JSON file with more info
                     referance_hash: null,
                 },
                 receiver_id: accountId,
-                perpetual_royalties: Object(perpetualRoyalties).keys ? perpetualRoyalties : null,
+                perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? perpetualRoyalties : null,
                 price: parseInt(nft.price)
             };
 
@@ -202,6 +234,36 @@ export default function MintNft({ contractX, account, wallet }) {
                 mint_txFee
             );
 
+        //    const response = await contract.account.signAndSendTransaction(contract.contractId, [
+        //         transactions.functionCall(
+        //           'nft_mint',
+        //           Buffer.from(
+        //             JSON.stringify({
+        //               token_id: nft.token,
+        //               metadata: JSON.stringify(nftData.metadata),
+        //               receiver_id: accountId,
+        //               perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? JSON.stringify(perpetualRoyalties) : null,
+        //             })
+        //           ),
+        //           GAS,
+        //           mint_txFee
+        //         ),
+        //         transactions.functionCall(
+        //           'nft_approve',
+        //           Buffer.from(
+        //             JSON.stringify({
+        //               token_id: nft.token,
+        //               account_id: accountId,
+        //               msg: JSON.stringify({
+        //                 sale_conditions:  utils.format.parseNearAmount(nft.price.toString()), is_auction: true
+        //               }),
+        //             })
+        //           ),
+        //           GAS,
+        //           mint_txFee
+        //         ),
+        //       ]);
+
             console.log(response);
         } catch (error) {
             console.log(error);
@@ -221,22 +283,22 @@ export default function MintNft({ contractX, account, wallet }) {
         // }
     };
 
-    const handleRoyaltyChange = (e, index) =>{
-        debugger;
-        // const items = talbeRows;
-        // items[index][e.target.name] =  e.target.value;
-        // setRows(items);
+    const handleRoyaltyChange = (e, index) => {
+        var updatedRows = [...talbeRows];
+        updatedRows[index][e.target.name] = e.target.value;
+        setRows(updatedRows);
+    }
 
-        var updatedRows = [...talbeRows]
-        updatedRows[index][e.target.name] =  e.target.value;
-        setRows(updatedRows)
+    const handlePropertyChange = (e, index) => {
+        var allProperties = [...properties]
+        allProperties[index][e.target.name] = e.target.value;
+        setProperties(allProperties)
     }
 
     const handleChangeCollection = (e) => {
         setNft((prev) => {
             return { ...prev, "collection": e };
         });
-debugger;
         const subaccount = e.label.toLowerCase().replace(/ /g, "_");
         init1(subaccount);
 
@@ -313,7 +375,7 @@ debugger;
                             <div className="pb-3">
                                 <div className="pb-2 upload-text">Upload file</div>
                                 <div className="file-upload">
-                                    <FileUploader handleChange={handleFileChange} defaultValue={nft.media} name="media" types={fileTypes} label="PNG, GIF, WEBP, SVG. Max 100mb." maxSize="2" onTypeError={onSizeError} />
+                                    <FileUploader handleChange={handleFileChange} defaultValue={nft.media} name="media" types={fileTypes} label="PNG, GIF, WEBP, SVG, JPG, MOV, AVI, MP3, MP4, WAV, FLAC, Max 100mb." maxSize="2" onTypeError={onSizeError} />
                                     {/* <p>{file ? `File name: ${file.name}` : "no files uploaded yet"}</p> */}
                                     <span className='file-upload-cosef'>Choose file</span>
                                 </div>
@@ -330,7 +392,7 @@ debugger;
                             <div className="border-bottom-2"></div>
                             <div>
                                 <div className="font-size-18 text-light py-3">Name</div>
-                                <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “Redeemable T-Shirt withLogo”'
+                                <input type="text" className="profile-input pb-3 w-100" placeholder='"e.g. Redeemable T-Shirt with Original Art!"'
                                     name="title"
                                     defaultValue={nft.title}
                                     onChange={handleChange}
@@ -357,7 +419,7 @@ debugger;
                             <div className="border-bottom-2"></div> */}
                             <div>
                                 <div className="font-size-18 text-light py-3">Description <span className="color-gray"> (Optional)</span></div>
-                                <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “Redeemable T-Shirt withLogo”'
+                                <input type="text" className="profile-input pb-3 w-100" placeholder='"e.g. This holder of this NFT is entitled to a free T-Shirt"'
                                     name="description"
                                     defaultValue={nft.description}
                                     onChange={handleChange}
@@ -397,7 +459,7 @@ debugger;
                             {/* <div className="border-bottom-2"></div> */}
 
                             <div>
-                                <div className="font-size-18 text-light py-3">Price</div>
+                                <div className="font-size-18 text-light py-3">Price (Near)</div>
                                 <input type="number" min="1" className="profile-input pb-3 w-100" placeholder='E. g. 10”'
                                     name="price"
                                     defaultValue={nft.price}
@@ -415,11 +477,11 @@ debugger;
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
                                                         <input type="text" className="profile-input pb-3 w-100" placeholder='10%'
-                                                        name="royalty"
-                                                        value={item.royalty}
-                                                        onChange={(e) => {
-                                                            handleRoyaltyChange(e, index);
-                                                        }}
+                                                            name="royalty"
+                                                            value={item.royalty}
+                                                            onChange={(e) => {
+                                                                handleRoyaltyChange(e, index);
+                                                            }}
                                                         />
                                                     </div>
                                                     <div className="border-bottom-2"></div>
@@ -428,7 +490,7 @@ debugger;
                                                 <div className="col-sm-6">
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Wallet address</div>
-                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|' 
+                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|'
                                                             name="walletaddress"
                                                             value={item.walletaddress}
                                                             onChange={(e) => {
@@ -465,43 +527,52 @@ debugger;
                             </div> */}
 
 
-                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> add more loyalties</button>
+                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
 
                             <div className="font-size-18 mob-f-16 text-light py-3">Properties <span className="color-gray"> (Optional)</span></div>
-                            <div className="row bid-mobile-100">
-                                <div className="col-sm-6">
-                                    <div>
-                                        <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. Size'
-
-                                        />
-                                    </div>
-                                    <div className="border-bottom-2"></div>
-                                </div>
-                                <div className="col-sm-6">
-                                    <div>
-                                        <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. M'
-
-                                        />
-                                    </div>
-                                    <div className="border-bottom-2"></div>
-                                </div>
-                            </div>
+                            
+                            {properties.map((item, index) => {
+                                if (item)
+                                    return (
+                                        <div className="row bid-mobile-100"  key={index.toString()}>
+                                            <div className="col-sm-6">
+                                                <div>
+                                                    <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. Size'
+                                                        name="key"
+                                                        value={item.key}
+                                                        onChange={(e) => {
+                                                            handlePropertyChange(e, index);
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="border-bottom-2"></div>
+                                            </div>
+                                            <div className="col-sm-6">
+                                                <div>
+                                                    <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. M'
+                                                        name="value"
+                                                        value={item.value}
+                                                        onChange={(e) => {
+                                                            handlePropertyChange(e, index);
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="border-bottom-2"></div>
+                                            </div>
+                                        </div>
+                                    )
+                            })}
+                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid mt-3" onClick={addNewProperty}><b>+ </b> more properties</button>
+                            
                             <div className="row pt-3 pb-5 bid-mobile-100">
                                 <div className="col-sm-6">
-                                    <button type="submit" className="btn-submit text-light font-w-700 text-light-mode"
-                                    // onClick={() => {
-                                    //     // setCreateBtn("Initializing contract 🚀🚀🚀");
-                                    //     handleSubmit().then(() => {
-                                    //         // setCreateBtn("Deploy contract and initialize");
-                                    //     });
-                                    // }}
-                                    >Create item</button>
+                                    <button type="submit" className="btn-submit text-light font-w-700 text-light-mode">Mint NFT</button>
                                 </div>
-                                <div className="col-sm-6 text-end">
+                                {/* <div className="col-sm-6 text-end">
                                     <div className="d-flex justify-content-end color-gray">
                                         <div className="pt-2 font-w-700">Unsaved changes</div> <div className="help ms-3">?</div>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
 
                         </div>

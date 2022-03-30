@@ -16,6 +16,8 @@ const Nft = ({ wallet }) => {
     const [activeTab, setActiveTab] = useState(1);
     const [isLoading, setLoader] = useState(false);
     const [nft, setNft] = useState({});
+    const [owner, setOwner] = useState({});
+    const [collection, setCollection] = useState({});
 
     const handleSelect = (selectedTab) => {
         setActiveTab(parseInt(selectedTab))
@@ -45,11 +47,35 @@ const Nft = ({ wallet }) => {
             const response = await contract.nft_token({ "token_id": tokenId});
             console.log(response);
             setNft(response);
+
+            getProfile(response.owner_id);
+            getCollection(contract);
             return response;
         } catch (error) {
             console.log(error);
         }
     };
+
+    const getProfile = async (accountId) => {
+        setLoader(true);
+        const user = await getUserForUpdateDb();
+        const response = await user.functions.get_profile(accountId);
+        console.log(response);
+        setOwner(response);
+        setLoader(false);
+    }
+
+    const getCollection = async (contract) => {
+            try {
+            const response = await contract.nft_metadata();
+            console.log(response);
+            debugger;
+            setCollection(response)
+            return response;
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     const addLike = async () => {
 
@@ -87,16 +113,16 @@ const Nft = ({ wallet }) => {
                             <div>Highest bid 7 WETH</div>
                         </div>
 
-                        <div className="row pt-3 tab-col-w-100">
-                            <div className="col-sm-6">
-                                <div className="pb-2">Creator</div>
-                                <div><img src={creater} className="me-2 font-size-18" /> Creator</div>
-                            </div>
-                            <div className="col-sm-6">
-                                <div className="pb-2">Collection</div>
-                                <div><img src={collection} className="me-2 font-size-18" /> Collection</div>
-                            </div>
-                        </div>
+                         <div className="row pt-3 tab-col-w-100">
+                                    <div className="col-sm-6">
+                                        <div className="pb-2">Creator</div>
+                                        <div><img src={owner?.profile_pic ? owner?.profile_pic : creater} className="me-2 border-radius-50" width="48"/>{nft?.owner_id}</div>
+                                    </div>
+                                    <div className="col-sm-6">
+                                        <div className="pb-2">Collection</div>
+                                        <div><img src={collection.icon ? collection.icon : collection} className="me-2 border-radius-50" width="48"/>{collection?.name}</div>
+                                    </div>
+                                </div>
 
                         <div className="pt-4">
                             <div className="tabs-links mt-4">
@@ -104,26 +130,27 @@ const Nft = ({ wallet }) => {
                                     <Tab eventKey={1} title="Details" className="mt-3">
                                         <div className="font-size-16 pt-3 pb-2">Owner</div>
                                         <div className="d-flex font-size-18">
-                                            <div><img className="mr-2" src={creater} /> 0x3864a2619...c416</div>
+                                            <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : creater} width="48" /> {nft?.owner_id}</div>
                                         </div>
 
                                         <div className="font-size-16 pt-5 pb-2">Properties</div>
                                         <div className="d-flex mb-5 properties-box-row">
-                                            <div className="properties-box p-3 me-3">
-                                                <div className="font-size-16 color-pink">Backgrounds</div>
-                                                <div className="font-size-18 my-1">M1 Army Green</div>
-                                                <div className="font-size-14">10,5% rarity</div>
-                                            </div>
-                                            <div className="properties-box p-3 me-3">
-                                                <div className="font-size-16 color-pink">Clothes</div>
-                                                <div className="font-size-18 my-1">M1 Guayabera</div>
-                                                <div className="font-size-14">10,5% rarity</div>
-                                            </div>
-                                            <div className="properties-box p-3">
-                                                <div className="font-size-16 color-pink">Eyes</div>
-                                                <div className="font-size-18 my-1">M1 X Eyes</div>
-                                                <div className="font-size-14">10,5% rarity</div>
-                                            </div>
+                                            {nft?.metadata?.extra && Object.keys(JSON.parse(nft?.metadata?.extra)).map((key, index) => {
+                                                return (
+                                                    <div className="properties-box p-3 me-3" key={index.toString()}>
+                                                        <div className="font-size-16 color-pink">Property</div>
+                                                        <div className="font-size-18 my-1" >{key}</div>
+                                                        <div className="font-size-14">{JSON.parse(nft?.metadata?.extra)[key]}</div>
+                                                    </div>
+                                                )
+                                            })}
+
+                                            {!nft?.metadata?.extra && (
+                                                <div className="properties-box p-3 me-3">
+                                                    <div className="font-size-16 color-pink">No property added for the nft</div>
+                                                </div>
+                                            )}
+
                                         </div>
 
                                         <div className="d-flex font-size-18 border-top-2 border-bottom-2 py-3">
@@ -150,6 +177,10 @@ const Nft = ({ wallet }) => {
                     <div className="col-sm-6">
                         {/* <div className="min-height-468">  */}
                         <img src={nft.metadata?.media} className="img-fluid border-bg product-profile-img" />
+                        {/* <video width="400" controls>
+                            <source src={nft.metadata?.media} type="video/mp4" />
+                        </video> */}
+
                         {/* <img src={product} className="img-fluid border-bg product-profile-img" /> */}
 
                         {/* </div> */}
