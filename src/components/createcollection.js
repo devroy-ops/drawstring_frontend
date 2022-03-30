@@ -17,7 +17,7 @@ import { create } from "ipfs-http-client";
 const client = create('https://ipfs.infura.io:5001/api/v0');
 const { transactions } = require("near-api-js");
 
-const fileTypes = ["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
+const fileTypes = ['PNG', 'GIF', 'JPG', 'WEBP'];
 
 var tableRowIndex = 0;
 
@@ -28,9 +28,8 @@ export default function CreateCollection({ contractX, account, wallet }) {
     const [isLoading, setLoader] = useState(false);
 
     const [talbeRows, setRows] = useState([{
-        index: 0,
         royalty: "",
-        walletaddress: ""
+        walletaddress: wallet.getAccountId()
     }
     ]);
 
@@ -45,7 +44,26 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
-        updatedRows[tableRowIndex] = { index: tableRowIndex, royalty: "", walletaddress: "" }
+        updatedRows[tableRowIndex] = { royalty: "", walletaddress: "" }
+        setRows(updatedRows)
+    }
+
+    const deleteRow = (index) => {
+        debugger
+        if(talbeRows.length > 1){
+           var updatedRows = [...talbeRows]
+           var indexToRemove = updatedRows.findIndex(x => x.index == index);
+           if(indexToRemove === -1){
+              updatedRows.splice(indexToRemove, 1)
+              setRows(updatedRows);
+           }
+        }
+     }
+  
+
+    const handleRoyaltyChange = (e, index) => {
+        var updatedRows = [...talbeRows];
+        updatedRows[index][e.target.name] = e.target.value;
         setRows(updatedRows)
     }
 
@@ -281,15 +299,16 @@ export default function CreateCollection({ contractX, account, wallet }) {
         <div className="bg-darkmode">
             {isLoading ? <Loader /> : null}
             <div className="container text-light createcollection p-0">
-                <div className="py-3 title">Create Collection</div>
+                <div className="pt-3 title">Create Collection</div>
+                <div className='pb-3'>A collection is a unique group of NFTs stored on the blockchain.  Creating a collection lets you claim a unique name, description, and default set of royalties for any NFTs you want to mint.  You can also mint NFTs directly to the Drawstring collection without creating a custom collection.</div>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     {/* <form id="contact" action="" method="post"> */}
                     <div className="row">
                         <div className="col-sm-6">
                             <div className="pb-3">
-                                <div className="pb-2 upload-text">Upload file</div>
+                                <div className="pb-2 upload-text">Upload cover</div>
                                 <div className="file-upload">
-                                    <FileUploader handleChange={handleFileChange} name="file" types={fileTypes} label="PNG, GIF, WEBP, MP4 or MP3. Max 100mb." maxSize="100" />
+                                    <FileUploader handleChange={handleFileChange} name="file" types={fileTypes} label="PNG, GIF, JPG, WEBP. Max 100mb." maxSize="100" />
                                     {/* <p>{file ? `File name: ${file.name}` : "no files uploaded yet"}</p> */}
                                     <span className='file-upload-cosef'>Choose file</span>
                                 </div>
@@ -306,7 +325,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             <div className="border-bottom-2"></div>
                             <div>
                                 <div className="font-size-18 text-light py-3">Name</div>
-                                <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “Redeemable T-Shirt withLogo”'
+                                <input type="text" className="profile-input pb-3 w-100" placeholder='"e.g. My new album"'
                                     name="name"
                                     value={collection.name}
                                     onChange={(e) => {
@@ -354,13 +373,13 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
                             <div>
                                 <div className="font-size-18 text-light py-3">Description <span className="color-gray"> (Optional)</span></div>
-                                <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “Redeemable T-Shirt withLogo”'
+                                <textarea className="profile-input pb-3 w-100" placeholder='"e.g. My newest collection is finally here! Holders will receive some exciting things in the future ;)"'
                                     value={collection.reference}
                                     name="reference"
                                     onChange={(e) => {
                                         handleChange(e);
                                     }}
-                                />
+                                ></textarea>
                             </div>
                             <div className="border-bottom-2"></div>
                             {/* <div>
@@ -374,7 +393,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             <div className="border-bottom-2"></div>
                             <div className="font-size-14 color-gray pt-2">Amount of tokens</div> */}
 
-                            {/* {
+                            {
                                 talbeRows.map((item, index) => {
                                     if (item)
                                         return (
@@ -383,12 +402,10 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
                                                         <input type="text" className="profile-input pb-3 w-100" placeholder='10%'
-                                                            placeholder="Base URI (optional)"
-                                                            type="url"
-                                                            name="base_uri"
-                                                            value={collection.URI}
+                                                            name="royalty"
+                                                            value={item.royalty}
                                                             onChange={(e) => {
-                                                                handleChange(e);
+                                                                handleRoyaltyChange(e, index);
                                                             }}
                                                         />
                                                     </div>
@@ -398,26 +415,31 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                                 <div className="col-sm-6">
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Wallet address</div>
-                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|' />
+                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|' 
+                                                             name="walletaddress"
+                                                             value={item.walletaddress}
+                                                             onChange={(e) => {
+                                                                 handleRoyaltyChange(e, index);
+                                                             }}
+                                                        />
                                                     </div>
                                                     <div className="border-bottom-2"></div>
                                                 </div>
+                                                {/* {index != 0 && (
+                                                    <div className='col-sm-2 pt-5'>
+                                                        <button className='btn btn-danger mt-4' type='button' onClick={() => deleteRow(index)}>Remove</button>
+                                                    </div>
+                                                )} */}
                                             </div>
                                         )
                                 })
-                            } */}
-                            <div className="row bid-mobile-100">
+                            }
+                            {/* <div className="row bid-mobile-100">
                                 <div className="col-sm-6">
                                     <div>
                                         <div className="font-size-18 text-light py-3">Royalties</div>
                                         <input type="text" className="profile-input pb-3 w-100"
-                                            placeholder='10%'
-                                        // name="base_uri"
-                                        // value={collection.URI}
-                                        // onChange={(e) => {
-                                        //     handleChange(e);
-                                        // }}
-                                        />
+                                            placeholder='10%'/>
                                     </div>
                                     <div className="border-bottom-2"></div>
                                     <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div>
@@ -429,10 +451,10 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                     </div>
                                     <div className="border-bottom-2"></div>
                                 </div>
-                            </div>
+                            </div> */}
 
 
-                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> add more royalties</button>
+                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
 
                             {/* <div className="row bid-mobile-100">
                                 <div className="col-sm-6">
@@ -466,20 +488,13 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             </div> */}
                             <div className="row pt-3 pb-5 bid-mobile-100">
                                 <div className="col-sm-6">
-                                    <button type="submit" className="btn-submit text-light font-w-700 text-light-mode"
-                                    // onClick={() => {
-                                    //     // setCreateBtn("Initializing contract 🚀🚀🚀");
-                                    //     initializeContract().then(() => {
-                                    //         // setCreateBtn("Deploy contract and initialize");
-                                    //     });
-                                    // }}
-                                    >Create item</button>
+                                    <button type="submit" className="btn-submit text-light font-w-700 text-light-mode">Create Collection</button>
                                 </div>
-                                <div className="col-sm-6 text-end">
+                                {/* <div className="col-sm-6 text-end">
                                     <div className="d-flex justify-content-end color-gray">
                                         <div className="pt-2 font-w-700">Unsaved changes</div> <div className="help ms-3">?</div>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
 
                         </div>

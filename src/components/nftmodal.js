@@ -17,10 +17,10 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     const [isLoading, setLoader] = useState(false);
     const [nft, setNft] = useState({});
     const [owner, setOwner] = useState({});
-
+    const [collection, setCollection] = useState({});
 
     useEffect(() => {
-       return viewNFTs();
+        return viewNFTs();
     }, []);
 
     const viewNFTs = async () => {
@@ -28,11 +28,11 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
             debugger
             const contract = await init(wallet, nftData.contract_id.toLowerCase());
             const response = await contract.nft_token({ "token_id": nftData.id });
-            debugger;
             console.log(response);
             setNft(response);
 
-            getProfile(response.owner_id)
+            getProfile(response.owner_id);
+            getCollection(contract);
             return response;
         } catch (error) {
             console.log(error);
@@ -47,6 +47,18 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
         console.log(response);
         setOwner(response);
         setLoader(false);
+    }
+
+    const getCollection = async (contract) => {
+            try {
+            const response = await contract.nft_metadata();
+            console.log(response);
+            debugger;
+            setCollection(response)
+            return response;
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     return (
@@ -79,11 +91,11 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                 <div className="row pt-3 tab-col-w-100">
                                     <div className="col-sm-6">
                                         <div className="pb-2">Creator</div>
-                                        <div><img src={creater} className="me-2 font-size-18" />{nftData?.owner}</div>
+                                        <div><img src={owner?.profile_pic ? owner?.profile_pic : creater} className="me-2 border-radius-50" width="48"/>{nftData?.owner}</div>
                                     </div>
                                     <div className="col-sm-6">
                                         <div className="pb-2">Collection</div>
-                                        <div><img src={collection} className="me-2 font-size-18" />{nftData?.collection_name}</div>
+                                        <div><img src={collection.icon ? collection.icon : collection} className="me-2 border-radius-50" width="48"/>{nftData?.collection_name}</div>
                                     </div>
                                 </div>
 
@@ -93,26 +105,28 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                     <Tab eventKey={1} title="Details" className="mt-3"> */}
                                         <div className="font-size-16 pt-3 pb-2">Owner</div>
                                         <div className="d-flex font-size-18">
-                                            <div><img className="mr-2 border-radius-50" src={owner.profile_pic ? owner.profile_pic : creater} width="48"/> {nft?.owner_id}</div>
+                                            <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : creater} width="48" /> {nft?.owner_id}</div>
                                         </div>
 
                                         <div className="font-size-16 pt-5 pb-2">Properties</div>
+
                                         <div className="d-flex mb-5 properties-box-row">
-                                            <div className="properties-box p-3 me-3">
-                                                <div className="font-size-16 color-pink">Backgrounds</div>
-                                                <div className="font-size-18 my-1">M1 Army Green</div>
-                                                <div className="font-size-14">10,5% rarity</div>
-                                            </div>
-                                            <div className="properties-box p-3 me-3">
-                                                <div className="font-size-16 color-pink">Clothes</div>
-                                                <div className="font-size-18 my-1">M1 Guayabera</div>
-                                                <div className="font-size-14">10,5% rarity</div>
-                                            </div>
-                                            <div className="properties-box p-3">
-                                                <div className="font-size-16 color-pink">Eyes</div>
-                                                <div className="font-size-18 my-1">M1 X Eyes</div>
-                                                <div className="font-size-14">10,5% rarity</div>
-                                            </div>
+                                            {nft?.metadata?.extra && Object.keys(JSON.parse(nft?.metadata?.extra)).map((key, index) => {
+                                                return (
+                                                    <div className="properties-box p-3 me-3" key={index.toString()}>
+                                                        <div className="font-size-16 color-pink">Property</div>
+                                                        <div className="font-size-18 my-1" >{key}</div>
+                                                        <div className="font-size-14">{JSON.parse(nft?.metadata?.extra)[key]}</div>
+                                                    </div>
+                                                )
+                                            })}
+
+                                            {!nft?.metadata?.extra && (
+                                                <div className="properties-box p-3 me-3">
+                                                    <div className="font-size-16 color-pink">No property added for the nft</div>
+                                                </div>
+                                            )}
+
                                         </div>
 
                                         {/* <div className="d-flex font-size-18 border-top-2 border-bottom-2 py-3">

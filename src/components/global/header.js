@@ -173,8 +173,8 @@ export default function Header({ currentUser, wallet, nearConfig }) {
             </Dropdown.Toggle>
 
             <Dropdown.Menu>
-              <Dropdown.Item onClick={(e)=>{e.preventDefault(); navigate("/mintnft")}}>Mint Nft</Dropdown.Item>
-              <Dropdown.Item onClick={(e)=>{e.preventDefault(); navigate("/createcollection")}} >Create Collection</Dropdown.Item>
+              <Dropdown.Item onClick={(e)=>{e.preventDefault(); !User ? handleUser() : navigate("/mintnft")}}>Mint Nft</Dropdown.Item>
+              <Dropdown.Item onClick={(e)=>{e.preventDefault(); !User ? handleUser() : navigate("/createcollection")}} >Create Collection</Dropdown.Item>
              </Dropdown.Menu>
              </Dropdown>
              {/* <NavLink exact="true" activeclassname="active" to="/mintnft" className="create">Create</NavLink> */}
