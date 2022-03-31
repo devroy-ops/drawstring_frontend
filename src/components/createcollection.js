@@ -14,17 +14,16 @@ import { storage } from '../db/firebase';
 import { toast } from 'react-toastify';
 import { Loader } from '../services/ui';
 import { create } from "ipfs-http-client";
-const client = create('https://ipfs.infura.io:5001/api/v0');
-const { transactions } = require("near-api-js");
+import { transactions } from 'near-api-js';
 
-const fileTypes = ['PNG', 'GIF', 'JPG', 'WEBP'];
+const client = create('https://ipfs.infura.io:5001/api/v0');
+
+const fileTypes = ['PNG', 'GIF', 'JPG', 'WEBP', 'JPEG'];
 
 var tableRowIndex = 0;
 
 export default function CreateCollection({ contractX, account, wallet }) {
 
-    const [currentAuthor, setAuthor] = useState({});
-    const [contract, setContract] = useState({});
     const [isLoading, setLoader] = useState(false);
 
     const [talbeRows, setRows] = useState([{
@@ -33,12 +32,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
     }
     ]);
 
-    // Receive data from TableRow 
-    //  const handleChange = data => {
-    //     talbeRows[data.index] = data
-    //  }
-
-    // Add New Table Row
+    // Add New Row
     const addNewRow = (event) => {
         event.preventDefault()
 
@@ -49,17 +43,16 @@ export default function CreateCollection({ contractX, account, wallet }) {
     }
 
     const deleteRow = (index) => {
-        debugger
-        if(talbeRows.length > 1){
-           var updatedRows = [...talbeRows]
-           var indexToRemove = updatedRows.findIndex(x => x.index == index);
-           if(indexToRemove === -1){
-              updatedRows.splice(indexToRemove, 1)
-              setRows(updatedRows);
-           }
+        if (talbeRows.length > 1) {
+            var updatedRows = [...talbeRows]
+            var indexToRemove = updatedRows.findIndex(x => x.index == index);
+            if (indexToRemove === -1) {
+                updatedRows.splice(indexToRemove, 1)
+                setRows(updatedRows);
+            }
         }
-     }
-  
+    }
+
 
     const handleRoyaltyChange = (e, index) => {
         var updatedRows = [...talbeRows];
@@ -68,9 +61,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
     }
 
     const [file, setFile] = useState(null);
-
     // const [createBtn, setCreateBtn] = useState("Deploy contract and initialize");
-
 
     const [collection, setCollection] = useState({
         spec: "nft-1.0.0", // nft-1.0.0
@@ -87,84 +78,37 @@ export default function CreateCollection({ contractX, account, wallet }) {
         if (transactionHashes) {
             let col = JSON.parse(localStorage.getItem("collection"));
             if (col) {
+                debugger;
+
                 const subaccount = col.name.toLowerCase().replace(/ /g, "_");
                 var isContractInitialized = localStorage.getItem(subaccount + "_isContractInitialized");
                 if (!isContractInitialized) {
                     localStorage.setItem(subaccount + "_isContractInitialized", true);
                     initializeContract();
-                }else{
-                    let col = JSON.parse(localStorage.getItem("collection"));
-                    const subaccount = col.name.toLowerCase().replace(/ /g, "_");
+                } else {
+
+                    setLoader(true);
+                    const user = await getUserForUpdateDb();
+                    await user.functions.add_collection(col.name.toLowerCase(), col.fileUrl, subaccount);
+                    setLoader(false);
+
                     navigate(`/viewcollection/${subaccount}`);
-                    toast("Collection created successfully.", {type: "success"});
+                    toast("Collection created successfully.", { type: "success" });
+
+                    localStorage.removeItem(collection);
+                    localStorage.removeItem(subaccount + "_isContractInitialized");
                 }
             }
         }
     }
-
-    // const init1 = async () => {
-    //    var authors = await author(authorId);
-    //    setAuthor(authors);
-    //     let contract = await init(wallet);
-    //     setContract(contract);
-    // }
-
-    const init2 = async (subaccount) => {
-        try {
-            // Load the NFT from the subaccount created in the deploy function
-            return await new nearAPI.Contract(
-                wallet.account(),
-                `${subaccount}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
-                {
-                    // View methods
-                    viewMethods: [
-                        "nft_token",
-                        "nft_tokens",
-                        "nft_tokens_for_owner",
-                        "nft_metadata",
-                        "nft_total_supply",
-                        "nft_supply_for_owner",
-                        "nft_is_approved",
-                        "nft_payout",
-                        "nft_whitelist"
-                    ],
-                    // Change methods
-                    changeMethods: [
-                        "nft_mint",
-                        "new",
-                        "nft_transfer",
-                        "nft_transfer_call",
-                        "nft_approve",
-                        "nft_revoke",
-                        "nft_revoke_all",
-                        "burn_nft",
-                        "add_to_whitelist",
-                        "remove_from_whitelist",
-                        "toggle_whitelisting"
-                    ],
-                    sender: wallet.getAccountId(),
-                }
-            );
-
-        } catch (error) {
-            console.log(error);
-            return error;
-        }
-    };
 
     useEffect(() => {
         return init1();
     }, []);
 
 
-    /**
-   * Deploys to an account, and initialize the smart contract with NFTContractMetadata
-   * @function
-   * @returns Promise<void>
-   */
     const deploy = async () => {
         try {
-            debugger;
             // load and deploy smart contract
             const subaccount = collection.name.toLowerCase().replace(/ /g, "_");
             const respons = await contractX.deploy_contract_code(
@@ -182,11 +126,64 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
     const initializeContract = async () => {
 
+        try {
+            let col = JSON.parse(localStorage.getItem("collection"));
+
+            const subaccount = col.name.toLowerCase().replace(/ /g, "_");
+
+            const contract = await init(wallet, subaccount);
+
+            const allTransactions = [
+                transactions.functionCall(
+                    'new',
+                    Buffer.from(
+                        JSON.stringify({
+                            owner_id: account.accountId,
+                            metadata: {
+                                "spec": col.spec,
+                                "name": col.name.toLowerCase(),
+                                "symbol": col.symbol,
+                                "icon": col.fileUrl,
+                                "base_uri": null,
+                                "referance": null,
+                                "referance_hash": null, // must exist if the "referance" field exists.
+                            },
+                        }),
+                    ),
+                    GAS
+                )
+            ]
+
+            if (col.royalties) {
+                allTransactions.push(
+                    transactions.functionCall(
+                        'set_contract_royalty',
+                        Buffer.from(
+                            JSON.stringify(
+                                { contract_royalty: 2 }// col.royalties
+                            )
+                        ),
+                        GAS
+                    ),
+                )
+            }
+            debugger;
+            const response = await contract.account.signAndSendTransaction(contract.contractId,
+                allTransactions
+            );
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const initializeContract1 = async () => {
+
         let col = JSON.parse(localStorage.getItem("collection"));
 
         const subaccount = col.name.toLowerCase().replace(/ /g, "_");
 
-        const contract = await init2(subaccount);
+        const contract = await init(wallet, subaccount);
 
         try {
             setLoader(true);
@@ -218,34 +215,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
         }
     }
 
-    // const deployAndInitializeContract = async (iconUrl) => {
-    //     try {
-    //         const result = await account.signAndSendTransaction({
-    //             receiverId: "rough.testnet",//account.accountId,
-    //             actions: [
-    //                 //deploy(),
-    //                 initializeContract(iconUrl)
-    //                 // transactions.deployContract(
-    //                 //     {
-    //                 //         account_id: `${collection.name.replace(/ /g,"_")}.stingy.testnet` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
-    //                 //     },
-    //                 //     GAS,
-    //                 //     deploy_txFee
-    //                 // ),
-    //                 // transactions.functionCall(
-    //                 //     "new",
-    //                 //     Buffer.from(JSON.stringify(newArgs)),
-    //                 //     GAS,
-    //                 //     "0"
-    //                 // ),
-    //             ],
-    //         });
-    //         console.log(result);
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // }
-
     const [validated, setValidated] = useState(false);
 
     const handleSubmit = (event) => {
@@ -254,14 +223,12 @@ export default function CreateCollection({ contractX, account, wallet }) {
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
-            // deployAndInitializeContract("https://ipfs.infura.io/ipfs/QmSKypcja9efixmHLzrpVupi1UNFYdVcARPrxJ3fuvLbLg");
             uploadFile();
         }
         setValidated(true);
     };
 
     const handleFileChange = (file) => {
-        //setCollection((prev) => { return { ...prev, "icon": file } });
         const reader = new window.FileReader();
         reader.readAsArrayBuffer(file);
 
@@ -280,12 +247,22 @@ export default function CreateCollection({ contractX, account, wallet }) {
             let col = collection;
             col.fileUrl = url;
 
+            const royalties = {};
+            talbeRows.forEach((item) => {
+                if (item.royalty) {
+                    royalties[item.walletaddress] = parseInt(item.royalty);
+                }
+            });
+            if (Object.keys(royalties).length > 0) {
+                col.royalties = royalties;
+            }
+
             localStorage.setItem("collection", JSON.stringify(col));
 
             deploy();
-            //initializeContract(url);
-        }else{
-            toast("File is required", {type: "error"})
+
+        } else {
+            toast("File is required", { type: "error" })
         }
     }
 
@@ -335,7 +312,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                 />
                                 <Form.Control.Feedback type="invalid">
                                     Name is required.
-                            </Form.Control.Feedback>
+                                </Form.Control.Feedback>
                             </div>
                             <div className="border-bottom-2"></div>
 
@@ -415,12 +392,12 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                                 <div className="col-sm-6">
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Wallet address</div>
-                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|' 
-                                                             name="walletaddress"
-                                                             value={item.walletaddress}
-                                                             onChange={(e) => {
-                                                                 handleRoyaltyChange(e, index);
-                                                             }}
+                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|'
+                                                            name="walletaddress"
+                                                            value={item.walletaddress}
+                                                            onChange={(e) => {
+                                                                handleRoyaltyChange(e, index);
+                                                            }}
                                                         />
                                                     </div>
                                                     <div className="border-bottom-2"></div>

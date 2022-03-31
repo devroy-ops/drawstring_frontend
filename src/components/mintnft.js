@@ -3,7 +3,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import '../styles/createcollection.css';
-import { init, author, GAS, mint_txFee, transfer_txFee, txFee, storage1 } from "../services/helper";
+import { init, author, GAS, mint_txFee, transfer_txFee, txFee, initMarketplaceContract, storageDeposit } from "../services/helper";
 import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
@@ -17,6 +17,7 @@ import logo1 from '../images/collection/logo1.png';
 import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
 import * as nearAPI from "near-api-js";
+import { marketContractName } from '../services/utils';
 const { utils } = nearAPI;
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
@@ -46,7 +47,7 @@ export default function MintNft({ contractX, account, wallet }) {
     }]);
 
     const [validated, setValidated] = useState(false);
-    //setOptions([{ label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 },{ label: "Drawstring", value: "high_on_drip", image: logo1 }]);
+
     const [nft, setNft] = useState({
         token: `token-${Date.now()}`,
         title: "",
@@ -55,14 +56,9 @@ export default function MintNft({ contractX, account, wallet }) {
         copies: 1,
         price: 1,
         collection: { label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 }
-        //perpetual_royalties: talbeRows
     });
 
     const accountId = wallet.getAccountId();
-    // Receive data from TableRow 
-    //  const handleChange = data => {
-    //     talbeRows[data.index] = data
-    //  }
 
     // Add New Table Row
     const addNewRow = (event) => {
@@ -82,14 +78,11 @@ export default function MintNft({ contractX, account, wallet }) {
         setProperties(allProperties)
     }
 
-    // const { authorId } = useParams();
-
     const [searchParams, setSearchParams] = useSearchParams();
     let navigate = useNavigate();
 
     const init1 = async (subaccount) => {
-        // var authors = await author(authorId);
-        // setAuthor(authors);
+
         let contract = await init(wallet, subaccount);
         setContract(contract);
         getCollections();
@@ -97,31 +90,54 @@ export default function MintNft({ contractX, account, wallet }) {
         if (transactionHashes) {
             const nft = JSON.parse(localStorage.getItem("nft"));
 
-            // if(!nft.isApproved){
-            //     nft.isApproved = true;
-            //     localStorage.setItem("nft", JSON.stringify(nft));
-            // }
+            if (nft) {
+                setLoader(true);
+                const user = await getUserForUpdateDb();
+                await user.functions.add_new_nft_listing(
+                    nft.title,
+                    nft.tokenId,
+                    nft.mediaLink,
+                    nft.mediaLink,
+                    parseInt(nft.price),
+                    nft.contractId,
+                    accountId,
+                    nft.contractName,
+                    nft.description,
+                    nft.type
+                );
 
-            navigate(`/nft/${nft.contractId}/${nft.tokenId}`);
+                setLoader(false);
 
-            toast("Nft minted successfully.", { type: "success" });
+                navigate(`/nft/${nft.contractId}/${nft.tokenId}`);
+
+                toast("Nft minted successfully.", { type: "success" });
+
+                localStorage.removeItem("nft");
+            }
         }
     }
 
+    const initMarketPlace = async () => {
+        await storageDeposit(wallet);
+    }
+
     useEffect(() => {
-        console.log("useeffect aldkjfajlfdjlajdlfkj")
+        return initMarketPlace();
+    }, [])
+
+    useEffect(() => {
         return init1();
     }, [colCount]);
 
     const getCollections = async () => {
         setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_collections(5, colCount * 5);
+        const response = await user.functions.get_collections(20, colCount * 20);
 
         var allCollections = [...collections, ...response];
         setCollections(allCollections);
 
-        const options = [{ label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 },{ label: "Drawstring", value: "high_on_drip", image: logo1 }];
+        const options = [{ label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 }, { label: "Drawstring", value: "high_on_drip", image: logo1 }];
         allCollections.forEach(col => {
             options.push({
                 label: col.name,
@@ -181,88 +197,121 @@ export default function MintNft({ contractX, account, wallet }) {
                     perpetualRoyalties[item.walletaddress] = parseInt(item.royalty);
                 }
             });
-
-            const allProperties = {};
-            properties.forEach((item) => {
-                if (item.key) {
-                    allProperties[item.key] = item.value;
-                }
-            });
 debugger;
-            var nftData = {
-                token_id: nft.token,
-                metadata: {
-                    title: nft.title,
-                    description: nft.description,
-                    media: mediaLink,
-                    media_hash: null,
-                    copies: parseInt(nft.copies),
-                    issued_at: null, // Unix epoch in milliseconds
-                    expires_at: null,
-                    starts_at: null, // When token starts being valid, Unix epoch in milliseconds
-                    updated_at: null, // When token was last updated, Unix epoch in milliseconds
-                    extra: Object.keys(allProperties).length > 0 ? JSON.stringify(allProperties) : null, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
-                    referance: null, // URL to a JSON file with more info
-                    referance_hash: null,
-                },
-                receiver_id: accountId,
-                perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? perpetualRoyalties : null,
-                price: parseInt(nft.price)
+
+            const allProperties = {
+                creator_id: accountId,
+                media_size: nft.media.size, 
+                media_type: nft.media.type,
+                price: nft.price,
+                properties: {}
             };
 
-            const user = await getUserForUpdateDb();
-            debugger
-            var data = { contractId: nft.collection.value, tokenId: nft.token };// price: nft.price, isApproved: false
+            properties.forEach((item) => {
+                if (item.key) {
+                    allProperties["properties"][item.key] = item.value;
+                }
+            });
+
+            // var nftData = {
+            //     token_id: nft.token,
+            //     metadata: {
+            //         title: nft.title,
+            //         description: nft.description,
+            //         media: mediaLink,
+            //         media_hash: null,
+            //         copies: parseInt(nft.copies),
+            //         issued_at: null, // Unix epoch in milliseconds
+            //         expires_at: null,
+            //         starts_at: null, // When token starts being valid, Unix epoch in milliseconds
+            //         updated_at: null, // When token was last updated, Unix epoch in milliseconds
+            //         extra: Object.keys(allProperties).length > 0 ? JSON.stringify(allProperties) : null, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
+            //         referance: null, // URL to a JSON file with more info
+            //         referance_hash: null,
+            //     },
+            //     receiver_id: accountId,
+            //     perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? perpetualRoyalties : null,
+            //     price: parseInt(nft.price)
+            // };
+
+
+            var data = {
+                contractId: nft.collection.value,
+                contractName: nft.collection.label,
+                tokenId: nft.token,
+                title: nft.title,
+                mediaLink: mediaLink,
+                price: parseInt(nft.price),
+                description: nft.description,
+                type: nft.media.type
+            };// price: nft.price, isApproved: false
             localStorage.setItem("nft", JSON.stringify(data));
 
-            await user.functions.add_new_nft_listing(
-                nft.title,
-                nft.token,
-                mediaLink,
-                mediaLink,
-                parseInt(nft.price),
-                nft.collection.value,
-                accountId,
-                nft.collection.label,
-                nft.description,
-                "image"
-            );
+            //const user = await getUserForUpdateDb();
+            // await user.functions.add_new_nft_listing(
+            //     nft.title,
+            //     nft.token,
+            //     mediaLink,
+            //     mediaLink,
+            //     parseInt(nft.price),
+            //     nft.collection.value,
+            //     accountId,
+            //     nft.collection.label,
+            //     nft.description,
+            //     "image"
+            // );
 
-            const response = await contract.nft_mint(
-                nftData,
-                GAS,
-                mint_txFee
-            );
+            // const response = await contract.nft_mint(
+            //     nftData,
+            //     GAS,
+            //     mint_txFee
+            // );
 
-        //    const response = await contract.account.signAndSendTransaction(contract.contractId, [
-        //         transactions.functionCall(
-        //           'nft_mint',
-        //           Buffer.from(
-        //             JSON.stringify({
-        //               token_id: nft.token,
-        //               metadata: JSON.stringify(nftData.metadata),
-        //               receiver_id: accountId,
-        //               perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? JSON.stringify(perpetualRoyalties) : null,
-        //             })
-        //           ),
-        //           GAS,
-        //           mint_txFee
-        //         ),
-        //         transactions.functionCall(
-        //           'nft_approve',
-        //           Buffer.from(
-        //             JSON.stringify({
-        //               token_id: nft.token,
-        //               account_id: accountId,
-        //               msg: JSON.stringify({
-        //                 sale_conditions:  utils.format.parseNearAmount(nft.price.toString()), is_auction: true
-        //               }),
-        //             })
-        //           ),
-        //           GAS,
-        //           mint_txFee
-        //         ),
-        //       ]);
+
+            const metadata = {
+                title: nft.title,
+                description: nft.description,
+                media: mediaLink,
+                // media_hash: undefined,
+                copies: nft.copies,
+                issued_at: Date.now(), // Unix epoch in milliseconds
+                // expires_at: undefined,
+                // starts_at: undefined, // When token starts being valid, Unix epoch in milliseconds
+                // updated_at: undefined, // When token was last updated, Unix epoch in milliseconds
+                extra: Object.keys(allProperties).length > 0 ? JSON.stringify(allProperties) : undefined, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
+                // referance: undefined, // URL to a JSON file with more info
+                // referance_hash: undefined,
+            };
+
+            const response = await contract.account.signAndSendTransaction(contract.contractId, [
+                transactions.functionCall(
+                    'nft_mint',
+                    Buffer.from(
+                        JSON.stringify({
+                            token_id: nft.token,
+                            metadata,
+                            receiver_id: accountId,
+                            perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? perpetualRoyalties : undefined,
+                        }),
+                    ),
+                    GAS,
+                    mint_txFee
+                ),
+                transactions.functionCall(
+                    'nft_approve',
+                    Buffer.from(
+                        JSON.stringify({
+                            token_id: nft.token,
+                            account_id: marketContractName, //"drawstring_market.testnet",
+                            msg: JSON.stringify({
+                                sale_conditions: utils.format.parseNearAmount(nft.price.toString()), is_auction: true,// utils..format.parseNearAmount(nft.price.toString()), ft_token_id: 'near'
+                            }),
+                        })
+                    ),
+                    GAS,
+                    mint_txFee
+                ),
+            ]);
 
             console.log(response);
         } catch (error) {
@@ -365,6 +414,7 @@ debugger;
 
     return (
         <div className="bg-darkmode">
+             {isLoading ? <Loader /> : null}
             <div className="container text-light createcollection p-0">
                 <div className="py-3 title">Mint NFT</div>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -530,11 +580,11 @@ debugger;
                             <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
 
                             <div className="font-size-18 mob-f-16 text-light py-3">Properties <span className="color-gray"> (Optional)</span></div>
-                            
+
                             {properties.map((item, index) => {
                                 if (item)
                                     return (
-                                        <div className="row bid-mobile-100"  key={index.toString()}>
+                                        <div className="row bid-mobile-100" key={index.toString()}>
                                             <div className="col-sm-6">
                                                 <div>
                                                     <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. Size'
@@ -563,7 +613,7 @@ debugger;
                                     )
                             })}
                             <button type="button" className="btn-submit text-light bg-darkmode border-2-solid mt-3" onClick={addNewProperty}><b>+ </b> more properties</button>
-                            
+
                             <div className="row pt-3 pb-5 bid-mobile-100">
                                 <div className="col-sm-6">
                                     <button type="submit" className="btn-submit text-light font-w-700 text-light-mode">Mint NFT</button>
