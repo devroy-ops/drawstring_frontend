@@ -35,7 +35,7 @@ import { Loader } from '../services/ui';
 const Profile = ({ contractX, account, wallet }) => {
 
     const accountId = wallet.getAccountId();
-
+    const [collections, setCollections] = useState([]);
     const [activeTab, setActiveTab] = useState(1);
     const [author, setAuthor] = useState({});
     const [isLoading, setLoader] = useState(false);
@@ -57,6 +57,7 @@ const Profile = ({ contractX, account, wallet }) => {
         setLoader(false);
 
         getAllListedNfts();
+        getCollections();
     }
 
     const getAllListedNfts = async () => {
@@ -65,6 +66,17 @@ const Profile = ({ contractX, account, wallet }) => {
         const allListedNfts = await user.functions.get_nfts_by_owner(accountId);
         console.log(allListedNfts);
         setListedNfts(allListedNfts);
+        setLoader(false);
+    }
+
+    const getCollections = async () => {
+        setLoader(true);
+        const user = await getUser();
+        //const top = await user.functions.get_collections(limit, offset)
+        const response = await user.functions.get_collections(500, 0);
+        console.log(response);
+        debugger
+        setCollections(response);
         setLoader(false);
     }
 
@@ -109,7 +121,7 @@ const Profile = ({ contractX, account, wallet }) => {
                 <div className="d-flex py-4">
                     {/* <button type="button" className="btn follow-btn">Follow</button> */}
                     <button type="button" onClick={() => {
-                        navigator.clipboard.writeText(`${window.location.origin.toString() + "/" + wallet.getAccountId()}`);
+                        navigator.clipboard.writeText(`${window.location.origin.toString() + "/user/" + wallet.getAccountId()}`);
                         toast("copied user profile url", { type: "success" })
                     }} className="btn mx-4 up-btn"><img src={upload} /></button>
                     <button type="button" className="btn more-btn"><img src={more} /></button>
@@ -118,7 +130,7 @@ const Profile = ({ contractX, account, wallet }) => {
             <div className="">
                 <div className="container tabs-links px-0">
                     <Tabs activeKey={activeTab} onSelect={handleSelect}>
-                        <Tab eventKey={1} title="On sale 9">
+                        <Tab eventKey={1} title={`On sale ${listedNfts.filter(x=>x.is_live === true).length}`}>
                             {/* <div className="border-bottom-2"></div> */}
                             <div className="pb-4">
                                 <div className="row title text-light pt-3">
@@ -134,7 +146,7 @@ const Profile = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                                 <div className="row pt-2">
-                                    {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
+                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.is_live === true).map((nft, index) => {
                                         return (
                                             <div className="col-sm-3 pb-4" key={index}>
                                                 <div className="top-sec-box">
@@ -183,13 +195,179 @@ const Profile = ({ contractX, account, wallet }) => {
                                 </div>
                             </div>
                         </Tab>
-                        <Tab eventKey={2} title="Owned  12">Tab 2 content</Tab>
-                        <Tab eventKey={3} title="Created  8">Tab 3 content</Tab>
-                        <Tab eventKey={4} title="Liked  18">Tab 4 content is displayed by default</Tab>
-                        <Tab eventKey={5} title="Activity">Tab 5 content</Tab>
-                        <Tab eventKey={6} title="Collabs">Tab 6 content</Tab>
-                        <Tab eventKey={7} title="Collections">Tab 7 content</Tab>
+                        <Tab eventKey={2} title={`On sale ${listedNfts.filter(x=>x.owner === wallet.getAccountId()).length}`}>
+                        <div className="pb-4">
+                                <div className="row title text-light pt-3">
+                                    <div className="col-sm-9">
+                                        {/* <img src={blockchain} className="" /><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} /> */}
+                                        <img src={category} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Category </span><img src={arrow_down} />
+                                        <img src={images} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} />
+                                        <img src={saletype} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Sale type </span><img src={arrow_down} />
+                                        <img src={price} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Price range </span><img src={arrow_down} />
+                                    </div>
+                                    <div className="col-sm-3 text-end">
+                                        <img src={sort} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Sort By </span><img src={arrow_down} />
+                                    </div>
+                                </div>
+                                <div className="row pt-2">
+                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.owner === wallet.getAccountId()).map((nft, index) => {
+                                        return (
+                                            <div className="col-sm-3 pb-4" key={index}>
+                                                <div className="top-sec-box">
+                                                    <div className="row py-2 px-3">
+                                                        <div className="col-sm-8">
+                                                            <div className="d-flex">
+                                                                <div className="explore-dot bg-pink"></div>
+                                                                <div className="explore-dot bg-blue"></div>
+                                                                <div className="explore-dot bg-green"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-sm-4 ">
+                                                            <div className="explore-dot bg-black float-end">
+                                                                <img src={more} className="pb-1" alt="more icon" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <img src={nft.media_link} className="w-100" height="270" alt="nft media" />
+                                                    <div className="text-light font-size-18 p-3">
+                                                        <div>{nft.name}</div>
+                                                        <div className="row pt-2 bid-mobile-100">
+                                                            <div className="col-sm-6">
+                                                                {nft.price} ETN <span className="color-gray">1/1</span>
+                                                            </div>
+                                                            <div className="col-sm-6 text-end">
+                                                                <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
+                                                            </div>
+                                                        </div>
+                                                        <div className="pt-1">
+                                                            <button type="button" className="btn heart-btn p-0" onClick={() => addLike(nft, index)}><img src={heart} alt="heart icon" /> <span className="color-gray">{nft.likes}</span></button>
+                                                            {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                    )}
+
+                                    {listedNfts && listedNfts.length == 0 && (
+                                        <div className="alert alert-secondary" role="alert">
+                                        No data available
+                                        </div>
+                                    )}
+                                    
+                                </div>
+                            </div>
+                        </Tab>
+                        <Tab eventKey={3} title={`On sale ${listedNfts.filter(x=>x.owner === wallet.getAccountId()).length}`}>
+                        <div className="pb-4">
+                                <div className="row title text-light pt-3">
+                                    <div className="col-sm-9">
+                                        {/* <img src={blockchain} className="" /><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} /> */}
+                                        <img src={category} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Category </span><img src={arrow_down} />
+                                        <img src={images} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} />
+                                        <img src={saletype} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Sale type </span><img src={arrow_down} />
+                                        <img src={price} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Price range </span><img src={arrow_down} />
+                                    </div>
+                                    <div className="col-sm-3 text-end">
+                                        <img src={sort} className="ps-4" /><span className="font-size-14 vertical-align px-2"> Sort By </span><img src={arrow_down} />
+                                    </div>
+                                </div>
+                                <div className="row pt-2">
+                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.owner === wallet.getAccountId()).map((nft, index) => {
+                                        return (
+                                            <div className="col-sm-3 pb-4" key={index}>
+                                                <div className="top-sec-box">
+                                                    <div className="row py-2 px-3">
+                                                        <div className="col-sm-8">
+                                                            <div className="d-flex">
+                                                                <div className="explore-dot bg-pink"></div>
+                                                                <div className="explore-dot bg-blue"></div>
+                                                                <div className="explore-dot bg-green"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="col-sm-4 ">
+                                                            <div className="explore-dot bg-black float-end">
+                                                                <img src={more} className="pb-1" alt="more icon" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <img src={nft.media_link} className="w-100" height="270" alt="nft media" />
+                                                    <div className="text-light font-size-18 p-3">
+                                                        <div>{nft.name}</div>
+                                                        <div className="row pt-2 bid-mobile-100">
+                                                            <div className="col-sm-6">
+                                                                {nft.price} ETN <span className="color-gray">1/1</span>
+                                                            </div>
+                                                            <div className="col-sm-6 text-end">
+                                                                <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
+                                                            </div>
+                                                        </div>
+                                                        <div className="pt-1">
+                                                            <button type="button" className="btn heart-btn p-0" onClick={() => addLike(nft, index)}><img src={heart} alt="heart icon" /> <span className="color-gray">{nft.likes}</span></button>
+                                                            {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                    )}
+
+                                    {listedNfts && listedNfts.length == 0 && (
+                                        <div className="alert alert-secondary" role="alert">
+                                        No data available
+                                        </div>
+                                    )}
+                                    
+                                </div>
+                            </div>
+                        </Tab>
+                        {/* <Tab eventKey={4} title="Liked  18">Tab 4 content is displayed by default</Tab>
+                        <Tab eventKey={5} title="Activity">Tab 5 content</Tab> */}
+                        <Tab eventKey={6} title="Collabs">
+                            <div className="alert alert-secondary" role="alert">
+                                No data available
+                            </div>
+                        </Tab>
+                        <Tab eventKey={7} title="Collections">
+                            <div className='mt-4'>
+                            <div className="row home_explore">
+                                {/* {isLoading ? <Loader /> : null} */}
+                                {collections && collections.length > 0 && collections.map((collection, index) => {
+                                    return (
+                                        <div className="col-sm-3 pb-4" key={index}>
+                                            <div className="top-sec-box">
+                                                <div className="row py-2 px-3">
+                                                    <div className="col-sm-8">
+                                                        <div className="d-flex">
+                                                            <div className="explore-dot bg-pink"></div>
+                                                            <div className="explore-dot bg-blue"></div>
+                                                            <div className="explore-dot bg-green"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-sm-4 ">
+                                                        <div className="explore-dot bg-black float-end">
+                                                            <img src={more} className="pb-1" alt="more icon" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <img src={collection.img} className="w-100" height="270" alt="collection media" />
+                                                {/* onClick={() => handleShow(nft)}  */}
+                                                <div className="text-light font-size-18 p-3">
+                                                    <div>{collection.name}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                }
+                                )}
+                            </div>
+                            </div>
+                        </Tab>
                     </Tabs>
+
+
 
                 </div>
             </div>

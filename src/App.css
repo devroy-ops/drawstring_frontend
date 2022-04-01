@@ -121,6 +121,9 @@ body{
   border-radius: 50%;
   background-size: 100% 100%;
 }
+.edit-profile-pic-input:hover .d-block-text, .banner-bg:hover .d-block-btext{
+  display: block !important;
+}
 
 .edit-prifile-pic-text{
   color: #C51254;
@@ -510,6 +513,7 @@ button:focus{
 .modal-content{
   background: rgb(240,240,240);
 }
+
 
 
 /* Light Mode css */

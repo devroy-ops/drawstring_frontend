@@ -30,7 +30,7 @@ const EditProfile = ({ contractX, account, wallet }) => {
 
     const [author, setAuthor] = useState({
         userName: accountId,
-        customUrl: "",
+        customUrl: accountId,
         bio: "",
         twitterUsername: "",
         siteOrPortfolioLink: "",
@@ -189,14 +189,16 @@ const EditProfile = ({ contractX, account, wallet }) => {
                 <div className="pos-rel pb-5">
                     {console.log(bannerImage)}
                     <div className="bg-profile height-240 banner-bg" onClick={upload1} style={{ backgroundImage: `url('${bannerImage?.bannerImage}')` }}>
-                    <div className="edit-prifile-pic-text"> Change Banner (We recomended an image of at least 1200x240) </div>
+                    <div className="edit-prifile-pic-text d-block-btext" style={{display: bannerImage?.bannerImage ? 'none' : 'block' }}> Change Banner (We recomended an image of at least 1200x240) </div>
                         <input id='selectImage1' hidden type="file" onChange={fileSelectHandler1} accept="image/*" />
                     </div>
                     <div className="container pb-5">
                         {/* <img src={avtar} className="avtar-position" /> */}
                         <div className="avtar-position edit-profile-pic-input" onClick={upload} style={{ backgroundImage: `url('${image?.image}')`}}>
                             <div className="pos-rel" style={{ width: '180px', height: '180px' }}>
-                                <div className="edit-prifile-pic-text"> Choose file </div>
+                                {/* {!image?.image && ( */}
+                                    <div className="edit-prifile-pic-text d-block-text" style={{display: image?.image ? 'none' : 'block' }}> Choose file </div>
+                                {/* )} */}
                                 <input id='selectImage' hidden type="file" onChange={fileSelectHandler} accept="image/*" />
                             </div>
                         </div>

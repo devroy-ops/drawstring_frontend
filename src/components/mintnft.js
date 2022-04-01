@@ -22,7 +22,7 @@ const { utils } = nearAPI;
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
-const fileTypes = ["PNG", "JPEG", "GIF", "WEBP", "SVG", "JPG", "MOV", "AVI", "MP3", "MP4", "WAV", "FLAC"];//["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
+const fileTypes = ["PNG", "JPEG", "GIF", "WEBP", "SVG", "JPG", "MOV", "AVI", "MP3", "MP4", "WAV", "FLAC"];//
 
 var tableRowIndex = 0;
 var propertyRowIndex = 0;
@@ -59,7 +59,6 @@ export default function MintNft({ contractX, account, wallet }) {
     });
 
     const accountId = wallet.getAccountId();
-
     // Add New Table Row
     const addNewRow = (event) => {
         event.preventDefault()
@@ -354,18 +353,22 @@ debugger;
     }
 
     const handleFileChange = (file) => {
+        debugger;
         setNft((prev) => { return { ...prev, "media": file } });
 
         if (file) {
             let reader = new FileReader();
             reader.onload = (e) => {
-                setImage({ image: e.target.result });
+                setImage((prev) => { return { ...prev, image: e.target.result } });
+                // setImage({ image: e.target.result });
             };
             reader.readAsDataURL(file);
         }
     };
 
     const onSizeError = (error) => {
+        debugger
+        console.log(error)
     }
 
     const CustomMenu = (props) => {
@@ -425,7 +428,7 @@ debugger;
                             <div className="pb-3">
                                 <div className="pb-2 upload-text">Upload file</div>
                                 <div className="file-upload">
-                                    <FileUploader handleChange={handleFileChange} defaultValue={nft.media} name="media" types={fileTypes} label="PNG, GIF, WEBP, SVG, JPG, MOV, AVI, MP3, MP4, WAV, FLAC, Max 100mb." maxSize="2" onTypeError={onSizeError} />
+                                    <FileUploader handleChange={handleFileChange} defaultValue={nft.media} name="media" types={fileTypes} label="PNG, GIF, WEBP, SVG, JPG, MOV, AVI, MP3, MP4, WAV, FLAC, Max 100mb." maxSize="100" onTypeError={onSizeError} />
                                     {/* <p>{file ? `File name: ${file.name}` : "no files uploaded yet"}</p> */}
                                     <span className='file-upload-cosef'>Choose file</span>
                                 </div>
@@ -526,7 +529,7 @@ debugger;
                                                 <div className="col-sm-6">
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
-                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='10%'
+                                                        <input type="number" max={35} className="profile-input pb-3 w-100" placeholder='10%'
                                                             name="royalty"
                                                             value={item.royalty}
                                                             onChange={(e) => {
@@ -535,7 +538,7 @@ debugger;
                                                         />
                                                     </div>
                                                     <div className="border-bottom-2"></div>
-                                                    <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div>
+                                                    <div className="font-size-14 color-gray py-2 suggested-text">Maximum is 35%</div>
                                                 </div>
                                                 <div className="col-sm-6">
                                                     <div>
@@ -628,7 +631,16 @@ debugger;
                         </div>
                         <div className="col-sm-6 mobile-none">
                             <div className="pb-2">Preview</div>
-                            <div className="img-preview-box font-size-16 bg-options" style={{ backgroundImage: `url('${image?.image}')` }}>
+                            {/* style={{ backgroundImage: `url('${image?.image}')` }} */}
+                            <div className="img-preview-box font-size-16 bg-options" >
+                                {image?.image && nft?.media && !nft?.media.type.includes('video') && (
+                                <img src={image?.image} className="img-fluid w-100"/>
+                                )}
+                                {image?.image && nft?.media && nft?.media.type.includes('video') && (
+                                    <video width="100%" height="400" controls>
+                                    <source src={image?.image} type="video/mp4" />
+                                  </video>
+                                )}
                                 <div className={"no-img-txt color-gray " + (image?.image ? 'd-none' : '')} >
                                     Upload file to preview your
                                     brand new NFT
