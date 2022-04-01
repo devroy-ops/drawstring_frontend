@@ -17,40 +17,46 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     const [isLoading, setLoader] = useState(false);
     const [nft, setNft] = useState({});
     const [owner, setOwner] = useState({});
+    const [creator, setCreator] = useState({});
     const [collection, setCollection] = useState({});
 
     useEffect(() => {
         return viewNFTs();
     }, []);
 
-    const viewNFTs = async () => {
+    const viewNFTs = async (contract) => {
         try {
-            debugger
             const contract = await init(wallet, nftData.contract_id.toLowerCase());
             const response = await contract.nft_token({ "token_id": nftData.id });
             console.log(response);
+            const extra = JSON.parse(response.metadata.extra);
+            response.price = extra.price;
             setNft(response);
-
-            getProfile(response.owner_id);
+            debugger;
+            const user = await getUserForUpdateDb();
+            const owner = await getProfile(user, response.owner_id);
+            setOwner(owner);
+           const creator = await getProfile(user, extra.creator_id);
+           debugger;
+           setCreator(creator);
             getCollection(contract);
             return response;
         } catch (error) {
             console.log(error);
-            toast(JSON.stringify(error), { type: "error" });
         }
     };
 
-    const getProfile = async (accountId) => {
+    const getProfile = async (user, accountId) => {
         setLoader(true);
-        const user = await getUserForUpdateDb();
         const response = await user.functions.get_profile(accountId);
         console.log(response);
-        setOwner(response);
+        //setOwner(response);
         setLoader(false);
+        return response;
     }
 
     const getCollection = async (contract) => {
-            try {
+        try {
             const response = await contract.nft_metadata();
             console.log(response);
             debugger;
@@ -84,18 +90,18 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                 {/* <div className="copy-btn pt-2 mt-3 mb-4"> #27513  0x47BE...6f4f <img src={copy_icon} className="float-end" /></div> */}
 
                                 <div className="d-flex font-size-18 mt-4 mb-3 onsel-mob-text-16" >
-                                    <div className="me-5">On sale for {nftData?.price} Near</div>
+                                    <div className="me-5">On sale for {nft?.price} Near</div>
                                     {/* <div>Highest bid 7 WETH</div> */}
                                 </div>
 
                                 <div className="row pt-3 tab-col-w-100">
                                     <div className="col-sm-6">
                                         <div className="pb-2">Creator</div>
-                                        <div><img src={owner?.profile_pic ? owner?.profile_pic : creater} className="me-2 border-radius-50" width="48"/>{nftData?.owner}</div>
+                                        <div><img src={creator?.profile_pic ? creator?.profile_pic : creater} className="me-2 border-radius-50" width="48" />{creator?.display_name}</div>
                                     </div>
                                     <div className="col-sm-6">
                                         <div className="pb-2">Collection</div>
-                                        <div><img src={collection.icon ? collection.icon : collection} className="me-2 border-radius-50" width="48"/>{nftData?.collection_name}</div>
+                                        <div><img src={collection.icon ? collection.icon : collection} className="me-2 border-radius-50" width="48" />{nftData?.collection_name}</div>
                                     </div>
                                 </div>
 
@@ -111,7 +117,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                         <div className="font-size-16 pt-5 pb-2">Properties</div>
 
                                         <div className="d-flex mb-5 properties-box-row">
-                                            {nft?.metadata?.extra && Object.keys(JSON.parse(nft?.metadata?.extra)).map((key, index) => {
+                                            {nft?.metadata?.extra && Object.keys(JSON.parse(nft?.metadata?.extra).properties).map((key, index) => {
                                                 return (
                                                     <div className="properties-box p-3 me-3" key={index.toString()}>
                                                         <div className="font-size-16 color-pink">Property</div>

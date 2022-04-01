@@ -3,7 +3,7 @@ import '../styles/collection.css';
 import collection1 from '../images/collection/collection1.svg';
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { init, author, GAS, mint_txFee, transfer_txFee, txFee, storage1 } from "../services/helper";
+import { init, author, GAS, mint_txFee, transfer_txFee, txFee } from "../services/helper";
 import { Button, Modal, Form, Row, Col } from 'react-bootstrap';
 import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';

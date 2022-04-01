@@ -1,9 +1,9 @@
-
 import * as nearAPI from "near-api-js";
 import { db } from "../db/firebase";
 import Big from "big.js";
 import { ObjectID } from 'bson';
 import { mongodb } from "../db/mongodb";
+import { marketContractName } from "./utils";
 
 
 const mint_txFee = Big(0.1)
@@ -18,7 +18,7 @@ const transfer_txFee = Big(1)
   .times(10 ** 24)
   .toFixed();
 
-const GAS = Big(20)
+const GAS = Big(10)
   .times(10 ** 13)
   .toFixed();
 
@@ -26,16 +26,15 @@ const txFee = Big(1)
   .times(10 ** 24)
   .toFixed();
 
-const storage1 = async (wallet) => {
+const storageDeposit = async (wallet) => {
   try {
-    // call market init function then ->
-    //   var loadMarketplaceContract;
-    //   if(!transactionHashes){
     const loadMarketplaceContract = await initMarketplaceContract(wallet);
-    //   }
-    const response = await loadMarketplaceContract.storage_deposit({ "account_id": "jitendrapal080791.testnet" }, GAS, txFee);
-    console.log(response);
-    console.log(loadMarketplaceContract);
+    //const minBalance = await loadMarketplaceContract.storage_minimum_balance({});
+    const balance = await loadMarketplaceContract.storage_balance_of({account_id: wallet.getAccountId()});
+    if(!balance){
+      const response = await loadMarketplaceContract.storage_deposit({ "account_id": wallet.getAccountId() }, GAS, txFee);
+    }
+    return;
   } catch (err) {
     console.log(err)
   }
@@ -46,8 +45,8 @@ const initMarketplaceContract = async (wallet) => {
     // Load the NFT from the subaccount created in the deploy function
     return await new nearAPI.Contract(
       wallet.account(),
-      //nearConfig.contractName,
-      "drawstring_market.testnet",
+      //"drawstring_market.testnet",
+      marketContractName,
       {
         viewMethods: [
           "get_supply_by_owner_id",
@@ -114,7 +113,8 @@ const init = async (wallet, subaccount) => {
           "burn_nft",
           "add_to_whitelist",
           "remove_from_whitelist",
-          "toggle_whitelisting"
+          "toggle_whitelisting",
+          "set_contract_royalty"
         ],
         sender: wallet.getAccountId(),
       }
@@ -137,5 +137,5 @@ const author = async (authorId) => {
 }
 
 
-export { init, mint_txFee, deploy_txFee, transfer_txFee, GAS, author, txFee, storage1 };
+export { init, mint_txFee, deploy_txFee, transfer_txFee, GAS, author, txFee, storageDeposit, initMarketplaceContract };
 
