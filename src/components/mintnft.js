@@ -18,6 +18,8 @@ import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
 import * as nearAPI from "near-api-js";
 import { marketContractName } from '../services/utils';
+import { FileTypes } from '../enums/filetypes';
+
 const { utils } = nearAPI;
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
@@ -196,7 +198,6 @@ export default function MintNft({ contractX, account, wallet }) {
                     perpetualRoyalties[item.walletaddress] = parseInt(item.royalty);
                 }
             });
-debugger;
 
             const allProperties = {
                 creator_id: accountId,
@@ -353,7 +354,6 @@ debugger;
     }
 
     const handleFileChange = (file) => {
-        debugger;
         setNft((prev) => { return { ...prev, "media": file } });
 
         if (file) {
@@ -367,7 +367,6 @@ debugger;
     };
 
     const onSizeError = (error) => {
-        debugger
         console.log(error)
     }
 
@@ -633,14 +632,23 @@ debugger;
                             <div className="pb-2">Preview</div>
                             {/* style={{ backgroundImage: `url('${image?.image}')` }} */}
                             <div className="img-preview-box font-size-16 bg-options" >
-                                {image?.image && nft?.media && !nft?.media.type.includes('video') && (
-                                <img src={image?.image} className="img-fluid w-100"/>
+                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.IMAGE) && (
+                                    <img src={image?.image} className="img-fluid w-100" />
                                 )}
-                                {image?.image && nft?.media && nft?.media.type.includes('video') && (
+                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.VIDEO) && (
                                     <video width="100%" height="400" controls>
-                                    <source src={image?.image} type="video/mp4" />
-                                  </video>
+                                        <source src={image?.image} type="video/mp4" />
+                                    </video>
                                 )}
+                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.AUDIO) && (
+                                    <div className='p-5'>
+                                    <audio controls src={image?.image}>
+                                        Your browser does not support the
+                                        <code>audio</code> element.
+                                    </audio>
+                                    </div>
+                                )}
+                                
                                 <div className={"no-img-txt color-gray " + (image?.image ? 'd-none' : '')} >
                                     Upload file to preview your
                                     brand new NFT
