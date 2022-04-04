@@ -85,18 +85,18 @@ export default function Header({ currentUser, wallet, nearConfig }) {
     if (event.key === 'Enter') {
       //setMenuOpen(true);
       debugger;
-      gotoHome().then(()=>{
+      gotoHome().then(() => {
         navigate(`/search?searchString=${searchString}`);
       })
     }
   }
 
-  const gotoHome = async() =>{
+  const gotoHome = async () => {
     navigate("/");
   }
 
   const searchValue = (option) => {
-    gotoHome().then(()=>{
+    gotoHome().then(() => {
       // navigate(`/${option}?searchString=${searchString}`);
       navigate(`/search?searchString=${searchString}`);
     })
@@ -110,6 +110,12 @@ export default function Header({ currentUser, wallet, nearConfig }) {
       e.target.value
     );
   };
+
+  const handleToggle = (isOpen, event, metadata) => {
+    if (!User && isOpen) {
+      handleUser()
+    }
+  }
 
   return (
 
@@ -167,17 +173,17 @@ export default function Header({ currentUser, wallet, nearConfig }) {
         <ul className="navbar-nav me-auto mb-2 mb-lg-0 create-signin-btn">
           <li className="nav-item">
 
-          <Dropdown align="end">
-            <Dropdown.Toggle id="dropdown-button-dark" variant="dark" className="create">
-              Create
-            </Dropdown.Toggle>
+            <Dropdown align="end" onToggle={handleToggle}>
+              <Dropdown.Toggle id="dropdown-button-dark" variant="dark" className="create">
+                Create
+              </Dropdown.Toggle>
 
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={(e)=>{e.preventDefault(); !User ? handleUser() : navigate("/mintnft")}}>Mint Nft</Dropdown.Item>
-              <Dropdown.Item onClick={(e)=>{e.preventDefault(); !User ? handleUser() : navigate("/createcollection")}} >Create Collection</Dropdown.Item>
-             </Dropdown.Menu>
-             </Dropdown>
-             {/* <NavLink exact="true" activeclassname="active" to="/mintnft" className="create">Create</NavLink> */}
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/mintnft") }}>Mint Nft</Dropdown.Item>
+                <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/createcollection") }} >Create Collection</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            {/* <NavLink exact="true" activeclassname="active" to="/mintnft" className="create">Create</NavLink> */}
           </li>
           <li className="nav-item">
 
