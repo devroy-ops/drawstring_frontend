@@ -191,12 +191,17 @@ export default function MintNft({ contractX, account, wallet }) {
             }
 
             const perpetualRoyalties = {};
+            const total_unit = 10000;
 
             talbeRows.forEach((item) => {
+               let royaltyPercentage = parseInt(item.royalty)
+               let royalty = royaltyPercentage/100 * total_unit;
+               console.log(royalty);
                 if (item.royalty) {
-                    perpetualRoyalties[item.walletaddress] = parseInt(item.royalty);
+                    perpetualRoyalties[item.walletaddress] = royalty;
                 }
             });
+            
 debugger;
 
             const allProperties = {
@@ -333,6 +338,7 @@ debugger;
     };
 
     const handleRoyaltyChange = (e, index) => {
+        console.log(e.target.value);
         var updatedRows = [...talbeRows];
         updatedRows[index][e.target.name] = e.target.value;
         setRows(updatedRows);

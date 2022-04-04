@@ -378,7 +378,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                                 <div className="col-sm-6">
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
-                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='10%'
+                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='5%'
                                                             name="royalty"
                                                             value={item.royalty}
                                                             onChange={(e) => {
