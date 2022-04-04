@@ -1,6 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes, HashRouter } from "react-router-dom";
 import { useRef } from 'react'
 import Home from './components/home';
 import Users from './components/users';

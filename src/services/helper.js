@@ -27,16 +27,20 @@ const txFee = Big(1)
   .toFixed();
 
 const storageDeposit = async (wallet) => {
-  try {
-    const loadMarketplaceContract = await initMarketplaceContract(wallet);
+  const loadMarketplaceContract = await initMarketplaceContract(wallet);
     //const minBalance = await loadMarketplaceContract.storage_minimum_balance({});
-    const balance = await loadMarketplaceContract.storage_balance_of({account_id: wallet.getAccountId()});
-    if(!balance){
-      const response = await loadMarketplaceContract.storage_deposit({ "account_id": wallet.getAccountId() }, GAS, txFee);
-    }
+    const accoutnId = wallet.getAccountId();
+  try {
+    
+    const balance = await loadMarketplaceContract.storage_balance_of({account_id: accoutnId});
+    // if(!balance){
+    //   const response = await loadMarketplaceContract.storage_deposit({ "account_id": accoutnId }, GAS, txFee);
+    // }
     return;
   } catch (err) {
     console.log(err)
+debugger;
+    await loadMarketplaceContract.storage_deposit({ "account_id": accoutnId }, GAS, txFee);
   }
 }
 
@@ -87,7 +91,8 @@ const init = async (wallet, subaccount) => {
     // Load the NFT from the subaccount created in the deploy function
     return await new nearAPI.Contract(
       wallet.account(),
-      `${subaccount}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
+     // `${subaccount}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
+      `${subaccount}.deploycontract1.testnet`,
       {
         // View methods
         viewMethods: [

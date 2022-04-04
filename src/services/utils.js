@@ -7,7 +7,7 @@ let available;
 
 const nearConfig = getConfig(process.env.NODE_ENV !== undefined);
 
- export const marketContractName = 'drawstring_market.testnet';
+ export const marketContractName = 'drawstring_market.testnet';//'drawstringnft.testnet';
 
 // Initialize contract & set global variables
 export async function initContracts() {
@@ -27,7 +27,7 @@ export async function initContracts() {
     };
   } else {
     currentUser = {
-      accountId: 'stingy.testnet',
+      accountId: "stingy.testnet",//'stingy.testnet',
     };
   }
 
@@ -54,14 +54,15 @@ export async function initContracts() {
 
   const contractX = await new Contract(
     walletConnection.account(),
-    nearConfig.CONTRACT_NAME,
+    //nearConfig.CONTRACT_NAME,
+    "deploycontract1.testnet",
     {
       changeMethods: ["deploy_contract_code"],
     }
   );
 
   // Initializing our contract APIs by contract name and configuration
-  const nftContract = await new Contract(walletConnection.account(), 'manmade.stingy.testnet', {
+  const nftContract = await new Contract(walletConnection.account(), 'manmade.drawstringnft.testnet', {
     // View methods are read only. They don't modify the state, but usually return some value.
     viewMethods: [...nftMethods.viewMethods],
     // Change methods can modify the state. But you don't receive the returned value when called.

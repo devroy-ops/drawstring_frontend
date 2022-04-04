@@ -1,5 +1,5 @@
 
-const CONTRACT_NAME = process.env.CONTRACT_NAME || "stingy.testnet";
+const CONTRACT_NAME = process.env.CONTRACT_NAME || "drawstringnft.testnet"//"stingy.testnet";
 
 const getConfig = ()=>{
 	let config = {
