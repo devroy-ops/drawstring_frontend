@@ -1,10 +1,9 @@
 import '../App.css';
-import '../styles/createcollection.css';
-
 import * as nearAPI from "near-api-js";
 import React, { useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import '../styles/createcollection.css';
 import { init, author, GAS, deploy_txFee } from "../services/helper";
 // import { getUser, mongodb, mongoUser } from '../db/mongodb';
 import * as Realm from "realm-web";
@@ -26,10 +25,9 @@ var tableRowIndex = 0;
 export default function CreateCollection({ contractX, account, wallet }) {
 
     const [isLoading, setLoader] = useState(false);
-    const [image, setImage] = useState();
 
     const [talbeRows, setRows] = useState([{
-        royalty: 5,
+        royalty: "",
         walletaddress: wallet.getAccountId()
     }
     ]);
@@ -40,7 +38,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
-        updatedRows[tableRowIndex] = { royalty: 0, walletaddress: "" }
+        updatedRows[tableRowIndex] = { royalty: "", walletaddress: "" }
         setRows(updatedRows)
     }
 
@@ -57,9 +55,11 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
 
     const handleRoyaltyChange = (e, index) => {
+        
         var updatedRows = [...talbeRows];
         updatedRows[index][e.target.name] = e.target.value;
         setRows(updatedRows)
+        console.log(talbeRows);
     }
 
     const [file, setFile] = useState(null);
@@ -89,34 +89,19 @@ export default function CreateCollection({ contractX, account, wallet }) {
                     initializeContract();
                 } else {
 
-                    // if (col.royalties) {
-                    //     const isRoyaltiesSet = localStorage.getItem(subaccount+ "_isSetRoyalties");
-                    //     if(!isRoyaltiesSet){
-                    //     localStorage.setItem(subaccount + "_isSetRoyalties", true);
-                    //         setRoyalties();
-                    //     }else{
-                    //         saveContract()
-                    //     }
-                    // } else {
-                        saveContract(col, subaccount);
-                    //}
+                    setLoader(true);
+                    const user = await getUserForUpdateDb();
+                    await user.functions.add_collection(col.name.toLowerCase(), col.fileUrl, subaccount);
+                    setLoader(false);
+
+                    navigate(`/viewcollection/${subaccount}`);
+                    toast("Collection created successfully.", { type: "success" });
+
+                    localStorage.removeItem(collection);
+                    localStorage.removeItem(subaccount + "_isContractInitialized");
                 }
             }
         }
-    }
-
-    const saveContract = async(col, subaccount) => {
-        setLoader(true);
-        const user = await getUserForUpdateDb();
-        await user.functions.add_collection(col.name.toLowerCase(), col.fileUrl, subaccount);
-        setLoader(false);
-
-        navigate(`/viewcollection/${subaccount}`);
-        toast("Collection created successfully.", { type: "success" });
-
-        localStorage.removeItem(collection);
-        localStorage.removeItem(subaccount + "_isContractInitialized");
-        //localStorage.removeItem(subaccount + "_isSetRoyalties");
     }
 
     useEffect(() => {
@@ -130,7 +115,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
             const subaccount = collection.name.toLowerCase().replace(/ /g, "_");
             const respons = await contractX.deploy_contract_code(
                 {
-                    account_id: `${subaccount}.deploycontract1.testnet` //"${subaccount}.stingy.testnet" //"pack.stingy.testnet",
+                    account_id: `${subaccount}.stingy.testnet` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
                 },
                 GAS,
                 deploy_txFee
@@ -194,24 +179,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
         }
     }
 
-    const setRoyalties = async () => {
-        let col = JSON.parse(localStorage.getItem("collection"));
-        const subaccount = col.name.toLowerCase().replace(/ /g, "_");
-        const contract = await init(wallet, subaccount);
-
-        const response = await contract.account.signAndSendTransaction(contract.contractId,
-            transactions.functionCall(
-                'set_contract_royalty',
-                Buffer.from(
-                    JSON.stringify(
-                        { contract_royalty: 2 }// col.royalties
-                    )
-                ),
-                GAS
-            ),
-        )
-    }
-
     const initializeContract1 = async () => {
 
         let col = JSON.parse(localStorage.getItem("collection"));
@@ -270,14 +237,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
         reader.onloadend = () => {
             setFile(Buffer(reader.result));
         };
-
-        if (file) {
-            let reader = new FileReader();
-            reader.onload = (e) => {
-                setImage({ image: e.target.result });
-            };
-            reader.readAsDataURL(file);
-        }
     };
 
     const uploadFile = async () => {
@@ -291,11 +250,18 @@ export default function CreateCollection({ contractX, account, wallet }) {
             col.fileUrl = url;
 
             const royalties = {};
+            const total_unit = 10000;
             talbeRows.forEach((item) => {
+                let colroyalty = parseInt(item.royalty)
+                let royalty = colroyalty/100 * total_unit;
+                console.log(royalty);
+                debugger;
                 if (item.royalty) {
-                    royalties[item.walletaddress] = parseInt(item.royalty);
+                    royalties[item.walletaddress] = royalty;
                 }
             });
+            console.log(royalties);
+            debugger;
             if (Object.keys(royalties).length > 0) {
                 col.royalties = royalties;
             }
@@ -421,7 +387,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                                 <div className="col-sm-6">
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
-                                                        <input type="number" max={35} className="profile-input pb-3 w-100" placeholder='10%'
+                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='5%'
                                                             name="royalty"
                                                             value={item.royalty}
                                                             onChange={(e) => {
@@ -430,7 +396,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                                         />
                                                     </div>
                                                     <div className="border-bottom-2"></div>
-                                                    {/* <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div> */}
+                                                    <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div>
                                                 </div>
                                                 <div className="col-sm-6">
                                                     <div>
@@ -454,7 +420,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                         )
                                 })
                             }
-                            <div className="font-size-14 color-gray py-2 suggested-text">Royalties for a collection are received whenever any NFT in the collection is sold.  Maximum total royalties cannot exceed 10% for a collection.  Additional royalties can be added when each NFT is minted.</div>
                             {/* <div className="row bid-mobile-100">
                                 <div className="col-sm-6">
                                     <div>
@@ -475,7 +440,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             </div> */}
 
 
-                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
+                            {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button> */}
 
                             {/* <div className="row bid-mobile-100">
                                 <div className="col-sm-6">
@@ -519,15 +484,15 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             </div>
 
                         </div>
-                        <div className="col-sm-6 mobile-none">
+                        {/* <div className="col-sm-6 mobile-none">
                             <div className="pb-2">Preview</div>
-                            <div className="img-preview-box font-size-16 bg-options" style={{ backgroundImage: `url('${image?.image}')` }}>
-                                <div className={"no-img-txt color-gray " + (image?.image ? 'd-none' : '')} >
+                            <div className="img-preview-box font-size-16">
+                                <div className="no-img-txt color-gray">
                                     Upload file to preview your
                                     brand new NFT
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </Form>
             </div>
