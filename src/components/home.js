@@ -9,6 +9,7 @@ import arrow_down from '../images/home/arrow_down.svg';
 import blockchain from '../images/home/blockchain.svg';
 import category from '../images/home/category.svg';
 import saletype from '../images/home/saletype.svg';
+import audio from '../images/collection/audio_bg.png';
 import price from '../images/home/price.svg';
 import logo from '../../src/images/header/logo.png'
 import sort from '../images/home/sort.svg';
@@ -26,13 +27,16 @@ import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 import * as Realm from 'realm-web'
 import Nft from './viewnft';
 import NftDetailModal from './nftmodal';
+import { FileTypes } from '../enums/filetypes';
 
-const app = new Realm.App({ id: "drawstringrealmapp-vafye"});
+const app = new Realm.App({ id: "drawstringrealmapp-vafye" });
 
-const Home = ({contractX, account, wallet }) => {
+const Home = ({ contractX, account, wallet }) => {
     var [nfts, setNfts] = useState([]);
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
+    const [featuredNfts, setFeatured] = useState([]);
+    const [topCollections, setTopCollections] = useState([]);
     const [count, setCount] = useState(0)
     const [nft, setNft] = useState({});
     const [show, setShow] = useState(false);
@@ -50,33 +54,36 @@ const Home = ({contractX, account, wallet }) => {
         setLoader(true);
 
         const user = await getUser();
-        // const featured = await user.functions.get_featured();
-         const allListedNfts = await user.functions.get_all_listed_nfts(12, count*12);
-         console.log(allListedNfts)
-         setListedNfts([...listedNfts, ...allListedNfts]);
-        // const top = await user.functions.get_top_collections();
-
-        mongodb.collection('nfts').find().then(nftss=>{
-            setNfts(nftss);
-            setLoader(false);
-        })
+        const featured = await user.functions.get_featured();
+        setFeatured(featured);
+        const allListedNfts = await user.functions.get_all_listed_nfts(12, count * 12);
+        console.log(allListedNfts)
+        setListedNfts([...listedNfts, ...allListedNfts]);
+        const top = await user.functions.get_top_collections();
+        setTopCollections(top);
+        
+        setLoader(false);
+        // mongodb.collection('nfts').find().then(nftss => {
+        //     setNfts(nftss);
+        //     setLoader(false);
+        // })
     }
 
     const viewDrop = async (e) => {
         e.preventDefault();
     }
 
-    const addLike = async (nft, index) =>{
+    const addLike = async (nft, index) => {
         const newItems = [...listedNfts];
         newItems[index].likes = newItems[index].likes ? newItems[index].likes + 1 : 1;
         setListedNfts(newItems);
 
         const walletId = wallet.getAccountId();
         const user = await getUserForUpdateDb();
-        await user.functions.add_like(walletId,nft.id, nft.contract_id);
+        await user.functions.add_like(walletId, nft.id, nft.contract_id);
     }
     const loadMore = () => {
-        setCount((prev)=> prev + 1)
+        setCount((prev) => prev + 1)
     }
 
     let carousel;
@@ -87,7 +94,7 @@ const Home = ({contractX, account, wallet }) => {
 
             <div className="pos-rel home_banner-section">
                 <AliceCarousel ref={(el) => (carousel = el)} disableButtonsControls="true" disableDotsControls="true">
-                    {nfts && nfts.length > 0 && nfts.filter(x => x.isMainSlideImage === true).map((nft, index) => {
+                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isMainSlideNft === true).map((nft, index) => {
                         return (
                             <div className="sliderimg" key={index}>
                                 <div className="container">
@@ -95,7 +102,7 @@ const Home = ({contractX, account, wallet }) => {
                                         <div className="col-sm-7 pe-4">
                                             <div className="row first-box">
                                                 <div className="col-sm-6 p-5 pb-3">
-                                                    <div className="title text-light mb-3">{nft.nftData.metadata.description}</div>
+                                                    <div className="title text-light mb-3">Canibus of Bust’d Labs - Covid Santa</div>
                                                     <div className="slide-desc text-light mb-3">Going Live Wednesday 12 - 22 at 5 pm Est</div>
                                                     <div className="my-5">
                                                         <NavLink exact="true" activeclassname="active" to="/" className="create-link" onClick={viewDrop}>View Drop</NavLink>
@@ -105,17 +112,17 @@ const Home = ({contractX, account, wallet }) => {
                                                         <div className="short-line"></div>
                                                     </div>
                                                 </div>
-                                                <div className="col-sm-6 first-box-image" style={{ backgroundImage: `url('${nft.nftData.metadata.media}')` }}></div>
+                                                <div className="col-sm-6 first-box-image" style={{ backgroundImage: `url('${nft.media_link}')` }}></div>
                                             </div>
                                         </div>
                                         <div className="col-sm-5">
                                             <div className="row">
-                                                {nfts && nfts.length > 0 && nfts.filter(x => x.isSliderNft === true).slice(index * 4, index === 0 ? 4 : index * 4 + 4).map((nft, i) => {
+                                                {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isChildSlideNft === true).slice(index * 4, index === 0 ? 4 : index * 4 + 4).map((nft, i) => {
                                                     return (
                                                         <div className="col-sm-6 col-xs-12 mb-4" key={i}>
-                                                            <div className="bg-img1 pos-rel" style={{ backgroundImage: `url('${nft.nftData.metadata.media}')` }}>
+                                                            <div className="bg-img1 pos-rel" style={{ backgroundImage: `url('${nft.media_link}')` }}>
                                                                 <div className="img-title">
-                                                                    <div>{nft?.nftData?.metadata?.title}</div>
+                                                                    <div>{nft?.name}</div>
                                                                     <div>Collection</div>
                                                                 </div>
                                                             </div>
@@ -144,12 +151,20 @@ const Home = ({contractX, account, wallet }) => {
                     Featured NFT's
                 </div>
                 <div className="row pt-2">
-                    {nfts && nfts.length > 0 && nfts.slice(0, 4).map((nft, index) => {
+                    {/* {nfts && nfts.length > 0 && nfts.slice(0, 4).map((nft, index) => {
                             return (
                                 <div className="col-sm-3" key={index}>
                                     <img src={nft?.nftData?.metadata?.media} className="img-fluid w-100 featured-img" alt="nft media"/>
                                 </div>
                             )
+                    })
+                    } */}
+                    {featuredNfts && featuredNfts.length > 0 && featuredNfts.slice(0, 4).map((nft, index) => {
+                        return (
+                            <div className="col-sm-3" key={index}>
+                                <img src={nft?.img} className="img-fluid w-100 featured-img" alt="nft media" />
+                            </div>
+                        )
                     })
                     }
                 </div>
@@ -158,32 +173,46 @@ const Home = ({contractX, account, wallet }) => {
                     <div className="row pb-4">
                         <div className="col-sm-6 title text-light">
                             Top
-                            <img src={images} className="ps-4" alt="file icon"/><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} alt="dropdown icon"/>
+                            <img src={images} className="ps-4" alt="file icon" /><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} alt="dropdown icon" />
 
-                            <img src={calendar} className="ps-4" alt="calendar icon"/><span className="font-size-14 vertical-align px-2"> In 1 day </span><img src={arrow_down} alt="dropdown icon"/>
+                            <img src={calendar} className="ps-4" alt="calendar icon" /><span className="font-size-14 vertical-align px-2"> In 1 day </span><img src={arrow_down} alt="dropdown icon" />
                         </div>
                         <div className="col-sm-6 text-end">
                             <NavLink exact="true" activeclassname="active" to="/collections" className="login-link">View All</NavLink>
                         </div>
                     </div>
                     <div className="row pt-2 collection-name-tab-d">
-                        {nfts && nfts.length > 0 && nfts.slice(0, 8).map((nft, index) => {
-                                return (
-                                    <div className="col-sm-3 pb-4" key={index} >
-                                        <div className="top-sec-box">
-                                            <div className="row p-3">
-                                                <div className="col-sm-4">
-                                                    <div className="numbers float-start">0{index + 1}</div>
-                                                    <div><img className='logo' src={logo} alt="" /></div>
+                        {topCollections && topCollections.length > 0 && topCollections.slice(0, 8).map((collection, index) => {
+                            return (
+                                <div className="col-sm-3 pb-4" key={index} >
+                                    <div className="top-sec-box">
+                                        <div className="row p-3">
+                                            <div className="col-sm-4">
+                                                <div className="numbers float-start">0{index + 1}</div>
+                                                <div>
+                                                    {/* <img src={collection.img} alt="" className="border-radius-50" width="50" height="50"/> */}
+                                                    {collection?.type.includes(FileTypes.IMAGE) && (
+                                                        <img src={collection.media_link} className="border-radius-50" width="50" height="50" />
+                                                    )}
+                                                    {collection?.type.includes(FileTypes.VIDEO) && (
+                                                        <video id="video1" className="border-radius-50" width="50" height="50">
+                                                            <source src={nft.media_link} type="video/mp4" />
+                                                        </video>
+                                                    )}
+                                                    {collection.type.includes(FileTypes.AUDIO) && (
+                                                        <img src={audio} className="border-radius-50" width="50" height="50" alt="nft media" />
+                                                    )}
+
                                                 </div>
-                                                <div className="col-sm-8 text-light font-size-18">
-                                                    <div className="collect-name">{nft?.nftData?.metadata?.title}</div>
-                                                    <div className="color-gray">{nft.nftData.price.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</div>
-                                                </div>
+                                            </div>
+                                            <div className="col-sm-8 text-light font-size-18">
+                                                <div className="collect-name">{collection.collection_name}</div>
+                                                <div className="color-gray">{collection.price} Near</div>
                                             </div>
                                         </div>
                                     </div>
-                                )
+                                </div>
+                            )
                         })
                         }
                     </div>
@@ -191,9 +220,9 @@ const Home = ({contractX, account, wallet }) => {
                     <div className="row title text-light pb-4 mt-60">
                         <div className="explore col-sm-9">
                             Discover
-                        {/* <img src={blockchain} className="ps-4" alt="blockchain icon"/><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} alt="dropdown icon"/> */}
-                        <div className='row'>
-                            {/* <Dropdown className="col-sm-3" align="end">
+                            {/* <img src={blockchain} className="ps-4" alt="blockchain icon"/><span className="font-size-14 vertical-align px-2"> Blockchain </span><img src={arrow_down} alt="dropdown icon"/> */}
+                            <div className='row'>
+                                {/* <Dropdown className="col-sm-3" align="end">
                                 <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
                                 <img src={category} className="ps-4" alt="category icon"/><span className="font-size-14 vertical-align px-2"> Category </span><img src={arrow_down} alt="dropdown icon"/>
                                 </Dropdown.Toggle>
@@ -203,17 +232,17 @@ const Home = ({contractX, account, wallet }) => {
                                 <Dropdown.Item>Animation</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown> */}
-                            <Dropdown className="col-sm-3 ps-2" align="end">
-                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align' id="dropdown-basic">
-                                <img src={images} className="ps-4" alt="images icon"/><span className="font-size-14 vertical-align px-1">Collections</span><img src={arrow_down} alt="dropdown icon"/>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                <Dropdown.Item>Music</Dropdown.Item>
-                                <Dropdown.Item>Video</Dropdown.Item>
-                                <Dropdown.Item>Animation</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                            {/* <Dropdown className="col-sm-3" align="end">
+                                <Dropdown className="col-sm-3 ps-2" align="end">
+                                    <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align' id="dropdown-basic">
+                                        <img src={images} className="ps-4" alt="images icon" /><span className="font-size-14 vertical-align px-1">Collections</span><img src={arrow_down} alt="dropdown icon" />
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item>Music</Dropdown.Item>
+                                        <Dropdown.Item>Video</Dropdown.Item>
+                                        <Dropdown.Item>Animation</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                                {/* <Dropdown className="col-sm-3" align="end">
                                 <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
                                 <img src={saletype} className="ps-4" alt="saletype icon"/><span className="font-size-14 vertical-align px-2"> Sale type </span><img src={arrow_down} alt="dropdown icon"/>
                                 </Dropdown.Toggle>
@@ -223,18 +252,18 @@ const Home = ({contractX, account, wallet }) => {
                                 <Dropdown.Item>Not on Sale</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown> */}
-                            <Dropdown className="col-sm-3" align="end">
-                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-4' id="dropdown-basic">
-                                <img src={price} className="ps-4" alt="price icon"/><span className="font-size-14 vertical-align px-6"> Price range </span><img src={arrow_down} alt="dropdown icon"/>
-                                </Dropdown.Toggle>
-                                <Dropdown.Menu>
-                                <Dropdown.Item>Free</Dropdown.Item>
-                                <Dropdown.Item>0 - 1 Near</Dropdown.Item>
-                                <Dropdown.Item>1-10 Near</Dropdown.Item>
-                                <Dropdown.Item>10+ Near</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </div>
+                                <Dropdown className="col-sm-3" align="end">
+                                    <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-4' id="dropdown-basic">
+                                        <img src={price} className="ps-4" alt="price icon" /><span className="font-size-14 vertical-align px-6"> Price range </span><img src={arrow_down} alt="dropdown icon" />
+                                    </Dropdown.Toggle>
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item>Free</Dropdown.Item>
+                                        <Dropdown.Item>0 - 1 Near</Dropdown.Item>
+                                        <Dropdown.Item>1-10 Near</Dropdown.Item>
+                                        <Dropdown.Item>10+ Near</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
                         </div>
                         {/* <div className="col-sm-3 text-end">
                         <Dropdown className="col-sm-3" align="end">
@@ -271,7 +300,7 @@ const Home = ({contractX, account, wallet }) => {
                                                     </OverlayTrigger>
                                                     <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contract_id}</Tooltip>}>
                                                         <span className="d-inline-block">
-                                                        <div className="explore-dot bg-green"></div>
+                                                            <div className="explore-dot bg-green"></div>
                                                         </span>
                                                     </OverlayTrigger>
                                                     {/* <div className="explore-dot bg-pink"></div>
@@ -281,11 +310,42 @@ const Home = ({contractX, account, wallet }) => {
                                             </div>
                                             <div className="col-sm-4 ">
                                                 <div className="explore-dot bg-black float-end">
-                                                    <img src={more} className="pb-1" alt="more icon"/>
+                                                    <img src={more} className="pb-1" alt="more icon" />
                                                 </div>
                                             </div>
                                         </div>
-                                        <img src={nft.media_link} className="w-100" height="270" alt="nft media" onClick={()=>handleShow(nft)}/>
+
+                                        {nft?.type.includes(FileTypes.IMAGE) && (
+                                            <img src={nft.media_link} className="w-100" height="270" alt="nft media" onClick={() => handleShow(nft)} />
+                                        )}
+                                        {nft?.type.includes(FileTypes.VIDEO) && (
+                                            <video width="100%" id="video" height="270" onClick={() => handleShow(nft)}>
+                                                <source src={nft.media_link} type="video/mp4" />
+                                            </video>
+                                        )}
+                                        {nft.type.includes(FileTypes.AUDIO) && (
+
+                                            <img src={audio} className="w-100" height="270" alt="nft media" onClick={() => handleShow(nft)} />
+                                        )}
+
+                                        {/* 
+                                        {image?.image && nft?.media && nft?.media.type.includes(FileTypes.IMAGE) && (
+                                    <img src={image?.image} className="img-fluid w-100" />
+                                )}
+                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.VIDEO) && (
+                                    <video width="100%" height="400" controls id="video">
+                                        <source src={image?.image} type="video/mp4" />
+                                    </video>
+                                )}
+                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.AUDIO) && (
+                                    <div className='p-5'>
+                                    <audio controls src={image?.image} id="audio">
+                                        Your browser does not support the
+                                        <code>audio</code> element.
+                                    </audio>
+                                    </div>
+                                )} */}
+
                                         <div className="text-light font-size-18 p-3">
                                             <div>{nft.name}</div>
                                             <p className="color-gray col-name">{!nft.collection_name ? "" : nft.collection_name + " collection"}</p>
@@ -306,18 +366,18 @@ const Home = ({contractX, account, wallet }) => {
                             )
                         }
                         )}
-                                <div className='load'>
-                                <button onClick={loadMore} className="load-more">
-                                    {isLoading ? 'Loading...' : 'Load More'}
-                                </button>
-                                </div>
+                        <div className='load'>
+                            <button onClick={loadMore} className="load-more">
+                                {isLoading ? 'Loading...' : 'Load More'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-                        {show && (
-                            <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet}/>
-                        )}
-           
+            {show && (
+                <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet} />
+            )}
+
         </div>
     );
 }
