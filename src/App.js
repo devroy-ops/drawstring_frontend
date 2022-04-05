@@ -71,7 +71,7 @@ import Search from './components/searchresult';
 // );
 
 
-function App({ contractX, currentUser, nearConfig, wallet, account }) {
+function App({ contractX, currentUser, nearConfig, wallet, account, near }) {
   //return routing;
   return (
     <AuthProvider>
@@ -188,6 +188,7 @@ function App({ contractX, currentUser, nearConfig, wallet, account }) {
                 currentUser={currentUser}
                 account={account}
                 wallet={wallet}
+                near={near}
                 nearConfig={nearConfig}
               />} />
 

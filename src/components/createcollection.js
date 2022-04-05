@@ -155,21 +155,22 @@ export default function CreateCollection({ contractX, account, wallet }) {
                     GAS
                 )
             ]
-
+            console.log(col.royalties,'ewuuu');
             if (col.royalties) {
+                console.log(col.royalties,'ewu');
+                debugger
                 allTransactions.push(
                     transactions.functionCall(
                         'set_contract_royalty',
                         Buffer.from(
                             JSON.stringify(
-                                { contract_royalty: 2 }// col.royalties
+                                { contract_royalty: col.royalties }// col.royalties
                             )
                         ),
                         GAS
                     ),
                 )
             }
-            debugger;
             const response = await contract.account.signAndSendTransaction(contract.contractId,
                 allTransactions
             );

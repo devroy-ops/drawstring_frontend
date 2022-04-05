@@ -18,6 +18,7 @@ import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
 import * as nearAPI from "near-api-js";
 import { marketContractName } from '../services/utils';
+import { doesAccountExist } from '../services/helper';
 const { utils } = nearAPI;
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
@@ -63,8 +64,7 @@ export default function MintNft({ contractX, account, wallet }) {
     // Add New Table Row
     const addNewRow = (event) => {
         event.preventDefault()
-        setTabs((tab)=> tab+1);
-        console.log(tabs);
+        setTabs((tab) => tab+1);
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
         updatedRows[tableRowIndex] = { royalty: "", walletaddress: "" }
@@ -536,8 +536,8 @@ debugger;
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
                                                         <input type="number" className="profile-input pb-3 w-100" placeholder='10%'
                                                             name="royalty"
-                                                            min="0"
-                                                            value={item.royalty && Math.max(0, item.royalty)}
+                            
+                                                            value={item.royalty}
                                                             onChange={(e) => {
                                                                 handleRoyaltyChange(e, index);
                                                             }}
