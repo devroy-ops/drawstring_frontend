@@ -9,20 +9,25 @@ import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
 import { ObjectID } from 'bson';
 import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
-import { Form } from 'react-bootstrap';
+import { Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { components } from 'react-select';
 import Select from 'react-select';
 import dp from '../images/header/dp.svg';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+
 import logo1 from '../images/collection/logo1.png';
 import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
 import * as nearAPI from "near-api-js";
 import { marketContractName } from '../services/utils';
+import { FileTypes } from '../enums/filetypes';
+
 const { utils } = nearAPI;
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
-const fileTypes = ["PNG", "JPEG", "GIF", "WEBP", "SVG", "JPG", "MOV", "AVI", "MP3", "MP4", "WAV", "FLAC"];//["JPG", "JPEG", "PNG", "GIF", "WEBP", "SVG"];
+const fileTypes = ["PNG", "JPEG", "GIF", "WEBP", "SVG", "JPG", "MOV", "AVI", "MP3", "MP4", "WAV", "FLAC"];//
 
 var tableRowIndex = 0;
 var propertyRowIndex = 0;
@@ -32,6 +37,7 @@ export default function MintNft({ contractX, account, wallet }) {
     const [currentAuthor, setAuthor] = useState({});
     var [contract, setContract] = useState({});
     const [isLoading, setLoader] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
     const [colCount, setColCount] = useState(0)
     const [collections, setCollections] = useState([]);
     const [options, setOptions] = useState([]);
@@ -40,7 +46,7 @@ export default function MintNft({ contractX, account, wallet }) {
         royalty: "",
         walletaddress: wallet.getAccountId()
     }]);
-    const [tabs, setTabs] = useState(1);
+
     const [properties, setProperties] = useState([{
         key: "",
         value: ""
@@ -63,12 +69,31 @@ export default function MintNft({ contractX, account, wallet }) {
     // Add New Table Row
     const addNewRow = (event) => {
         event.preventDefault()
-        setTabs((tab)=> tab+1);
-        console.log(tabs);
+
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
         updatedRows[tableRowIndex] = { royalty: "", walletaddress: "" }
         setRows(updatedRows)
+    }
+    // Remove row
+    const deleteRow = (items, index, type) => {
+        debugger
+        if (items.length > 1) {
+            var updatedRows = [...items];
+            if (index) {
+                updatedRows.splice(index, 1);
+                if (type == "properties") {
+                    setProperties(updatedRows);
+                } else {
+                    setRows(updatedRows);
+                }
+            }
+            // var indexToRemove = updatedRows.findIndex(x => x.index == index);
+            // if (indexToRemove === -1) {
+            //     updatedRows.splice(indexToRemove, 1)
+            //     setRows(updatedRows);
+            // }
+        }
     }
 
     const addNewProperty = (event) => {
@@ -82,8 +107,8 @@ export default function MintNft({ contractX, account, wallet }) {
     const [searchParams, setSearchParams] = useSearchParams();
     let navigate = useNavigate();
 
-    const init1 = async (subaccount) => {
-
+    const init1 = async () => {
+        const subaccount = ("Drawstring Marketplace").toLowerCase().replace(/ /g, "_");
         let contract = await init(wallet, subaccount);
         setContract(contract);
         getCollections();
@@ -109,7 +134,9 @@ export default function MintNft({ contractX, account, wallet }) {
 
                 setLoader(false);
 
-                navigate(`/nft/${nft.contractId}/${nft.tokenId}`);
+                //navigate(`/nft/${nft.contractId}/${nft.tokenId}`);
+                const collectionId = nft.contractName.toLowerCase().replace(/ /g, "_");
+                navigate(`/nft/${collectionId}/${nft.tokenId}`);
 
                 toast("Nft minted successfully.", { type: "success" });
 
@@ -131,14 +158,14 @@ export default function MintNft({ contractX, account, wallet }) {
     }, [colCount]);
 
     const getCollections = async () => {
-        setLoader(true);
+        // setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_collections(20, colCount * 20);
+        const response = await user.functions.get_collections(40, colCount * 40);
 
         var allCollections = [...collections, ...response];
         setCollections(allCollections);
 
-        const options = [{ label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 }, { label: "Drawstring", value: "high_on_drip", image: logo1 }];
+        const options = [{ label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 }];
         allCollections.forEach(col => {
             options.push({
                 label: col.name,
@@ -147,7 +174,7 @@ export default function MintNft({ contractX, account, wallet }) {
             });
         });
         setOptions(options);
-        setLoader(false);
+        // setLoader(false);
         console.log("collections ", response);
 
     }
@@ -158,6 +185,7 @@ export default function MintNft({ contractX, account, wallet }) {
 
 
     const handleSubmit = async (event) => {
+        setSubmitted(true);
         event.preventDefault();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
@@ -192,23 +220,16 @@ export default function MintNft({ contractX, account, wallet }) {
             }
 
             const perpetualRoyalties = {};
-            const total_unit = 10000;
 
             talbeRows.forEach((item) => {
-               let royaltyPercentage = parseInt(item.royalty)
-               let royalty = royaltyPercentage/100 * total_unit;
-               console.log(royalty);
                 if (item.royalty) {
-                    perpetualRoyalties[item.walletaddress] = royalty;
+                    perpetualRoyalties[item.walletaddress] = parseInt(item.royalty);
                 }
             });
-            console.log(perpetualRoyalties);
-            
-debugger;
 
             const allProperties = {
                 creator_id: accountId,
-                media_size: nft.media.size, 
+                media_size: nft.media.size,
                 media_type: nft.media.type,
                 price: nft.price,
                 properties: {}
@@ -340,7 +361,6 @@ debugger;
     };
 
     const handleRoyaltyChange = (e, index) => {
-        console.log(e.target.value);
         var updatedRows = [...talbeRows];
         updatedRows[index][e.target.name] = e.target.value;
         setRows(updatedRows);
@@ -352,13 +372,15 @@ debugger;
         setProperties(allProperties)
     }
 
-    const handleChangeCollection = (e) => {
+    const handleChangeCollection = async (e) => {
         setNft((prev) => {
             return { ...prev, "collection": e };
         });
         const subaccount = e.label.toLowerCase().replace(/ /g, "_");
-        init1(subaccount);
-
+        //init1(wallet, subaccount);
+        debugger;
+        let contract = await init(wallet, subaccount);
+        setContract(contract);
     }
 
     const handleFileChange = (file) => {
@@ -367,13 +389,26 @@ debugger;
         if (file) {
             let reader = new FileReader();
             reader.onload = (e) => {
-                setImage({ image: e.target.result });
+                setImage((prev) => { return { ...prev, image: e.target.result } });
+                // setImage({ image: e.target.result });
             };
             reader.readAsDataURL(file);
         }
+
+        setTimeout(() => {
+            if (file.type.includes(FileTypes.VIDEO)) {
+                var video = document.getElementById('video');
+                video.load();
+            }
+            if (file.type.includes(FileTypes.AUDIO)) {
+                var audio = document.getElementById('audio');
+                audio.load();
+            }
+        }, 1000);
     };
 
     const onSizeError = (error) => {
+        console.log(error)
     }
 
     const CustomMenu = (props) => {
@@ -422,7 +457,7 @@ debugger;
 
     return (
         <div className="bg-darkmode">
-             {isLoading ? <Loader /> : null}
+            {isLoading ? <Loader /> : null}
             <div className="container text-light createcollection p-0">
                 <div className="py-3 title">Mint NFT</div>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -433,7 +468,7 @@ debugger;
                             <div className="pb-3">
                                 <div className="pb-2 upload-text">Upload file</div>
                                 <div className="file-upload">
-                                    <FileUploader handleChange={handleFileChange} defaultValue={nft.media} name="media" types={fileTypes} label="PNG, GIF, WEBP, SVG, JPG, MOV, AVI, MP3, MP4, WAV, FLAC, Max 100mb." maxSize="2" onTypeError={onSizeError} />
+                                    <FileUploader handleChange={handleFileChange} defaultValue={nft.media} name="media" types={fileTypes} label="PNG, GIF, WEBP, SVG, JPG, MOV, AVI, MP3, MP4, WAV, FLAC, Max 100mb." maxSize="100" onTypeError={onSizeError} />
                                     {/* <p>{file ? `File name: ${file.name}` : "no files uploaded yet"}</p> */}
                                     <span className='file-upload-cosef'>Choose file</span>
                                 </div>
@@ -531,39 +566,50 @@ debugger;
                                     if (item)
                                         return (
                                             <div className="row bid-mobile-100" key={index.toString()}>
-                                                <div className="col-sm-6">
+                                                <div className="col-sm-5">
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
-                                                        <input type="number" className="profile-input pb-3 w-100" placeholder='10%'
+                                                        <input type="number" max={35} min={0} className="profile-input pb-3 w-100" placeholder='10%'
                                                             name="royalty"
-                                                            min="0"
-                                                            value={item.royalty && Math.max(0, item.royalty)}
+                                                            value={item.royalty}
                                                             onChange={(e) => {
                                                                 handleRoyaltyChange(e, index);
                                                             }}
+                                                            required={item.walletaddress ? true : false}
                                                         />
                                                     </div>
                                                     <div className="border-bottom-2"></div>
-                                                    <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div>
+                                                    <Form.Control.Feedback type="invalid" className={submitted && item.walletaddress && !item.royalty ? 'd-block' : ''}>
+                                                        Royalty is required.
+                                                    </Form.Control.Feedback>
+                                                    <div className="font-size-14 color-gray py-2 suggested-text">Maximum is 35%</div>
                                                 </div>
-                                                <div className="col-sm-6">
+                                                <div className="col-sm-5">
                                                     <div>
                                                         <div className="font-size-18 text-light py-3">Wallet address</div>
                                                         <input type="text" className="profile-input pb-3 w-100" placeholder='|'
                                                             name="walletaddress"
-                                                            required
                                                             value={item.walletaddress}
                                                             onChange={(e) => {
                                                                 handleRoyaltyChange(e, index);
                                                             }}
+                                                            required={item.royalty ? true : false}
                                                         />
-                                                        <Form.Control.Feedback type="invalid">
-                                                          wallet address is required.
-                                                        </Form.Control.Feedback>
                                                     </div>
                                                     <div className="border-bottom-2"></div>
+                                                    <Form.Control.Feedback type="invalid" className={submitted && item.royalty && !item.walletaddress ? 'd-block' : ''}>
+                                                        Wallet address is required.
+                                                    </Form.Control.Feedback>
+                                                </div>
+                                                <div className='col-sm-2 text-center pt-4'>
+                                                    {index != 0 && (
+                                                        <OverlayTrigger overlay={<Tooltip>Remove item</Tooltip>}>
+                                                            <Button variant="link" type='button' onClick={() => deleteRow(talbeRows, index, 'royalties')}> <FontAwesomeIcon icon={faTrash} className="color-theme" /></Button>
+                                                        </OverlayTrigger>
+                                                    )}
                                                 </div>
                                             </div>
+
                                         )
                                 })
                             }
@@ -590,15 +636,15 @@ debugger;
                             </div> */}
 
 
-                            <button type="button" disabled={tabs>3} className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
-                            <p style={{display: tabs>3? 'block':'none',color: 'red', fontSize:'13px'}}>You can only set 4 royalties</p>
+                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
+
                             <div className="font-size-18 mob-f-16 text-light py-3">Properties <span className="color-gray"> (Optional)</span></div>
 
                             {properties.map((item, index) => {
                                 if (item)
                                     return (
                                         <div className="row bid-mobile-100" key={index.toString()}>
-                                            <div className="col-sm-6">
+                                            <div className="col-sm-5">
                                                 <div>
                                                     <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. Size'
                                                         name="key"
@@ -606,11 +652,16 @@ debugger;
                                                         onChange={(e) => {
                                                             handlePropertyChange(e, index);
                                                         }}
+                                                        required={item.value ? true : false}
                                                     />
+
                                                 </div>
                                                 <div className="border-bottom-2"></div>
+                                                <Form.Control.Feedback type="invalid" className={submitted && item.value && !item.key ? 'd-block' : ''}>
+                                                    Property key is required.
+                                                </Form.Control.Feedback>
                                             </div>
-                                            <div className="col-sm-6">
+                                            <div className="col-sm-5">
                                                 <div>
                                                     <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. M'
                                                         name="value"
@@ -618,14 +669,30 @@ debugger;
                                                         onChange={(e) => {
                                                             handlePropertyChange(e, index);
                                                         }}
+                                                        required={item.key ? true : false}
                                                     />
+
                                                 </div>
                                                 <div className="border-bottom-2"></div>
+                                                <Form.Control.Feedback type="invalid" className={submitted && item.key && !item.value ? 'd-block' : ''}>
+                                                    Property key is required.
+                                                </Form.Control.Feedback>
+                                            </div>
+
+                                            <div className='col-sm-2 text-center pt-4'>
+                                                {index != 0 && (
+                                                    <OverlayTrigger overlay={<Tooltip>Remove item</Tooltip>}>
+                                                        <Button variant="link" type='button' onClick={() => deleteRow(properties, index, 'properties')}> <FontAwesomeIcon icon={faTrash} className="color-theme" /></Button>
+                                                    </OverlayTrigger>
+                                                )}
                                             </div>
                                         </div>
                                     )
                             })}
-                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid mt-3" onClick={addNewProperty}><b>+ </b>more properties</button>
+
+                            {properties.length > 0 && properties[properties.length - 1]["key"] && properties[properties.length - 1]["value"] && (
+                                <button type="button" className="btn-submit text-light bg-darkmode border-2-solid mt-3" onClick={addNewProperty}><b>+ </b> more properties</button>
+                            )}
 
                             <div className="row pt-3 pb-5 bid-mobile-100">
                                 <div className="col-sm-6">
@@ -641,7 +708,25 @@ debugger;
                         </div>
                         <div className="col-sm-6 mobile-none">
                             <div className="pb-2">Preview</div>
-                            <div className="img-preview-box font-size-16 bg-options" style={{ backgroundImage: `url('${image?.image}')` }}>
+                            {/* style={{ backgroundImage: `url('${image?.image}')` }} */}
+                            <div className="img-preview-box font-size-16 bg-options" >
+                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.IMAGE) && (
+                                    <img src={image?.image} className="img-fluid w-100" />
+                                )}
+                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.VIDEO) && (
+                                    <video width="100%" height="400" controls id="video">
+                                        <source src={image?.image} type="video/mp4" />
+                                    </video>
+                                )}
+                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.AUDIO) && (
+                                    <div className='p-5'>
+                                        <audio controls src={image?.image} id="audio">
+                                            Your browser does not support the
+                                            <code>audio</code> element.
+                                        </audio>
+                                    </div>
+                                )}
+
                                 <div className={"no-img-txt color-gray " + (image?.image ? 'd-none' : '')} >
                                     Upload file to preview your
                                     brand new NFT

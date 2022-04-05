@@ -65,8 +65,9 @@ const Nfts = ({ contractX, account, wallet }) => {
         }
     };
 
-    const routeChange = (collectionId, tokenId) => {
-        let path = `/nft/${collectionId}/${tokenId}`;
+    const routeChange = (collectionName, tokenId) => {
+        //let path = `/nft/${collectionId}/${tokenId}`;
+        let path = `/nft/${collectionName.toLowerCase().replace(/ /g, "_")}/${tokenId}`;
         navigate(path);
     }
 
@@ -126,7 +127,7 @@ const Nfts = ({ contractX, account, wallet }) => {
                                         <td>360,00</td>
                                         <td>$52 852</td>
                                         <td>$159 196 200</td> */}
-                                        <td> <button type="button" className="btn btn-danger" onClick={() => routeChange(nft.contract_id, nft.id)}>Show Data</button> </td>
+                                        <td> <button type="button" className="btn btn-danger" onClick={() => routeChange(nft.collection_name, nft.id)}>Show Data</button> </td>
                                     </tr>
                                 )
                             })

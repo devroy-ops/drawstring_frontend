@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { init } from '../services/helper';
 import { toast } from 'react-toastify';
 import { getUserForUpdateDb } from '../db/mongodb';
+import { FileTypes } from '../enums/filetypes';
+import avtar from '../images/users/avatar.svg';
 
 const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     // const [activeTab, setActiveTab] = useState(1);
@@ -26,7 +28,8 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
 
     const viewNFTs = async (contract) => {
         try {
-            const contract = await init(wallet, nftData.contract_id.toLowerCase());
+            debugger;
+            const contract = await init(wallet, nftData.collection_name.toLowerCase().replace(/ /g, "_"));
             const response = await contract.nft_token({ "token_id": nftData.id });
             console.log(response);
             const extra = JSON.parse(response.metadata.extra);
@@ -97,11 +100,11 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                 <div className="row pt-3 tab-col-w-100">
                                     <div className="col-sm-6">
                                         <div className="pb-2">Creator</div>
-                                        <div><img src={creator?.profile_pic ? creator?.profile_pic : creater} className="me-2 border-radius-50" width="48" />{creator?.display_name}</div>
+                                        <div><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48"/>{creator?.display_name}</div>
                                     </div>
                                     <div className="col-sm-6">
                                         <div className="pb-2">Collection</div>
-                                        <div><img src={collection.icon ? collection.icon : collection} className="me-2 border-radius-50" width="48" />{nftData?.collection_name}</div>
+                                        <div><img src={collection.icon ? collection.icon : avtar} className="me-2 border-radius-50" width="48" height="48"/>{nftData?.collection_name}</div>
                                     </div>
                                 </div>
 
@@ -111,7 +114,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                     <Tab eventKey={1} title="Details" className="mt-3"> */}
                                         <div className="font-size-16 pt-3 pb-2">Owner</div>
                                         <div className="d-flex font-size-18">
-                                            <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : creater} width="48" /> {nft?.owner_id}</div>
+                                            <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : avtar} width="48" height="48"/> {nft?.owner_id}</div>
                                         </div>
 
                                         <div className="font-size-16 pt-5 pb-2">Properties</div>
@@ -161,7 +164,25 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
 
                             </div>
                             <div className="col-sm-6">
-                                <img src={nft?.metadata?.media} className="img-fluid border-bg product-profile-img" />
+                                {console.log(nft.metadata)}
+                                {nft.metadata && JSON.parse(nft.metadata.extra).media_type.includes(FileTypes.IMAGE) && (
+                                    <img src={nft?.metadata?.media} className="img-fluid " height="270" alt="nft media" />
+                                )}
+                                {nft.metadata && JSON.parse(nft.metadata.extra).media_type.includes(FileTypes.VIDEO) && (
+                                    <video width="100%" controls id="video" height="270">
+                                        <source src={nft?.metadata?.media} type="video/mp4" />
+                                    </video>
+                                )}
+                                {nft.metadata && JSON.parse(nft.metadata.extra).media_type.includes(FileTypes.AUDIO) && (
+
+                                    <div className='p-5'>
+                                        <audio controls src={nft.metadata.media} id="audio">
+                                            Your browser does not support the
+                                            <code>audio</code> element.
+                                        </audio>
+                                    </div>
+                                )}
+                                {/* <img src={nft?.metadata?.media} className="img-fluid border-bg product-profile-img" /> */}
                             </div>
                         </div>
                     </div>

@@ -1,20 +1,23 @@
 import '../App.css';
+import '../styles/createcollection.css';
+
 import * as nearAPI from "near-api-js";
 import React, { useEffect, useState } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import '../styles/createcollection.css';
 import { init, author, GAS, deploy_txFee } from "../services/helper";
 // import { getUser, mongodb, mongoUser } from '../db/mongodb';
 import * as Realm from "realm-web";
 import { ObjectID } from 'bson';
-import { Form } from 'react-bootstrap';
+import { Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 import { storage } from '../db/firebase';
 import { toast } from 'react-toastify';
 import { Loader } from '../services/ui';
 import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
@@ -25,9 +28,10 @@ var tableRowIndex = 0;
 export default function CreateCollection({ contractX, account, wallet }) {
 
     const [isLoading, setLoader] = useState(false);
-
+    const [image, setImage] = useState();
+    const [submitted, setSubmitted] = useState(false);
     const [talbeRows, setRows] = useState([{
-        royalty: "",
+        royalty: 5,
         walletaddress: wallet.getAccountId()
     }
     ]);
@@ -38,16 +42,16 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
-        updatedRows[tableRowIndex] = { royalty: "", walletaddress: "" }
+        updatedRows[tableRowIndex] = { royalty: 0, walletaddress: "" }
         setRows(updatedRows)
     }
 
     const deleteRow = (index) => {
         if (talbeRows.length > 1) {
             var updatedRows = [...talbeRows]
-            var indexToRemove = updatedRows.findIndex(x => x.index == index);
-            if (indexToRemove === -1) {
-                updatedRows.splice(indexToRemove, 1)
+            // var indexToRemove = updatedRows.findIndex(x => x.index == index);
+            if (index) {
+                updatedRows.splice(index, 1)
                 setRows(updatedRows);
             }
         }
@@ -55,11 +59,9 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
 
     const handleRoyaltyChange = (e, index) => {
-        
         var updatedRows = [...talbeRows];
         updatedRows[index][e.target.name] = e.target.value;
         setRows(updatedRows)
-        console.log(talbeRows);
     }
 
     const [file, setFile] = useState(null);
@@ -80,28 +82,42 @@ export default function CreateCollection({ contractX, account, wallet }) {
         if (transactionHashes) {
             let col = JSON.parse(localStorage.getItem("collection"));
             if (col) {
-                debugger;
 
                 const subaccount = col.name.toLowerCase().replace(/ /g, "_");
                 var isContractInitialized = localStorage.getItem(subaccount + "_isContractInitialized");
                 if (!isContractInitialized) {
                     localStorage.setItem(subaccount + "_isContractInitialized", true);
-                    initializeContract();
+                    initializeContract(col);
                 } else {
 
-                    setLoader(true);
-                    const user = await getUserForUpdateDb();
-                    await user.functions.add_collection(col.name.toLowerCase(), col.fileUrl, subaccount);
-                    setLoader(false);
-
-                    navigate(`/viewcollection/${subaccount}`);
-                    toast("Collection created successfully.", { type: "success" });
-
-                    localStorage.removeItem(collection);
-                    localStorage.removeItem(subaccount + "_isContractInitialized");
+                    // if (col.royalties) {
+                    //     const isRoyaltiesSet = localStorage.getItem(subaccount+ "_isSetRoyalties");
+                    //     if(!isRoyaltiesSet){
+                    //     localStorage.setItem(subaccount + "_isSetRoyalties", true);
+                    //         setRoyalties();
+                    //     }else{
+                    //         saveContract()
+                    //     }
+                    // } else {
+                    saveContract(col, subaccount);
+                    //}
                 }
             }
         }
+    }
+
+    const saveContract = async (col, subaccount) => {
+        setLoader(true);
+        const user = await getUserForUpdateDb();
+        await user.functions.add_collection(col.name.toLowerCase(), col.fileUrl, subaccount);
+        setLoader(false);
+
+        navigate(`/viewcollection/${subaccount}`);
+        toast("Collection created successfully.", { type: "success" });
+
+        localStorage.removeItem(collection);
+        localStorage.removeItem(subaccount + "_isContractInitialized");
+        //localStorage.removeItem(subaccount + "_isSetRoyalties");
     }
 
     useEffect(() => {
@@ -115,7 +131,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
             const subaccount = collection.name.toLowerCase().replace(/ /g, "_");
             const respons = await contractX.deploy_contract_code(
                 {
-                    account_id: `${subaccount}.stingy.testnet` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
+                    account_id: `${subaccount}.deploycontract1.testnet` //"${subaccount}.stingy.testnet" //"pack.stingy.testnet",
                 },
                 GAS,
                 deploy_txFee
@@ -126,10 +142,10 @@ export default function CreateCollection({ contractX, account, wallet }) {
         }
     };
 
-    const initializeContract = async () => {
+    const initializeContract = async (col) => {
 
         try {
-            let col = JSON.parse(localStorage.getItem("collection"));
+            // let col = JSON.parse(localStorage.getItem("collection"));
 
             const subaccount = col.name.toLowerCase().replace(/ /g, "_");
 
@@ -179,47 +195,10 @@ export default function CreateCollection({ contractX, account, wallet }) {
         }
     }
 
-    const initializeContract1 = async () => {
-
-        let col = JSON.parse(localStorage.getItem("collection"));
-
-        const subaccount = col.name.toLowerCase().replace(/ /g, "_");
-
-        const contract = await init(wallet, subaccount);
-
-        try {
-            setLoader(true);
-            getUserForUpdateDb().then(user => {
-                // account.accountId
-                debugger
-                user.functions.add_collection(col.name.toLowerCase(), col.fileUrl, subaccount).then(async () => {
-                    setLoader(false);
-                    //Create a collection by initializing the NFT contract
-                    const response = await contract.new({
-                        owner_id: account.accountId,
-                        metadata: {
-                            "spec": col.spec,
-                            "name": col.name.toLowerCase(),
-                            "symbol": col.symbol,
-                            "icon": col.fileUrl,
-                            "base_uri": null,
-                            "referance": null,
-                            "referance_hash": null, // must exist if the "referance" field exists.
-                        }
-                    }, GAS);
-                    //console.log(response);
-                }, error => {
-                    toast(error, { type: "error" });
-                })
-            });
-        } catch (error) {
-            console.log(error);
-        }
-    }
-
     const [validated, setValidated] = useState(false);
 
     const handleSubmit = (event) => {
+        setSubmitted(true);
         event.preventDefault();
         const form = event.currentTarget;
         if (form.checkValidity() === false) {
@@ -237,6 +216,14 @@ export default function CreateCollection({ contractX, account, wallet }) {
         reader.onloadend = () => {
             setFile(Buffer(reader.result));
         };
+
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = (e) => {
+                setImage({ image: e.target.result });
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const uploadFile = async () => {
@@ -251,17 +238,17 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
             const royalties = {};
             const total_unit = 10000;
+
             talbeRows.forEach((item) => {
                 let colroyalty = parseInt(item.royalty)
                 let royalty = colroyalty/100 * total_unit;
                 console.log(royalty);
-                debugger;
                 if (item.royalty) {
                     royalties[item.walletaddress] = royalty;
                 }
             });
             console.log(royalties);
-            debugger;
+
             if (Object.keys(royalties).length > 0) {
                 col.royalties = royalties;
             }
@@ -383,43 +370,62 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                 talbeRows.map((item, index) => {
                                     if (item)
                                         return (
-                                            <div className="row bid-mobile-100" key={index.toString()}>
-                                                <div className="col-sm-6">
-                                                    <div>
-                                                        <div className="font-size-18 text-light py-3">Royalties</div>
-                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='5%'
-                                                            name="royalty"
-                                                            value={item.royalty}
-                                                            onChange={(e) => {
-                                                                handleRoyaltyChange(e, index);
-                                                            }}
-                                                        />
+                                            <div key={index.toString()}>
+                                                <div className="row bid-mobile-100">
+                                                    <div className="col-sm-6">
+                                                        <div>
+                                                            <div className="font-size-18 text-light py-3">Royalties</div>
+                                                            <input type="number" max={35} className="profile-input pb-3 w-100" placeholder='10%'
+                                                                name="royalty"
+                                                                value={item.royalty}
+                                                                onChange={(e) => {
+                                                                    handleRoyaltyChange(e, index);
+                                                                }}
+                                                                required={item.walletaddress ? true : false}
+                                                            />
+                                                        </div>
+                                                        <div className="border-bottom-2"></div>
+                                                        <Form.Control.Feedback type="invalid" className={submitted && item.walletaddress && !item.royalty ? 'd-block' : ''}>
+                                                            Royalty is required.
+                                                        </Form.Control.Feedback>
+                                                        {/* <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div> */}
                                                     </div>
-                                                    <div className="border-bottom-2"></div>
-                                                    <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div>
-                                                </div>
-                                                <div className="col-sm-6">
-                                                    <div>
-                                                        <div className="font-size-18 text-light py-3">Wallet address</div>
-                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|'
-                                                            name="walletaddress"
-                                                            value={item.walletaddress}
-                                                            onChange={(e) => {
-                                                                handleRoyaltyChange(e, index);
-                                                            }}
-                                                        />
+                                                    <div className="col-sm-6">
+                                                        <div>
+                                                            <div className="font-size-18 text-light py-3">Wallet address</div>
+                                                            <input type="text" className="profile-input pb-3 w-100" placeholder='|'
+                                                                name="walletaddress"
+                                                                value={item.walletaddress}
+                                                                onChange={(e) => {
+                                                                    handleRoyaltyChange(e, index);
+                                                                }}
+                                                                required={item.royalty ? true : false}
+                                                            />
+                                                        </div>
+                                                        <div className="border-bottom-2"></div>
+                                                        <Form.Control.Feedback type="invalid" className={submitted && item.royalty && !item.walletaddress ? 'd-block' : ''}>
+                                                            Wallet address is required.
+                                                        </Form.Control.Feedback>
                                                     </div>
-                                                    <div className="border-bottom-2"></div>
-                                                </div>
-                                                {/* {index != 0 && (
+
+                                                    {/* {index != 0 && (
                                                     <div className='col-sm-2 pt-5'>
                                                         <button className='btn btn-danger mt-4' type='button' onClick={() => deleteRow(index)}>Remove</button>
                                                     </div>
                                                 )} */}
+                                                </div>
+                                                <div className='text-end'>
+                                                    {index != 0 && (
+                                                        <OverlayTrigger overlay={<Tooltip>Remove item</Tooltip>}>
+                                                            <Button variant="link" type='button' onClick={() => deleteRow(index)}> <FontAwesomeIcon icon={faTrash} className="color-theme" /></Button>
+                                                        </OverlayTrigger>
+                                                    )}
+                                                </div>
                                             </div>
                                         )
                                 })
                             }
+                            <div className="font-size-14 color-gray py-2 suggested-text">Royalties for a collection are received whenever any NFT in the collection is sold.  Maximum total royalties cannot exceed 10% for a collection.  Additional royalties can be added when each NFT is minted.</div>
                             {/* <div className="row bid-mobile-100">
                                 <div className="col-sm-6">
                                     <div>
@@ -440,7 +446,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             </div> */}
 
 
-                            {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button> */}
+                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
 
                             {/* <div className="row bid-mobile-100">
                                 <div className="col-sm-6">
@@ -484,15 +490,15 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             </div>
 
                         </div>
-                        {/* <div className="col-sm-6 mobile-none">
+                        <div className="col-sm-6 mobile-none">
                             <div className="pb-2">Preview</div>
-                            <div className="img-preview-box font-size-16">
-                                <div className="no-img-txt color-gray">
+                            <div className="img-preview-box font-size-16 bg-options" style={{ backgroundImage: `url('${image?.image}')` }}>
+                                <div className={"no-img-txt color-gray " + (image?.image ? 'd-none' : '')} >
                                     Upload file to preview your
                                     brand new NFT
                                 </div>
                             </div>
-                        </div> */}
+                        </div>
                     </div>
                 </Form>
             </div>

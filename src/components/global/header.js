@@ -5,16 +5,21 @@ import '../../styles/header.css';
 import search from '../../images/header/search.svg';
 import day from '../../images/header/day.svg';
 import dp from '../../images/header/dp.svg';
-import { Dropdown } from 'react-bootstrap'
+import { Dropdown, Button, Modal } from 'react-bootstrap'
 import night from '../../images/header/night.svg';
 import { ThemeContext, themes } from '../../theame/theameContext';
 // import { AuthContext } from "../../auth/auth";
 import { db, auth } from "../../db/firebase";
-import logo from '../../images/header/logo.png'
+import logo from '../../images/header/logo.png';
+import icon1 from '../../images/header/icon1.png'
+import icon2 from '../../images/header/icon2.png';
+import icon3 from '../../images/header/icon3.png';
+
 import { NearContext } from '../../contexts';
 import { getUser, getUserForUpdateDb } from "../../db/mongodb";
 import { scroller } from "react-scroll";
 import { balance } from "../../services/utils";
+import avtar from '../../images/users/avatar.svg';
 
 export default function Header({ currentUser, wallet, nearConfig }) {
   const [darkMode, setDarkMode] = React.useState(true);
@@ -23,6 +28,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
   const [searchString, setSearchBoxValue] = useState('');
   const [isMenuOpened, setMenuOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [show, setShow] = useState(false);
 
   const navigate = useNavigate();
 
@@ -53,7 +59,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
   // }
 
 
-  let available = balance()
+  let available = balance();
 
   const user = wallet.getAccountId();
   let User = wallet.isSignedIn();
@@ -84,7 +90,6 @@ export default function Header({ currentUser, wallet, nearConfig }) {
   const handleKeyUp = (event) => {
     if (event.key === 'Enter') {
       //setMenuOpen(true);
-      debugger;
       gotoHome().then(() => {
         navigate(`/search?searchString=${searchString}`);
       })
@@ -116,6 +121,16 @@ export default function Header({ currentUser, wallet, nearConfig }) {
       handleUser()
     }
   }
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => {
+    if (!User) {
+      handleUser()
+    }else{
+      setShow(true);
+    }
+  } 
+
 
   return (
 
@@ -173,16 +188,78 @@ export default function Header({ currentUser, wallet, nearConfig }) {
         <ul className="navbar-nav me-auto mb-2 mb-lg-0 create-signin-btn">
           <li className="nav-item">
 
-            <Dropdown align="end" onToggle={handleToggle}>
+            <Button variant="dark" className="create" onClick={handleShow}>
+                Create
+            </Button>
+            
+            <Modal show={show} onHide={handleClose} size="lg" className="menu-modal" centered>
+              {/* <Modal.Header closeButton>
+                <Modal.Title>Modal heading</Modal.Title>
+              </Modal.Header> */}
+              <Modal.Body>
+              <div className="d-flex properties-box-row create-menu text-center p-2">
+                    <div className="properties-box mx-2 border-2-solid p-2 text-create" onClick={(e) => { e.preventDefault(); navigate("/createcollection");;handleClose(); }}>
+                      <div className="font-size-16">Collection</div>
+                      <img src={icon1} className="img-fluid" width={50} />
+                      <div className="font-size-14 break-word">Create a collection with a unique name and icon for your NFTs</div>
+                    </div>
+                    <div className="properties-box mx-2 border-2-solid p-2 text-create" onClick={(e) => { e.preventDefault(); navigate("/mintnft");handleClose(); }}>
+                      <div className="font-size-16">NFT</div>
+                      <img src={icon2} className="img-fluid" width={50} />
+                      <div className="font-size-14 break-word">Mint a unique one-of-a-kind NFT with as many editions as you want</div>
+                    </div>
+                 
+                    <div className="properties-box mx-2 border-2-solid p-2 text-create">
+                      <div className="font-size-16">Album</div>
+                      <img src={icon3} className="img-fluid" width={50} />
+                      <div className="font-size-14 break-word">A permanent, unique playlist of music, video, or whatever you want (coming soon)</div>
+                    </div>
+                </div>
+              </Modal.Body>
+              {/* <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                  Close
+                </Button>
+                <Button variant="primary" onClick={handleClose}>
+                  Save Changes
+                </Button>
+              </Modal.Footer> */}
+            </Modal>
+
+
+           {/* <Dropdown align="end" onToggle={handleToggle}>
               <Dropdown.Toggle id="dropdown-button-dark" variant="dark" className="create">
                 Create
               </Dropdown.Toggle>
 
-              <Dropdown.Menu>
+               <Dropdown.Menu>
+                <div className="d-flex properties-box-row create-menu text-center p-2">
+                  <Dropdown.Item className="properties-box mx-2 border-2-solid p-2 text-create" onClick={(e) => { e.preventDefault(); navigate("/createcollection") }}>
+                    <div>
+                      <div className="font-size-16">Collection</div>
+                      <img src={icon1} className="img-fluid" width={50} />
+                      <div className="font-size-14 break-word">Create a collection with a unique name and icon for your NFTs</div>
+                    </div>
+                  </Dropdown.Item>
+                  <Dropdown.Item className="properties-box mx-2 border-2-solid p-2 text-create" onClick={(e) => { e.preventDefault(); navigate("/mintnft") }}>
+                    <div>
+                      <div className="font-size-16">NFT</div>
+                      <img src={icon2} className="img-fluid" width={50} />
+                      <div className="font-size-14 break-word">Mint a unique one-of-a-kind NFT with as many editions as you want</div>
+                    </div>
+                  </Dropdown.Item>
+                  <Dropdown.Item className="properties-box mx-2 border-2-solid p-2 text-create">
+                    <div>
+                      <div className="font-size-16">Album</div>
+                      <img src={icon3} className="img-fluid" width={50} />
+                      <div className="font-size-14 break-word">A permanent, unique playlist of music, video, or whatever you want (coming soon)</div>
+                    </div>
+                  </Dropdown.Item>
+                </div>
                 <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/mintnft") }}>Mint Nft</Dropdown.Item>
-                <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/createcollection") }} >Create Collection</Dropdown.Item>
+                <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/createcollection") }} >Create Collection</Dropdown.Item> 
               </Dropdown.Menu>
-            </Dropdown>
+            </Dropdown> */}
             {/* <NavLink exact="true" activeclassname="active" to="/mintnft" className="create">Create</NavLink> */}
           </li>
           <li className="nav-item">
@@ -222,7 +299,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
                 type="button"
                 className="btn toggle-link p-0 height-width me-3"
               >
-                <img src={(profile && profile.profile_pic) ? profile?.profile_pic : dp} width="44" className="border-radius-50" />
+                <img src={(profile && profile.profile_pic) ? profile?.profile_pic : avtar} width="44" className="border-radius-50" />
               </div>
             </Dropdown.Toggle>
             <Dropdown.Menu>
