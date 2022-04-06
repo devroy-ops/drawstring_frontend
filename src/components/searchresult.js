@@ -192,7 +192,7 @@ const Search = ({ wallet }) => {
                     }
                     )}
 
-{collections && collections.length > 0 &&
+                    {collections && collections.length > 0 &&
                         <div className='load'>
                             <button onClick={() => loadMore('collections')} className="load-more">
                                 {isLoading ? 'Loading...' : 'Load More'}

@@ -11,6 +11,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 import { Loader } from '../services/ui';
 import { init } from '../services/helper';
+import avtar from '../images/users/avatar.svg';
 
 const Nft = ({ wallet }) => {
     const [activeTab, setActiveTab] = useState(1);
@@ -125,11 +126,11 @@ const Nft = ({ wallet }) => {
                             <div className="col-sm-6">
                                 <div className="pb-2">Creator</div>
                                 {/* {console.log(JSON.parse(nft?.metadata?.extra))} */}
-                                <div><img src={creator?.profile_pic ? creator?.profile_pic : creater} className="me-2 border-radius-50" width="48" />{ creator.display_name}</div>
+                                <div><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48"/>{ creator.display_name}</div>
                             </div>
                             <div className="col-sm-6">
                                 <div className="pb-2">Collection</div>
-                                <div><img src={collection.icon ? collection.icon : collection} className="me-2 border-radius-50" width="48" />{collection?.name}</div>
+                                <div><img src={collection.icon ? collection.icon : avtar} className="me-2 border-radius-50" width="48" height="48"/>{collection?.name}</div>
                             </div>
                         </div>
 
@@ -139,7 +140,7 @@ const Nft = ({ wallet }) => {
                                     <Tab eventKey={1} title="Details" className="mt-3">
                                         <div className="font-size-16 pt-3 pb-2">Owner</div>
                                         <div className="d-flex font-size-18">
-                                            <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : creater} width="48" /> {nft?.owner_id}</div>
+                                            <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : avtar} width="48" height="48"/> {nft?.owner_id}</div>
                                         </div>
 
                                         <div className="font-size-16 pt-5 pb-2">Properties</div>

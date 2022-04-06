@@ -514,7 +514,34 @@ button:focus{
   background: rgb(240,240,240);
 }
 
+.text-create{
+  color: #d7c7b2 !important;
+}
 
+.create-menu{
+  min-width: 600px;
+}
+
+.create-menu .properties-box{
+  min-width: 180px;
+  cursor: pointer;
+}
+/* 
+.create-signin-btn .dropdown-menu{
+  background: rgb(42, 42, 42);
+} */
+
+.create-menu .properties-box, .menu-modal .modal-content{
+  background: rgb(42, 42, 42) !important;
+}
+
+.border-2-solid{
+  border: 1px solid #d7c7b2 !important;
+}
+
+.break-word{
+  white-space: break-spaces;
+}
 
 /* Light Mode css */
 /* 
