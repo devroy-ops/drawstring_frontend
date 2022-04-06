@@ -445,7 +445,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             </div> */}
 
 
-                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
+                            {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button> */}
 
                             {/* <div className="row bid-mobile-100">
                                 <div className="col-sm-6">
