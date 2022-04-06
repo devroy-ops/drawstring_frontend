@@ -78,7 +78,7 @@ export default function MintNft({ contractX, account, wallet }) {
     const deleteRow = (items, index, type) => {
         debugger
         if (items.length > 1) {
-            setTabs((tab)=> tab-1);
+            
             var updatedRows = [...items];
             if (index) {
                 updatedRows.splice(index, 1);
@@ -88,6 +88,7 @@ export default function MintNft({ contractX, account, wallet }) {
                     setRows(updatedRows);
                 }
             }
+            setTabs((tab)=> tab-1);
             // var indexToRemove = updatedRows.findIndex(x => x.index == index);
             // if (indexToRemove === -1) {
             //     updatedRows.splice(indexToRemove, 1)
@@ -222,7 +223,13 @@ export default function MintNft({ contractX, account, wallet }) {
 
             const perpetualRoyalties = {};
 
+            const total_unit = 10000;
+
             talbeRows.forEach((item) => {
+                console.log(item, 'item');
+               let royaltyPercentage = parseInt(item.royalty)
+               let royalty = royaltyPercentage/100 * total_unit;
+               console.log(royalty);
                 if (item.royalty) {
                     perpetualRoyalties[item.walletaddress] = parseInt(parseFloat(royalty).toFixed(0));
                 }
@@ -638,8 +645,8 @@ debugger;
                             </div> */}
 
 
-                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
-
+                            <button disabled={tabs>3} type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
+                            <p style={{display: tabs>3? 'block':'none',color: 'red', fontSize:'13px'}}>You can only set 4 royalties</p>
                             <div className="font-size-18 mob-f-16 text-light py-3">Properties <span className="color-gray"> (Optional)</span></div>
 
                             {properties.map((item, index) => {
