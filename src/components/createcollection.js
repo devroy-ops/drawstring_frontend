@@ -31,7 +31,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
     const [image, setImage] = useState();
     const [submitted, setSubmitted] = useState(false);
     const [talbeRows, setRows] = useState([{
-        royalty: 5,
+        royalty: '',
         walletaddress: wallet.getAccountId()
     }
     ]);
@@ -171,21 +171,22 @@ export default function CreateCollection({ contractX, account, wallet }) {
                     GAS
                 )
             ]
-
             if (col.royalties) {
+                let col_royalty = col.royalties;
+                let royal = Object.values(col_royalty)[0]
+                debugger;
                 allTransactions.push(
                     transactions.functionCall(
                         'set_contract_royalty',
                         Buffer.from(
                             JSON.stringify(
-                                { contract_royalty: 2 }// col.royalties
+                                { contract_royalty: royal}// col.royalties
                             )
                         ),
                         GAS
                     ),
                 )
             }
-            debugger;
             const response = await contract.account.signAndSendTransaction(contract.contractId,
                 allTransactions
             );
@@ -247,8 +248,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
                     royalties[item.walletaddress] = royalty;
                 }
             });
-            console.log(royalties);
-
             if (Object.keys(royalties).length > 0) {
                 col.royalties = royalties;
             }
@@ -377,7 +376,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                                             <div className="font-size-18 text-light py-3">Royalties</div>
                                                             <input type="number" max={35} className="profile-input pb-3 w-100" placeholder='10%'
                                                                 name="royalty"
-                                                                value={item.royalty}
+                                                                value={item.royalty && Math.max(0, item.royalty)}
                                                                 onChange={(e) => {
                                                                     handleRoyaltyChange(e, index);
                                                                 }}
