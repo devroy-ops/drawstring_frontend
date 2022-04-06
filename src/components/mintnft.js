@@ -64,7 +64,7 @@ export default function MintNft({ contractX, account, wallet }) {
     });
 
     const accountId = wallet.getAccountId();
-
+    let tot;
     // Add New Table Row
     const addNewRow = (event) => {
         event.preventDefault()
@@ -222,18 +222,32 @@ export default function MintNft({ contractX, account, wallet }) {
 
 
             const perpetualRoyalties = {};
-
+            const royt = {};
             const total_unit = 10000;
 
             talbeRows.forEach((item) => {
-                console.log(item, 'item');
+            console.log(item, 'item');
                let royaltyPercentage = parseInt(item.royalty)
                let royalty = royaltyPercentage/100 * total_unit;
                console.log(royalty);
                 if (item.royalty) {
+                    royt[item.walletaddress] = item.royalty
+                    let keys = Object.values(royt);
+                    const keynum = keys.map(str => {
+                        return Number(str);
+                      });
+                    tot = keynum.reduce((a, b) => a + b, 0)
+                    console.log(tot, 'lmaoo');
+
                     perpetualRoyalties[item.walletaddress] = parseInt(parseFloat(royalty).toFixed(0));
                 }
             });
+            if(tot>35) {
+                alert ("royalties for NFT can't be more than 35")
+                navigate('/mintnft')
+                return;
+            }
+            console.log(royt);
             console.log(perpetualRoyalties, 'ppr');
 debugger;
             const allProperties = {
@@ -319,7 +333,7 @@ debugger;
                 // referance: undefined, // URL to a JSON file with more info
                 // referance_hash: undefined,
             };
-
+            debugger;
             const response = await contract.account.signAndSendTransaction(contract.contractId, [
                 transactions.functionCall(
                     'nft_mint',
@@ -646,6 +660,7 @@ debugger;
 
 
                             <button disabled={tabs>3} type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
+
                             <p style={{display: tabs>3? 'block':'none',color: 'red', fontSize:'13px'}}>You can only set 4 royalties</p>
                             <div className="font-size-18 mob-f-16 text-light py-3">Properties <span className="color-gray"> (Optional)</span></div>
 
