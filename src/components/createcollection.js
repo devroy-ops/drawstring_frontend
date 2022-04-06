@@ -27,7 +27,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
     const [isLoading, setLoader] = useState(false);
 
     const [talbeRows, setRows] = useState([{
-        royalty: "",
+        royalty: '',
         walletaddress: wallet.getAccountId()
     }
     ]);
@@ -155,16 +155,16 @@ export default function CreateCollection({ contractX, account, wallet }) {
                     GAS
                 )
             ]
-            console.log(col.royalties,'ewuuu');
             if (col.royalties) {
-                console.log(col.royalties,'ewu');
-                debugger
+                let col_royalty = col.royalties;
+                let royal = Object.values(col_royalty)[0]
+                debugger;
                 allTransactions.push(
                     transactions.functionCall(
                         'set_contract_royalty',
                         Buffer.from(
                             JSON.stringify(
-                                { contract_royalty: col.royalties }// col.royalties
+                                { contract_royalty: royal}// col.royalties
                             )
                         ),
                         GAS
@@ -261,8 +261,6 @@ export default function CreateCollection({ contractX, account, wallet }) {
                     royalties[item.walletaddress] = royalty;
                 }
             });
-            console.log(royalties);
-            debugger;
             if (Object.keys(royalties).length > 0) {
                 col.royalties = royalties;
             }
@@ -384,17 +382,25 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                 talbeRows.map((item, index) => {
                                     if (item)
                                         return (
-                                            <div className="row bid-mobile-100" key={index.toString()}>
-                                                <div className="col-sm-6">
-                                                    <div>
-                                                        <div className="font-size-18 text-light py-3">Royalties</div>
-                                                        <input type="text" className="profile-input pb-3 w-100" placeholder='5%'
-                                                            name="royalty"
-                                                            value={item.royalty}
-                                                            onChange={(e) => {
-                                                                handleRoyaltyChange(e, index);
-                                                            }}
-                                                        />
+                                            <div key={index.toString()}>
+                                                <div className="row bid-mobile-100">
+                                                    <div className="col-sm-6">
+                                                        <div>
+                                                            <div className="font-size-18 text-light py-3">Royalties</div>
+                                                            <input type="number" max={35} className="profile-input pb-3 w-100" placeholder='10%'
+                                                                name="royalty"
+                                                                value={item.royalty && Math.max(0, item.royalty)}
+                                                                onChange={(e) => {
+                                                                    handleRoyaltyChange(e, index);
+                                                                }}
+                                                                required={item.walletaddress ? true : false}
+                                                            />
+                                                        </div>
+                                                        <div className="border-bottom-2"></div>
+                                                        <Form.Control.Feedback type="invalid" className={submitted && item.walletaddress && !item.royalty ? 'd-block' : ''}>
+                                                            Royalty is required.
+                                                        </Form.Control.Feedback>
+                                                        {/* <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div> */}
                                                     </div>
                                                     <div className="border-bottom-2"></div>
                                                     <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div>

@@ -41,12 +41,12 @@ export default function MintNft({ contractX, account, wallet }) {
         royalty: "",
         walletaddress: wallet.getAccountId()
     }]);
-    const [tabs, setTabs] = useState(1);
+    
     const [properties, setProperties] = useState([{
         key: "",
         value: ""
     }]);
-
+    const [tabs, setTabs] = useState(1);
     const [validated, setValidated] = useState(false);
 
     const [nft, setNft] = useState({
@@ -64,11 +64,32 @@ export default function MintNft({ contractX, account, wallet }) {
     // Add New Table Row
     const addNewRow = (event) => {
         event.preventDefault()
-        setTabs((tab) => tab+1);
+        setTabs((tab)=> tab+1);
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
         updatedRows[tableRowIndex] = { royalty: "", walletaddress: "" }
         setRows(updatedRows)
+    }
+    // Remove row
+    const deleteRow = (items, index, type) => {
+        debugger
+        if (items.length > 1) {
+            setTabs((tab)=> tab-1);
+            var updatedRows = [...items];
+            if (index) {
+                updatedRows.splice(index, 1);
+                if (type == "properties") {
+                    setProperties(updatedRows);
+                } else {
+                    setRows(updatedRows);
+                }
+            }
+            // var indexToRemove = updatedRows.findIndex(x => x.index == index);
+            // if (indexToRemove === -1) {
+            //     updatedRows.splice(indexToRemove, 1)
+            //     setRows(updatedRows);
+            // }
+        }
     }
 
     const addNewProperty = (event) => {
@@ -191,6 +212,7 @@ export default function MintNft({ contractX, account, wallet }) {
                 return;
             }
 
+
             const perpetualRoyalties = {};
             const total_unit = 10000;
 
@@ -199,13 +221,11 @@ export default function MintNft({ contractX, account, wallet }) {
                let royalty = royaltyPercentage/100 * total_unit;
                console.log(royalty);
                 if (item.royalty) {
-                    perpetualRoyalties[item.walletaddress] = royalty;
+                    perpetualRoyalties[item.walletaddress] = parseInt(parseFloat(royalty).toFixed(0));
                 }
             });
-            console.log(perpetualRoyalties);
-            
+            console.log(perpetualRoyalties, 'ppr');
 debugger;
-
             const allProperties = {
                 creator_id: accountId,
                 media_size: nft.media.size, 
@@ -536,8 +556,7 @@ debugger;
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
                                                         <input type="number" className="profile-input pb-3 w-100" placeholder='10%'
                                                             name="royalty"
-                            
-                                                            value={item.royalty}
+                                                            value={item.royalty && Math.max(0, item.royalty)}
                                                             onChange={(e) => {
                                                                 handleRoyaltyChange(e, index);
                                                             }}
