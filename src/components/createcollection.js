@@ -169,13 +169,12 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             },
                         }),
                     ),
-                    GAS
+                    GAS/2
                 )
             ]
             if (col.royalties) {
                 let col_royalty = col.royalties;
                 let royal = Object.values(col_royalty)[0]
-                debugger;
                 allTransactions.push(
                     transactions.functionCall(
                         'set_contract_royalty',
@@ -184,7 +183,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                 { contract_royalty: royal}// col.royalties
                             )
                         ),
-                        GAS
+                        GAS/2
                     ),
                 )
             }

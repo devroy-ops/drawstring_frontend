@@ -12,6 +12,7 @@ import { getUser, getUserForUpdateDb } from '../db/mongodb';
 import { Loader } from '../services/ui';
 import { init } from '../services/helper';
 import avtar from '../images/users/avatar.svg';
+import { FileTypes } from '../enums/filetypes';
 
 const Nft = ({ wallet }) => {
     const [activeTab, setActiveTab] = useState(1);
@@ -51,12 +52,11 @@ const Nft = ({ wallet }) => {
             const extra = JSON.parse(response.metadata.extra);
             response.price = extra.price;
             setNft(response);
-            debugger;
             const user = await getUserForUpdateDb();
             const owner = await getProfile(user, response.owner_id);
             setOwner(owner);
+            debugger
             const creator = await getProfile(user, extra.creator_id);
-            debugger;
             setCreator(creator);
             getCollection(contract);
             return response;
@@ -78,7 +78,6 @@ const Nft = ({ wallet }) => {
         try {
             const response = await contract.nft_metadata();
             console.log(response);
-            debugger;
             setCollection(response)
             return response;
         } catch (error) {
@@ -126,7 +125,7 @@ const Nft = ({ wallet }) => {
                             <div className="col-sm-6">
                                 <div className="pb-2">Creator</div>
                                 {/* {console.log(JSON.parse(nft?.metadata?.extra))} */}
-                                <div><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48" />{creator.display_name}</div>
+                                <div><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48" />{creator?.display_name || wallet.getAccountId()}</div>
                             </div>
                             <div className="col-sm-6">
                                 <div className="pb-2">Collection</div>
@@ -185,15 +184,24 @@ const Nft = ({ wallet }) => {
 
                     </div>
                     <div className="col-sm-6">
-                        {/* <div className="min-height-468">  */}
-                        <img src={nft.metadata?.media} className="img-fluid border-bg product-profile-img" />
-                        {/* <video width="400" controls>
-                            <source src={nft.metadata?.media} type="video/mp4" />
-                        </video> */}
+                        {/* <img src={nft.metadata?.media} className="img-fluid border-bg product-profile-img" /> */}
+                        {nft.metadata && JSON.parse(nft.metadata.extra).media_type.includes(FileTypes.IMAGE) && (
+                            <img src={nft?.metadata?.media} className="img-fluid border-bg product-profile-img" height="270" alt="nft media" />
+                        )}
+                        {nft.metadata && JSON.parse(nft.metadata.extra).media_type.includes(FileTypes.VIDEO) && (
+                            <video width="100%" controls id="video" height="270">
+                                <source src={nft?.metadata?.media} type="video/mp4" />
+                            </video>
+                        )}
+                        {nft.metadata && JSON.parse(nft.metadata.extra).media_type.includes(FileTypes.AUDIO) && (
 
-                        {/* <img src={product} className="img-fluid border-bg product-profile-img" /> */}
-
-                        {/* </div> */}
+                            <div className='p-5'>
+                                <audio controls src={nft.metadata.media} id="audio">
+                                    Your browser does not support the
+                                    <code>audio</code> element.
+                                </audio>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

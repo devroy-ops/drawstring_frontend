@@ -3,3 +3,9 @@ export const FileTypes = {
     AUDIO: "audio",
     VIDEO: "video",
 }
+
+export const MarketplaceTypes = {
+    REMOVED: "removed",
+    OFFER: "offer",
+    BID: "bid"
+}

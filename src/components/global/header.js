@@ -192,27 +192,27 @@ export default function Header({ currentUser, wallet, nearConfig }) {
                 Create
             </Button>
             
-            <Modal show={show} onHide={handleClose} size="lg" className="menu-modal" centered>
+            <Modal show={show} onHide={handleClose} size="xl" className="menu-modal" centered>
               {/* <Modal.Header closeButton>
                 <Modal.Title>Modal heading</Modal.Title>
               </Modal.Header> */}
               <Modal.Body>
-              <div className="d-flex properties-box-row create-menu text-center p-2">
-                    <div className="properties-box mx-2 border-2-solid p-2 text-create" onClick={(e) => { e.preventDefault(); navigate("/createcollection");;handleClose(); }}>
-                      <div className="font-size-16">Collection</div>
-                      <img src={icon1} className="img-fluid" width={50} />
-                      <div className="font-size-14 break-word">Create a collection with a unique name and icon for your NFTs</div>
+              <div className="d-flex properties-box-row create-menu text-center p-5">
+                    <div className="properties-box mx-5 border-2-solid p-2 text-create" onClick={(e) => { e.preventDefault(); navigate("/createcollection");;handleClose(); }}>
+                      <div className="font-size-24">Collection</div>
+                      <img src={icon1} className="img-fluid" width={100} />
+                      <div className="font-size-16 break-word">Create a collection with a unique name and icon for your NFTs</div>
                     </div>
-                    <div className="properties-box mx-2 border-2-solid p-2 text-create" onClick={(e) => { e.preventDefault(); navigate("/mintnft");handleClose(); }}>
-                      <div className="font-size-16">NFT</div>
-                      <img src={icon2} className="img-fluid" width={50} />
-                      <div className="font-size-14 break-word">Mint a unique one-of-a-kind NFT with as many editions as you want</div>
+                    <div className="properties-box mx-5 border-2-solid p-2 text-create" onClick={(e) => { e.preventDefault(); navigate("/mintnft");handleClose(); }}>
+                      <div className="font-size-24">NFT</div>
+                      <img src={icon2} className="img-fluid" width={100} />
+                      <div className="font-size-16 break-word">Mint a unique one-of-a-kind NFT with as many editions as you want</div>
                     </div>
                  
-                    <div className="properties-box mx-2 border-2-solid p-2 text-create">
-                      <div className="font-size-16">Album</div>
-                      <img src={icon3} className="img-fluid" width={50} />
-                      <div className="font-size-14 break-word">A permanent, unique playlist of music, video, or whatever you want (coming soon)</div>
+                    <div className="properties-box mx-5 border-2-solid p-2 text-create">
+                      <div className="font-size-24">Album</div>
+                      <img src={icon3} className="img-fluid" width={100} />
+                      <div className="font-size-16 break-word">A permanent, unique playlist of music, video, or whatever you want (coming soon)</div>
                     </div>
                 </div>
               </Modal.Body>

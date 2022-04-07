@@ -76,7 +76,6 @@ export default function MintNft({ contractX, account, wallet }) {
     }
     // Remove row
     const deleteRow = (items, index, type) => {
-        debugger
         if (items.length > 1) {
             
             var updatedRows = [...items];
@@ -115,6 +114,7 @@ export default function MintNft({ contractX, account, wallet }) {
         getCollections();
         var transactionHashes = searchParams.get("transactionHashes");
         if (transactionHashes) {
+            debugger;
             const nft = JSON.parse(localStorage.getItem("nft"));
 
             if (nft) {
@@ -213,7 +213,6 @@ export default function MintNft({ contractX, account, wallet }) {
     }
 
     const mintNFT = async (mediaLink) => {
-        debugger;
         try {
 
             if (!accountId) {
@@ -250,7 +249,7 @@ export default function MintNft({ contractX, account, wallet }) {
             }
             console.log(royt);
             console.log(perpetualRoyalties, 'ppr');
-debugger;
+
             const allProperties = {
                 creator_id: accountId,
                 media_size: nft.media.size,
@@ -402,7 +401,6 @@ debugger;
         });
         const subaccount = e.label.toLowerCase().replace(/ /g, "_");
         //init1(wallet, subaccount);
-        debugger;
         let contract = await init(wallet, subaccount);
         setContract(contract);
     }

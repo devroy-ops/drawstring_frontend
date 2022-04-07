@@ -1,5 +1,5 @@
 import '../App.css';
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import '../styles/home.css';
 import arrow_back from '../images/home/arrow_back.svg';
 import arrow_fwd from '../images/home/arrow_fwd.svg';
@@ -27,7 +27,7 @@ import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 import * as Realm from 'realm-web'
 import Nft from './viewnft';
 import NftDetailModal from './nftmodal';
-import { FileTypes } from '../enums/filetypes';
+import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
 import { toast } from 'react-toastify';
 import NftsLists from './nftslist';
 
@@ -44,10 +44,33 @@ const Home = ({ contractX, account, wallet }) => {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const handleShow = (nftData) => {
         setNft(nftData);
         setShow(true);
+    }
+
+    useEffect(() => {
+        checkForByOrRemovedFromSale();
+    }, []);
+
+    const checkForByOrRemovedFromSale = async() =>{
+        var transactionHashes = searchParams.get("transactionHashes");
+        if (transactionHashes) {
+            debugger
+            const nft = JSON.parse(localStorage.getItem("nft"));
+            if(nft){
+                if(nft.marketType == MarketplaceTypes.OFFER){
+                    // TODO update db
+                    toast("Nft purchased successfully", {type: "success"});
+                }if(nft.marketType == MarketplaceTypes.REMOVED){
+                    // TODO update db
+                    toast("Nft removed from sale successfully", {type: "success"});
+                }
+                localStorage.removeItem("nft");
+            }
+        }
     }
 
     useEffect(() => {

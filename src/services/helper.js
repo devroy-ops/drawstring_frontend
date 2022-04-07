@@ -52,10 +52,8 @@ const storageDeposit = async (wallet) => {
   try {
     const minBalance = await loadMarketplaceContract.storage_minimum_balance({});
     const balance = await loadMarketplaceContract.storage_balance_of({ account_id: accoutnId });
-    debugger;
 
     if (minBalance > balance) {
-      debugger;
       const response = await loadMarketplaceContract.storage_deposit({ "account_id": accoutnId }, GAS, txFee);
     }
     return;
