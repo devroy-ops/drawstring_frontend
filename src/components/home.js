@@ -1,5 +1,5 @@
 import '../App.css';
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import '../styles/home.css';
 import arrow_back from '../images/home/arrow_back.svg';
 import arrow_fwd from '../images/home/arrow_fwd.svg';
@@ -11,6 +11,7 @@ import category from '../images/home/category.svg';
 import saletype from '../images/home/saletype.svg';
 import audio from '../images/collection/audio_bg.png';
 import price from '../images/home/price.svg';
+import upload from '../images/users/upload.svg';
 import logo from '../../src/images/header/logo.png'
 import sort from '../images/home/sort.svg';
 import more from '../images/home/more.svg';
@@ -19,7 +20,6 @@ import { db } from "../db/firebase";
 import React, { useEffect, useState } from "react";
 import { Loader } from "../services/ui";
 import { Button, Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
-
 import AliceCarousel from 'react-alice-carousel';
 import "react-alice-carousel/lib/alice-carousel.css";
 import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
@@ -28,6 +28,8 @@ import * as Realm from 'realm-web'
 import Nft from './viewnft';
 import NftDetailModal from './nftmodal';
 import { FileTypes } from '../enums/filetypes';
+import { toast } from 'react-toastify';
+import NftsLists from './nftslist';
 
 const app = new Realm.App({ id: "drawstringrealmapp-vafye" });
 
@@ -41,6 +43,8 @@ const Home = ({ contractX, account, wallet }) => {
     const [nft, setNft] = useState({});
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
+    const navigate = useNavigate();
+
     const handleShow = (nftData) => {
         setNft(nftData);
         setShow(true);
@@ -54,8 +58,8 @@ const Home = ({ contractX, account, wallet }) => {
         setLoader(true);
 
         const user = await getUser();
-        const featured = await user.functions.get_featured();
-        setFeatured(featured);
+        // const featured = await user.functions.get_featured();
+        // setFeatured(featured);
         const allListedNfts = await user.functions.get_all_listed_nfts(12, count * 12);
         console.log(allListedNfts)
         setListedNfts([...listedNfts, ...allListedNfts]);
@@ -102,17 +106,17 @@ const Home = ({ contractX, account, wallet }) => {
                                         <div className="col-sm-7 pe-4">
                                             <div className="row first-box">
                                                 <div className="col-sm-6 p-5 pb-3">
-                                                    <div className="title text-light mb-3">Canibus of Bust’d Labs - Covid Santa</div>
-                                                    <div className="slide-desc text-light mb-3">Going Live Wednesday 12 - 22 at 5 pm Est</div>
-                                                    <div className="my-5">
+                                                    <div className="title text-light mb-3">Welcome to <a href='https://drawstring.io/' target="_blank" >Drawstring.io</a></div>
+                                                    <div className="slide-desc text-light mb-3">The newest marketplace on Near</div>
+                                                    {/* <div className="my-5">
                                                         <NavLink exact="true" activeclassname="active" to="/" className="create-link" onClick={viewDrop}>View Drop</NavLink>
-                                                    </div>
+                                                    </div> */}
                                                     <div className="pos-rel">
                                                         <div className="long-line"></div>
                                                         <div className="short-line"></div>
                                                     </div>
                                                 </div>
-                                                <div className="col-sm-6 first-box-image" style={{ backgroundImage: `url('${nft.media_link}')` }}></div>
+                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }}></div>
                                             </div>
                                         </div>
                                         <div className="col-sm-5">
@@ -120,11 +124,11 @@ const Home = ({ contractX, account, wallet }) => {
                                                 {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isChildSlideNft === true).slice(index * 4, index === 0 ? 4 : index * 4 + 4).map((nft, i) => {
                                                     return (
                                                         <div className="col-sm-6 col-xs-12 mb-4" key={i}>
-                                                            <div className="bg-img1 pos-rel" style={{ backgroundImage: `url('${nft.media_link}')` }}>
-                                                                <div className="img-title">
+                                                            <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }}>
+                                                                {/* <div className="img-title">
                                                                     <div>{nft?.name}</div>
                                                                     <div>Collection</div>
-                                                                </div>
+                                                                </div> */}
                                                             </div>
                                                         </div>
                                                     )
@@ -147,21 +151,14 @@ const Home = ({ contractX, account, wallet }) => {
             </div>
 
             <div className="container home_featured mt-60">
-                <div className="text-light title pb-3">
+                {/* <div className="text-light title pb-3">
                     Featured NFT's
-                </div>
+                </div> */}
                 <div className="row pt-2">
-                    {/* {nfts && nfts.length > 0 && nfts.slice(0, 4).map((nft, index) => {
-                            return (
-                                <div className="col-sm-3" key={index}>
-                                    <img src={nft?.nftData?.metadata?.media} className="img-fluid w-100 featured-img" alt="nft media"/>
-                                </div>
-                            )
-                    })
-                    } */}
-                    {featuredNfts && featuredNfts.length > 0 && featuredNfts.slice(0, 4).map((nft, index) => {
+                    {/* {featuredNfts && featuredNfts.length > 0 && featuredNfts.slice(0, 4).map((nft, index) => { */}
+                        {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isChildSlideNft === true).map((nft, i) => {
                         return (
-                            <div className="col-sm-3" key={index}>
+                            <div className="col-sm-3" key={i}>
                                 <img src={nft?.img} className="img-fluid w-100 featured-img" alt="nft media" />
                             </div>
                         )
@@ -281,7 +278,10 @@ const Home = ({ contractX, account, wallet }) => {
                     </div>
 
                     <div className="row home_explore">
-                        {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
+                    {listedNfts && listedNfts.length > 0 && (
+                        <NftsLists nfts={listedNfts} wallet={wallet}/>
+                    )}
+                        {/* {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
                             return (
                                 <div className="col-sm-3 pb-4" key={index}>
                                     <div className="top-sec-box">
@@ -289,28 +289,30 @@ const Home = ({ contractX, account, wallet }) => {
                                             <div className="col-sm-8">
                                                 <div className="d-flex">
                                                     <OverlayTrigger overlay={<Tooltip>Owner: {nft?.owner}</Tooltip>}>
-                                                        <span className="d-inline-block">
+                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/user/${nft.owner}`) }}>
                                                             <div className="explore-dot bg-pink"></div>
                                                         </span>
                                                     </OverlayTrigger>
                                                     <OverlayTrigger overlay={<Tooltip>Creater: {nft?.owner}</Tooltip>}>
-                                                        <span className="d-inline-block">
+                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/user/${nft.owner}`) }}>
                                                             <div className="explore-dot bg-blue"></div>
                                                         </span>
                                                     </OverlayTrigger>
                                                     <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contract_id}</Tooltip>}>
-                                                        <span className="d-inline-block">
+                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); nft?.contract_id != "DrawstringMarketplace.near" ? navigate(`viewcollection/${nft.collection_name.toLowerCase().replace(/ /g, "_")}`) : e.preventDefault(); }}>
                                                             <div className="explore-dot bg-green"></div>
                                                         </span>
                                                     </OverlayTrigger>
-                                                    {/* <div className="explore-dot bg-pink"></div>
-                                                    <div className="explore-dot bg-blue"></div>
-                                                    <div className="explore-dot bg-green"></div> */}
+
                                                 </div>
                                             </div>
                                             <div className="col-sm-4 ">
-                                                <div className="explore-dot bg-black float-end">
-                                                    <img src={more} className="pb-1" alt="more icon" />
+                                                <div className="explore-dot bg-black float-end" onClick={() => {
+                                                    navigator.clipboard.writeText(`${window.location.origin.toString()}/nft/${nft.collection_name.toLowerCase().replace(/ /g, "_")}/${nft.id}`);
+                                                    toast("copied user profile url", { type: "success" })
+                                                }}>
+                                                    <img src={upload} className="up-icon" />
+
                                                 </div>
                                             </div>
                                         </div>
@@ -328,23 +330,6 @@ const Home = ({ contractX, account, wallet }) => {
                                             <img src={audio} className="w-100" height="270" alt="nft media" onClick={() => handleShow(nft)} />
                                         )}
 
-                                        {/* 
-                                        {image?.image && nft?.media && nft?.media.type.includes(FileTypes.IMAGE) && (
-                                    <img src={image?.image} className="img-fluid w-100" />
-                                )}
-                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.VIDEO) && (
-                                    <video width="100%" height="400" controls id="video">
-                                        <source src={image?.image} type="video/mp4" />
-                                    </video>
-                                )}
-                                {image?.image && nft?.media && nft?.media.type.includes(FileTypes.AUDIO) && (
-                                    <div className='p-5'>
-                                    <audio controls src={image?.image} id="audio">
-                                        Your browser does not support the
-                                        <code>audio</code> element.
-                                    </audio>
-                                    </div>
-                                )} */}
 
                                         <div className="text-light font-size-18 p-3">
                                             <div>{nft.name}</div>
@@ -353,19 +338,15 @@ const Home = ({ contractX, account, wallet }) => {
                                                 <div className="col-sm-6">
                                                     {nft.price} Near <span className="color-gray">1/1</span>
                                                 </div>
-                                                {/* <div className="col-sm-6 text-end">
-                                                    <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                </div> */}
+
                                             </div>
-                                            {/* <div className="pt-1">
-                                                <button type="button" className="btn heart-btn p-0" onClick={()=>addLike(nft, index)}><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></button>
-                                            </div> */}
+
                                         </div>
                                     </div>
                                 </div>
                             )
                         }
-                        )}
+                        )} */}
                         <div className='load'>
                             <button onClick={loadMore} className="load-more">
                                 {isLoading ? 'Loading...' : 'Load More'}
@@ -374,9 +355,9 @@ const Home = ({ contractX, account, wallet }) => {
                     </div>
                 </div>
             </div>
-            {show && (
+            {/* {show && (
                 <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet} />
-            )}
+            )} */}
 
         </div>
     );

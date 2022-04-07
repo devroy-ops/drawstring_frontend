@@ -524,6 +524,7 @@ button:focus{
 
 .create-menu .properties-box{
   min-width: 180px;
+  max-width: 235px;
   cursor: pointer;
 }
 /* 
@@ -535,12 +536,30 @@ button:focus{
   background: rgb(42, 42, 42) !important;
 }
 
+.create-menu .properties-box:hover{
+  background: rgb(240,240,240) !important;
+}
+
 .border-2-solid{
   border: 1px solid #d7c7b2 !important;
 }
 
 .break-word{
   white-space: break-spaces;
+}
+
+.text-ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bg-size-100{
+  background-size: 100% 100% !important;
+}
+
+.up-icon{
+  padding-bottom: 5px;
 }
 
 /* Light Mode css */

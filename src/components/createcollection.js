@@ -18,6 +18,7 @@ import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { smartContractName } from '../services/utils';
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
@@ -131,7 +132,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
             const subaccount = collection.name.toLowerCase().replace(/ /g, "_");
             const respons = await contractX.deploy_contract_code(
                 {
-                    account_id: `${subaccount}.deploycontract1.testnet` //"${subaccount}.stingy.testnet" //"pack.stingy.testnet",
+                    account_id: `${subaccount}.${smartContractName}` //"${subaccount}.stingy.testnet" //"pack.stingy.testnet",
                 },
                 GAS,
                 deploy_txFee
