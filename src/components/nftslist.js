@@ -52,7 +52,7 @@ const NftsLists = ({nfts, wallet}) => {
                                             <div className="col-sm-4 ">
                                                 <div className="explore-dot bg-black float-end" onClick={() => {
                                                     navigator.clipboard.writeText(`${window.location.origin.toString()}/nft/${nft.collection_name.toLowerCase().replace(/ /g, "_")}/${nft.id}`);
-                                                    toast("copied user profile url", { type: "success" })
+                                                    toast("nft link copied to clipboard", { type: "success" })
                                                 }}>
                                                     <img src={upload} className="up-icon" />
 

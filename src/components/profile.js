@@ -9,7 +9,7 @@ import copy_icon from '../images/users/copy_icon.svg';
 import upload from '../images/users/upload.svg';
 import more from '../images/home/more.svg';
 import '../styles/user.css';
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useParams, useSearchParams } from "react-router-dom";
 // import blockchain from '../images/home/blockchain.svg';
 import category from '../images/home/category.svg';
 import saletype from '../images/home/saletype.svg';
@@ -41,7 +41,11 @@ const Profile = ({ contractX, account, wallet }) => {
     const [author, setAuthor] = useState({});
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
-    debugger;
+    const [onSaleNfts, setOnSaleNfts] = useState([]);
+    const [createdNfts, setCreatedNfts] = useState([]);
+    const [ownedNfts, setOwnedNfts] = useState([]);
+    const [searchParams, setSearchParams] = useSearchParams();
+
     const { userId } = useParams();
 
     const accountId = userId ? userId : wallet.getAccountId();
@@ -51,11 +55,21 @@ const Profile = ({ contractX, account, wallet }) => {
     }
 
     useEffect(() => {
+        checkForByOrRemovedFromSale()
+    }, []);
+
+    const checkForByOrRemovedFromSale = async() =>{
+        var transactionHashes = searchParams.get("transactionHashes");
+        if (transactionHashes) {
+            debugger;
+        }
+    }
+
+    useEffect(() => {
         return getProfile();
     }, []);
 
     const getProfile = async () => {
-        debugger;
         setLoader(true);
         const user = await getUserForUpdateDb();
         const response = await user.functions.get_profile(accountId);
@@ -72,6 +86,14 @@ const Profile = ({ contractX, account, wallet }) => {
         const user = await getUser();
         const allListedNfts = await user.functions.get_nfts_by_owner(accountId);
         console.log(allListedNfts);
+        const liveNfts = allListedNfts.filter(x=>x.is_live === true);
+        // TODO filter by created
+        const created = allListedNfts.filter(x=>x.owner === accountId);
+        const owned = allListedNfts.filter(x=>x.owner === accountId);
+        setOnSaleNfts(liveNfts);
+        setCreatedNfts(created);
+        setOwnedNfts(owned);
+        
         setListedNfts(allListedNfts);
         setLoader(false);
     }
@@ -141,7 +163,7 @@ const Profile = ({ contractX, account, wallet }) => {
             <div className="">
                 <div className="container tabs-links px-0">
                     <Tabs activeKey={activeTab} onSelect={handleSelect}>
-                        <Tab eventKey={1} title={`On sale ${listedNfts.filter(x=>x.is_live === true).length}`}>
+                        <Tab eventKey={1} title={`On sale ${onSaleNfts.length}`}>
                             {/* <div className="border-bottom-2"></div> */}
                             <div className="pb-4">
                                 <div className="row title text-light pt-3">
@@ -157,7 +179,11 @@ const Profile = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                                 <div className="row pt-2">
-                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.is_live === true).map((nft, index) => {
+
+                                    {onSaleNfts && (
+                                        <NftsLists nfts={onSaleNfts} wallet={wallet}/>
+                                    )}
+                                    {/* {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.is_live === true).map((nft, index) => {
                                         return (
                                             <div className="col-sm-3 pb-4" key={index}>
                                                 <div className="top-sec-box">
@@ -194,12 +220,10 @@ const Profile = ({ contractX, account, wallet }) => {
                                             </div>
                                         )
                                     }
-                                    )}
-
-                                    {/* {listedNfts && listedNfts.filter(x=>x.is_live === true) > 0 && (
-                                        <NftsLists nfts={listedNfts.filter(x=>x.is_live === true)} wallet={wallet}/>
                                     )} */}
 
+                                    
+
                                     {listedNfts && listedNfts.length == 0 && (
                                         <div className="alert alert-secondary" role="alert">
                                         No data available
@@ -209,7 +233,7 @@ const Profile = ({ contractX, account, wallet }) => {
                                 </div>
                             </div>
                         </Tab>
-                        <Tab eventKey={2} title={`Created ${listedNfts.filter(x=>x.owner === accountId).length}`}>
+                        <Tab eventKey={2} title={`Created ${createdNfts.length}`}>
                         <div className="pb-4">
                                 <div className="row title text-light pt-3">
                                     <div className="col-sm-9">
@@ -224,47 +248,11 @@ const Profile = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                                 <div className="row pt-2">
-                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.owner === accountId).map((nft, index) => {
-                                        return (
-                                            <div className="col-sm-3 pb-4" key={index}>
-                                                <div className="top-sec-box">
-                                                    <div className="row py-2 px-3">
-                                                        <div className="col-sm-8">
-                                                            <div className="d-flex">
-                                                                <div className="explore-dot bg-pink"></div>
-                                                                <div className="explore-dot bg-blue"></div>
-                                                                <div className="explore-dot bg-green"></div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-sm-4 ">
-                                                            <div className="explore-dot bg-black float-end">
-                                                                <img src={more} className="pb-1" alt="more icon" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <img src={nft.media_link} className="w-100" height="270" alt="nft media" />
-                                                    <div className="text-light font-size-18 p-3">
-                                                        <div>{nft.name}</div>
-                                                        <div className="row pt-2 bid-mobile-100">
-                                                            <div className="col-sm-6">
-                                                                {nft.price} ETN <span className="color-gray">1/1</span>
-                                                            </div>
-                                                            <div className="col-sm-6 text-end">
-                                                                <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                            </div>
-                                                        </div>
-                                                        <div className="pt-1">
-                                                            <button type="button" className="btn heart-btn p-0" onClick={() => addLike(nft, index)}><img src={heart} alt="heart icon" /> <span className="color-gray">{nft.likes}</span></button>
-                                                            {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
+                                    {createdNfts && (
+                                        <NftsLists nfts={createdNfts} wallet={wallet}/>
                                     )}
 
-                                    {listedNfts && listedNfts.length == 0 && (
+                                    {createdNfts && createdNfts.length == 0 && (
                                         <div className="alert alert-secondary" role="alert">
                                         No data available
                                         </div>
@@ -273,7 +261,7 @@ const Profile = ({ contractX, account, wallet }) => {
                                 </div>
                             </div>
                         </Tab>
-                        <Tab eventKey={3} title={`Owned ${listedNfts.filter(x=>x.owner === accountId).length}`}>
+                        <Tab eventKey={3} title={`Owned ${ownedNfts.length}`}>
                         <div className="pb-4">
                                 <div className="row title text-light pt-3">
                                     <div className="col-sm-9">
@@ -288,47 +276,10 @@ const Profile = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                                 <div className="row pt-2">
-                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.owner === accountId).map((nft, index) => {
-                                        return (
-                                            <div className="col-sm-3 pb-4" key={index}>
-                                                <div className="top-sec-box">
-                                                    <div className="row py-2 px-3">
-                                                        <div className="col-sm-8">
-                                                            <div className="d-flex">
-                                                                <div className="explore-dot bg-pink"></div>
-                                                                <div className="explore-dot bg-blue"></div>
-                                                                <div className="explore-dot bg-green"></div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-sm-4 ">
-                                                            <div className="explore-dot bg-black float-end">
-                                                                <img src={more} className="pb-1" alt="more icon" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <img src={nft.media_link} className="w-100" height="270" alt="nft media" />
-                                                    <div className="text-light font-size-18 p-3">
-                                                        <div>{nft.name}</div>
-                                                        <div className="row pt-2 bid-mobile-100">
-                                                            <div className="col-sm-6">
-                                                                {nft.price} ETN <span className="color-gray">1/1</span>
-                                                            </div>
-                                                            <div className="col-sm-6 text-end">
-                                                                <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                            </div>
-                                                        </div>
-                                                        <div className="pt-1">
-                                                            <button type="button" className="btn heart-btn p-0" onClick={() => addLike(nft, index)}><img src={heart} alt="heart icon" /> <span className="color-gray">{nft.likes}</span></button>
-                                                            {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
+                                {ownedNfts && (
+                                        <NftsLists nfts={ownedNfts} wallet={wallet}/>
                                     )}
-
-                                    {listedNfts && listedNfts.length == 0 && (
+                                    {ownedNfts && ownedNfts.length == 0 && (
                                         <div className="alert alert-secondary" role="alert">
                                         No data available
                                         </div>
@@ -337,8 +288,10 @@ const Profile = ({ contractX, account, wallet }) => {
                                 </div>
                             </div>
                         </Tab>
+
                         {/* <Tab eventKey={4} title="Liked  18">Tab 4 content is displayed by default</Tab>
                         <Tab eventKey={5} title="Activity">Tab 5 content</Tab> */}
+
                         <Tab eventKey={6} title="Collabs">
                             <div className="alert alert-secondary" role="alert">
                                 No data available

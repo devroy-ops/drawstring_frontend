@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { deploy_txFee, GAS, init, initMarketplaceContract, mint_txFee, txFee } from '../services/helper';
 import { toast } from 'react-toastify';
 import { getUserForUpdateDb } from '../db/mongodb';
-import { FileTypes } from '../enums/filetypes';
+import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
 import avtar from '../images/users/avatar.svg';
 import { parseNearAmount } from 'near-api-js/lib/utils/format';
 import { marketContractName, smartContractName } from '../services/utils';
@@ -71,11 +71,15 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     const buyNft = async () => {
         try {
             const contract = await initMarketplaceContract(wallet);
-            debugger;
             const subaccount = nftData.collection_name.toLowerCase().replace(/ /g, "_");
             //const nft_contract_token = `${subaccount}.${smartContractName}.${nft.token_id}`; //nftData.collection_name.toLowerCase().replace(/ /g, "_") + ".deploycontract1.testnet" + "." + nft.token_id;
             // const sale = await contract.get_sale({ "nft_contract_token": nft_contract_token });
-            debugger;
+
+            // TODO update mongo db update owner
+            const data = nft;
+            data.marketType = MarketplaceTypes.OFFER; //"offer"
+            localStorage.setItem("nft", JSON.stringify(data));
+
             await contract.offer(
                 {
                     nft_contract_id: `${subaccount}.${smartContractName}`,//nftData.collection_name.toLowerCase().replace(/ /g, "_") + ".deploycontract1.testnet",
@@ -86,7 +90,6 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
             );
 
         } catch (error) {
-            debugger;
             console.log(error);
         }
     }
@@ -94,15 +97,22 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     const removeFromSale = async () => {
         try {
             debugger;
+            // TODO update mongo db update is_live field
             const contract = await initMarketplaceContract(wallet);
             const subaccount = nftData.collection_name.toLowerCase().replace(/ /g, "_");
+
+            const data = nft;
+            data.marketType = MarketplaceTypes.REMOVED; //"removed"
+            localStorage.setItem("nft", JSON.stringify(data));
+
             await contract.remove_sale(
                 {
                     nft_contract_id: `${subaccount}.${smartContractName}`,
                     token_id: nft.token_id
                 },
                 GAS,
-                parseNearAmount("1")
+                1
+                //parseNearAmount("1")
             );
             debugger
         } catch (error) {
@@ -142,7 +152,9 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                 <div className="row pt-3 tab-col-w-100">
                                     <div className="col-sm-6">
                                         <div className="pb-2">Creator</div>
-                                        <div><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48" />{creator?.display_name}</div>
+                                        <OverlayTrigger overlay={<Tooltip>{creator?.display_name || wallet.getAccountId()}</Tooltip>}>
+                                            <div className='text-ellipsis'><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48" />{creator?.display_name || wallet.getAccountId()}</div>
+                                        </OverlayTrigger>
                                     </div>
                                     <div className="col-sm-6">
                                         <div className="pb-2">Collection</div>
@@ -191,6 +203,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                         </div> */}
 
                                         <div className="pb-5 pt-4">
+                                            {console.log("nft data ", nftData)}
                                             <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nftData?.price} Near</button>
                                             {nft?.owner_id == wallet.getAccountId() && (
                                                 <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
