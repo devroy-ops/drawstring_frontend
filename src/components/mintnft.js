@@ -46,12 +46,11 @@ export default function MintNft({ contractX, account, wallet }) {
         royalty: "",
         walletaddress: wallet.getAccountId()
     }]);
-
     const [properties, setProperties] = useState([{
         key: "",
         value: ""
     }]);
-
+    const [tabs, setTabs] = useState(1);
     const [validated, setValidated] = useState(false);
 
     const [nft, setNft] = useState({
@@ -65,11 +64,11 @@ export default function MintNft({ contractX, account, wallet }) {
     });
 
     const accountId = wallet.getAccountId();
-
+    let tot;
     // Add New Table Row
     const addNewRow = (event) => {
         event.preventDefault()
-
+        setTabs((tab)=> tab+1);
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
         updatedRows[tableRowIndex] = { royalty: "", walletaddress: "" }
@@ -79,6 +78,7 @@ export default function MintNft({ contractX, account, wallet }) {
     const deleteRow = (items, index, type) => {
         debugger
         if (items.length > 1) {
+            
             var updatedRows = [...items];
             if (index) {
                 updatedRows.splice(index, 1);
@@ -88,6 +88,7 @@ export default function MintNft({ contractX, account, wallet }) {
                     setRows(updatedRows);
                 }
             }
+            setTabs((tab)=> tab-1);
             // var indexToRemove = updatedRows.findIndex(x => x.index == index);
             // if (indexToRemove === -1) {
             //     updatedRows.splice(indexToRemove, 1)
@@ -220,14 +221,36 @@ export default function MintNft({ contractX, account, wallet }) {
                 return;
             }
 
+
             const perpetualRoyalties = {};
+            const royt = {};
+            const total_unit = 10000;
 
             talbeRows.forEach((item) => {
+            console.log(item, 'item');
+               let royaltyPercentage = parseInt(item.royalty)
+               let royalty = royaltyPercentage/100 * total_unit;
+               console.log(royalty);
                 if (item.royalty) {
-                    perpetualRoyalties[item.walletaddress] = parseInt(item.royalty);
+                    royt[item.walletaddress] = item.royalty
+                    let keys = Object.values(royt);
+                    const keynum = keys.map(str => {
+                        return Number(str);
+                      });
+                    tot = keynum.reduce((a, b) => a + b, 0)
+                    console.log(tot, 'lmaoo');
+
+                    perpetualRoyalties[item.walletaddress] = parseInt(parseFloat(royalty).toFixed(0));
                 }
             });
-
+            if(tot>35) {
+                alert ("royalties for NFT can't be more than 35")
+                navigate('/mintnft')
+                return;
+            }
+            console.log(royt);
+            console.log(perpetualRoyalties, 'ppr');
+debugger;
             const allProperties = {
                 creator_id: accountId,
                 media_size: nft.media.size,
@@ -311,7 +334,7 @@ export default function MintNft({ contractX, account, wallet }) {
                 // referance: undefined, // URL to a JSON file with more info
                 // referance_hash: undefined,
             };
-debugger;
+
             const response = await contract.account.signAndSendTransaction(contract.contractId, [
                 transactions.functionCall(
                     'nft_mint',
@@ -572,7 +595,7 @@ debugger;
                                                         <div className="font-size-18 text-light py-3">Royalties</div>
                                                         <input type="number" max={35} min={0} className="profile-input pb-3 w-100" placeholder='10%'
                                                             name="royalty"
-                                                            value={item.royalty}
+                                                            value={item.royalty && Math.max(0, item.royalty)}
                                                             onChange={(e) => {
                                                                 handleRoyaltyChange(e, index);
                                                             }}
@@ -637,8 +660,9 @@ debugger;
                             </div> */}
 
 
-                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
+                            <button disabled={tabs>3} type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
 
+                            <p style={{display: tabs>3? 'block':'none',color: 'red', fontSize:'13px'}}>You can only set 4 royalties</p>
                             <div className="font-size-18 mob-f-16 text-light py-3">Properties <span className="color-gray"> (Optional)</span></div>
 
                             {properties.map((item, index) => {
