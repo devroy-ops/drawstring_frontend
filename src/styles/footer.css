@@ -35,9 +35,12 @@
 .border-top-2{
     border-top: 2px solid #3D3D3D;
 }
-
+/* 
 footer.menu.text-white {
     padding-top: 45px !important;
+} */
+footer{
+    padding: 0px !important;
 }
 .footer-btm a.text-white {
     text-decoration: none;

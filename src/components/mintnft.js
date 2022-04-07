@@ -97,7 +97,7 @@ export default function MintNft({ contractX, account, wallet }) {
     }
 
     const addNewProperty = (event) => {
-        event.preventDefault()
+        event.preventDefault();
         propertyRowIndex = parseFloat(propertyRowIndex) + 1;
         var allProperties = [...properties]
         allProperties[propertyRowIndex] = { key: "", value: "" }
@@ -212,6 +212,7 @@ export default function MintNft({ contractX, account, wallet }) {
     }
 
     const mintNFT = async (mediaLink) => {
+        debugger;
         try {
 
             if (!accountId) {
@@ -310,7 +311,7 @@ export default function MintNft({ contractX, account, wallet }) {
                 // referance: undefined, // URL to a JSON file with more info
                 // referance_hash: undefined,
             };
-
+debugger;
             const response = await contract.account.signAndSendTransaction(contract.contractId, [
                 transactions.functionCall(
                     'nft_mint',
@@ -322,7 +323,7 @@ export default function MintNft({ contractX, account, wallet }) {
                             perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? perpetualRoyalties : undefined,
                         }),
                     ),
-                    GAS,
+                    GAS/2,
                     mint_txFee
                 ),
                 transactions.functionCall(
@@ -330,13 +331,13 @@ export default function MintNft({ contractX, account, wallet }) {
                     Buffer.from(
                         JSON.stringify({
                             token_id: nft.token,
-                            account_id: marketContractName, //"drawstring_market.testnet",
+                            account_id: marketContractName,
                             msg: JSON.stringify({
-                                sale_conditions: utils.format.parseNearAmount(nft.price.toString()), is_auction: true,// utils..format.parseNearAmount(nft.price.toString()), ft_token_id: 'near'
+                                sale_conditions: utils.format.parseNearAmount(nft.price.toString()), is_auction: false,
                             }),
                         })
                     ),
-                    GAS,
+                    GAS/2,
                     mint_txFee
                 ),
             ]);
@@ -690,9 +691,9 @@ export default function MintNft({ contractX, account, wallet }) {
                                     )
                             })}
 
-                            {properties.length > 0 && properties[properties.length - 1]["key"] && properties[properties.length - 1]["value"] && (
-                                <button type="button" className="btn-submit text-light bg-darkmode border-2-solid mt-3" onClick={addNewProperty}><b>+ </b> more properties</button>
-                            )}
+                            {/* {properties.length > 0 && properties[properties.length - 1]["key"] && properties[properties.length - 1]["value"] && ( */}
+                                <button type="button" className="btn-submit text-light bg-darkmode border-2-solid mt-3" onClick={addNewProperty} ><b>+ </b> more properties</button>
+                            {/* )} */}
 
                             <div className="row pt-3 pb-5 bid-mobile-100">
                                 <div className="col-sm-6">

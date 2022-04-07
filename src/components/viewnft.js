@@ -55,9 +55,9 @@ const Nft = ({ wallet }) => {
             const user = await getUserForUpdateDb();
             const owner = await getProfile(user, response.owner_id);
             setOwner(owner);
-           const creator = await getProfile(user, extra.creator_id);
-           debugger;
-           setCreator(creator);
+            const creator = await getProfile(user, extra.creator_id);
+            debugger;
+            setCreator(creator);
             getCollection(contract);
             return response;
         } catch (error) {
@@ -126,11 +126,11 @@ const Nft = ({ wallet }) => {
                             <div className="col-sm-6">
                                 <div className="pb-2">Creator</div>
                                 {/* {console.log(JSON.parse(nft?.metadata?.extra))} */}
-                                <div><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48"/>{ creator.display_name}</div>
+                                <div><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48" />{creator.display_name}</div>
                             </div>
                             <div className="col-sm-6">
                                 <div className="pb-2">Collection</div>
-                                <div><img src={collection.icon ? collection.icon : avtar} className="me-2 border-radius-50" width="48" height="48"/>{collection?.name}</div>
+                                <div><img src={collection.icon ? collection.icon : avtar} className="me-2 border-radius-50" width="48" height="48" />{collection?.name}</div>
                             </div>
                         </div>
 
@@ -140,7 +140,7 @@ const Nft = ({ wallet }) => {
                                     <Tab eventKey={1} title="Details" className="mt-3">
                                         <div className="font-size-16 pt-3 pb-2">Owner</div>
                                         <div className="d-flex font-size-18">
-                                            <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : avtar} width="48" height="48"/> {nft?.owner_id}</div>
+                                            <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : avtar} width="48" height="48" /> {nft?.owner_id}</div>
                                         </div>
 
                                         <div className="font-size-16 pt-5 pb-2">Properties</div>
@@ -148,14 +148,14 @@ const Nft = ({ wallet }) => {
                                             {nft?.metadata?.extra && Object.keys(JSON.parse(nft?.metadata?.extra).properties).map((key, index) => {
                                                 return (
                                                     <div className="properties-box p-3 me-3" key={index.toString()}>
-                                                        <div className="font-size-16 color-pink">Property</div>
-                                                        <div className="font-size-18 my-1" >{key}</div>
-                                                        <div className="font-size-14">{JSON.parse(nft?.metadata?.extra)[key]}</div>
+                                                        <div className="font-size-16 color-pink">{key}</div>
+                                                        {/* <div className="font-size-18 my-1" >{key}</div> */}
+                                                        <div className="font-size-14">{JSON.parse(nft?.metadata?.extra).properties[key]}</div>
                                                     </div>
                                                 )
                                             })}
 
-                                            {!nft?.metadata?.extra && (
+                                            {nft.metadata && Object.keys(JSON.parse(nft.metadata.extra).properties).length == 0 && (
                                                 <div className="properties-box p-3 me-3">
                                                     <div className="font-size-16 color-pink">No property added for the nft</div>
                                                 </div>

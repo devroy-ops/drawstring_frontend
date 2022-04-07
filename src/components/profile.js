@@ -9,7 +9,7 @@ import copy_icon from '../images/users/copy_icon.svg';
 import upload from '../images/users/upload.svg';
 import more from '../images/home/more.svg';
 import '../styles/user.css';
-import { NavLink } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 // import blockchain from '../images/home/blockchain.svg';
 import category from '../images/home/category.svg';
 import saletype from '../images/home/saletype.svg';
@@ -30,16 +30,22 @@ import { toast } from 'react-toastify';
 import { Tabs, Tab } from 'react-bootstrap';
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 import { Loader } from '../services/ui';
+import NftsLists from './nftslist';
 
 
 const Profile = ({ contractX, account, wallet }) => {
 
-    const accountId = wallet.getAccountId();
+    //const accountId = wallet.getAccountId();
     const [collections, setCollections] = useState([]);
     const [activeTab, setActiveTab] = useState(1);
     const [author, setAuthor] = useState({});
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
+    debugger;
+    const { userId } = useParams();
+
+    const accountId = userId ? userId : wallet.getAccountId();
+
     const handleSelect = (selectedTab) => {
         setActiveTab(parseInt(selectedTab))
     }
@@ -49,6 +55,7 @@ const Profile = ({ contractX, account, wallet }) => {
     }, []);
 
     const getProfile = async () => {
+        debugger;
         setLoader(true);
         const user = await getUserForUpdateDb();
         const response = await user.functions.get_profile(accountId);
@@ -105,7 +112,11 @@ const Profile = ({ contractX, account, wallet }) => {
                 <div className="text-light font-size-32 font-w-700">{author?.display_name}</div>
                 <div className="d-flex text-light">
                     <div className="pt-1 pe-4 font-size-24"> <a href={author?.twitter} target="_blank" rel="noopener noreferrer"><img src={twitter} alt="twitter link" width="30" height="30" /></a> </div>
-                    <div className="copy-btn"> {wallet.getAccountId()} <img src={copy_icon} className="float-end" /></div>
+                    <div className="copy-btn"> {accountId} <img src={copy_icon} className="float-end" 
+                    onClick={() => {
+                        navigator.clipboard.writeText(`${author?.twitter}`);
+                        toast("copied twitter profile link", { type: "success" })
+                    }}/></div>
                 </div>
 
                 <div className="row pt-3">
@@ -121,7 +132,7 @@ const Profile = ({ contractX, account, wallet }) => {
                 <div className="d-flex py-4">
                     {/* <button type="button" className="btn follow-btn">Follow</button> */}
                     <button type="button" onClick={() => {
-                        navigator.clipboard.writeText(`${window.location.origin.toString() + "/user/" + wallet.getAccountId()}`);
+                        navigator.clipboard.writeText(`${window.location.origin.toString() + "/user/" + accountId}`);
                         toast("copied user profile url", { type: "success" })
                     }} className="btn mx-4 up-btn"><img src={upload} /></button>
                     <button type="button" className="btn more-btn"><img src={more} /></button>
@@ -177,7 +188,6 @@ const Profile = ({ contractX, account, wallet }) => {
                                                         </div>
                                                         <div className="pt-1">
                                                             <button type="button" className="btn heart-btn p-0" onClick={() => addLike(nft, index)}><img src={heart} alt="heart icon" /> <span className="color-gray">{nft.likes}</span></button>
-                                                            {/* <NavLink exact="true" activeclassname="active" to="/" className="heart-btn"><img src={heart} alt="heart icon"/> <span className="color-gray">{nft.likes}</span></NavLink> */}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -185,6 +195,10 @@ const Profile = ({ contractX, account, wallet }) => {
                                         )
                                     }
                                     )}
+
+                                    {/* {listedNfts && listedNfts.filter(x=>x.is_live === true) > 0 && (
+                                        <NftsLists nfts={listedNfts.filter(x=>x.is_live === true)} wallet={wallet}/>
+                                    )} */}
 
                                     {listedNfts && listedNfts.length == 0 && (
                                         <div className="alert alert-secondary" role="alert">
@@ -195,7 +209,7 @@ const Profile = ({ contractX, account, wallet }) => {
                                 </div>
                             </div>
                         </Tab>
-                        <Tab eventKey={2} title={`On sale ${listedNfts.filter(x=>x.owner === wallet.getAccountId()).length}`}>
+                        <Tab eventKey={2} title={`Created ${listedNfts.filter(x=>x.owner === accountId).length}`}>
                         <div className="pb-4">
                                 <div className="row title text-light pt-3">
                                     <div className="col-sm-9">
@@ -210,7 +224,7 @@ const Profile = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                                 <div className="row pt-2">
-                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.owner === wallet.getAccountId()).map((nft, index) => {
+                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.owner === accountId).map((nft, index) => {
                                         return (
                                             <div className="col-sm-3 pb-4" key={index}>
                                                 <div className="top-sec-box">
@@ -259,7 +273,7 @@ const Profile = ({ contractX, account, wallet }) => {
                                 </div>
                             </div>
                         </Tab>
-                        <Tab eventKey={3} title={`On sale ${listedNfts.filter(x=>x.owner === wallet.getAccountId()).length}`}>
+                        <Tab eventKey={3} title={`Owned ${listedNfts.filter(x=>x.owner === accountId).length}`}>
                         <div className="pb-4">
                                 <div className="row title text-light pt-3">
                                     <div className="col-sm-9">
@@ -274,7 +288,7 @@ const Profile = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                                 <div className="row pt-2">
-                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.owner === wallet.getAccountId()).map((nft, index) => {
+                                    {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.owner === accountId).map((nft, index) => {
                                         return (
                                             <div className="col-sm-3 pb-4" key={index}>
                                                 <div className="top-sec-box">

@@ -3,7 +3,7 @@ import { db } from "../db/firebase";
 import Big from "big.js";
 import { ObjectID } from 'bson';
 import { mongodb } from "../db/mongodb";
-import { marketContractName } from "./utils";
+import { marketContractName, smartContractName } from "./utils";
 
 
 const mint_txFee = Big(0.1)
@@ -18,7 +18,7 @@ const transfer_txFee = Big(1)
   .times(10 ** 24)
   .toFixed();
 
-const GAS = Big(10)
+const GAS = Big(30)
   .times(10 ** 13)
   .toFixed();
 
@@ -26,23 +26,26 @@ const txFee = Big(1)
   .times(10 ** 24)
   .toFixed();
 
+// const GAS = Big(30)
+//   .times(10 ** 13)
+//   .toFixed();
+
 const storageDeposit = async (wallet) => {
   const loadMarketplaceContract = await initMarketplaceContract(wallet);
-    
-    const accoutnId = wallet.getAccountId();
+
+  const accoutnId = wallet.getAccountId();
   try {
     const minBalance = await loadMarketplaceContract.storage_minimum_balance({});
-    const balance = await loadMarketplaceContract.storage_balance_of({account_id: accoutnId});
+    const balance = await loadMarketplaceContract.storage_balance_of({ account_id: accoutnId });
     debugger;
 
-    if(minBalance > balance){
+    if (minBalance > balance) {
       debugger;
       const response = await loadMarketplaceContract.storage_deposit({ "account_id": accoutnId }, GAS, txFee);
     }
     return;
   } catch (err) {
     console.log(err)
-debugger;
     await loadMarketplaceContract.storage_deposit({ "account_id": accoutnId }, GAS, txFee);
   }
 }
@@ -94,8 +97,8 @@ const init = async (wallet, subaccount) => {
     // Load the NFT from the subaccount created in the deploy function
     return await new nearAPI.Contract(
       wallet.account(),
-     // `${subaccount}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
-      `${subaccount}.deploycontract1.testnet`,
+      // `${subaccount}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
+      `${subaccount}.${smartContractName}`,
       {
         // View methods
         viewMethods: [

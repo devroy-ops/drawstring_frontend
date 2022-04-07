@@ -7,8 +7,8 @@ let available;
 
 const nearConfig = getConfig(process.env.NODE_ENV !== undefined);
 
- export const marketContractName = 'drawstring_market.testnet';//'drawstringnft.testnet';
-
+ export const marketContractName = "drawstringmarketplace.testnet"; //'drawstring_market.testnet';//'drawstringnft.testnet';
+ export const smartContractName = "deploycontract1.testnet";
 // Initialize contract & set global variables
 export async function initContracts() {
   // Initialize connection to the NEAR testnet
@@ -55,7 +55,7 @@ export async function initContracts() {
   const contractX = await new Contract(
     walletConnection.account(),
     //nearConfig.CONTRACT_NAME,
-    "deploycontract1.testnet",
+    smartContractName,
     {
       changeMethods: ["deploy_contract_code"],
     }
