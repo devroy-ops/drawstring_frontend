@@ -82,6 +82,20 @@ export default function Header({ currentUser, wallet, nearConfig }) {
     if (user) {
       const muser = await getUserForUpdateDb();
       const pro = await muser.functions.get_profile(user);
+      if(!pro){
+        
+        await muser.functions.update_profile(
+          user,
+          "",
+          "",
+          "",
+          user,
+          "",
+          "",
+          "",
+          ""
+      );
+      }
       console.log(pro)
       setProfile(pro);
     }

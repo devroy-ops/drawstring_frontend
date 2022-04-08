@@ -24,6 +24,7 @@ const NftsLists = ({nfts, wallet}) => {
 
     return (
         <>
+        
             {nfts && nfts.length > 0 && nfts.map((nft, index) => {
                             return (
                                 <div className="col-sm-3 pb-4" key={index}>
@@ -59,17 +60,16 @@ const NftsLists = ({nfts, wallet}) => {
                                                 </div>
                                             </div>
                                         </div>
-
-                                        {nft?.type.includes(FileTypes.IMAGE) && (
+                                        {console.log("nft ", nft)}
+                                        {nft?.type && nft?.type.includes(FileTypes.IMAGE) && (
                                             <img src={nft.media_link} className="w-100" height="270" alt="nft media" onClick={() => handleShow(nft)} />
                                         )}
-                                        {nft?.type.includes(FileTypes.VIDEO) && (
+                                        {nft?.type && nft?.type.includes(FileTypes.VIDEO) && (
                                             <video width="100%" id="video" height="270" onClick={() => handleShow(nft)}>
                                                 <source src={nft.media_link} type="video/mp4" />
                                             </video>
                                         )}
-                                        {nft.type.includes(FileTypes.AUDIO) && (
-
+                                        {nft?.type && nft?.type.includes(FileTypes.AUDIO) && (
                                             <img src={audio} className="w-100" height="270" alt="nft media" onClick={() => handleShow(nft)} />
                                         )}
 

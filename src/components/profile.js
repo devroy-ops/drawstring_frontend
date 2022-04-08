@@ -26,6 +26,8 @@ import arrow_down from '../images/home/arrow_down.svg';
 // import explore7 from '../images/home/explore7.svg';
 // import explore8 from '../images/home/explore8.svg';
 import heart from '../images/home/heart.svg';
+import avtar from '../images/users/avatar.svg';
+
 import { toast } from 'react-toastify';
 import { Tabs, Tab } from 'react-bootstrap';
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
@@ -127,7 +129,7 @@ const Profile = ({ contractX, account, wallet }) => {
 
                 </div>
                 <div className="container pb-5 px-0">
-                    <img src={author?.profile_pic} className="avtar-position edit-profile-pic-input" width="186" height="186" />
+                    <img src={author?.profile_pic || avtar} className="avtar-position edit-profile-pic-input" width="186" height="186" />
                 </div>
             </div>
             <div className="container pb-5 px-0">

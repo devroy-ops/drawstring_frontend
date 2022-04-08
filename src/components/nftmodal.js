@@ -28,7 +28,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
         return viewNFTs();
     }, []);
 
-    const viewNFTs = async (contract) => {
+    const viewNFTs = async () => {
         try {
             const contract = await init(wallet, nftData.collection_name.toLowerCase().replace(/ /g, "_"));
             const response = await contract.nft_token({ "token_id": nftData.id });
