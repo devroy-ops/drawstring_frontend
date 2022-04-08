@@ -167,7 +167,7 @@ export default function MintNft({ contractX, account, wallet }) {
         var allCollections = [...collections, ...response];
         setCollections(allCollections);
 
-        const options = [{ label: "Drawstring Marketplace", value: "drawstring1.drawstring_v1.near", image: logo1 }];
+        const options = [{ label: "drawstring1", value: "drawstring_v1.near", image: logo1 }];
         allCollections.forEach(col => {
             options.push({
                 label: col.name,
