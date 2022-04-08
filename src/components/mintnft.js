@@ -60,7 +60,7 @@ export default function MintNft({ contractX, account, wallet }) {
         description: "",
         copies: 1,
         price: 1,
-        collection: { label: "Drawstring Marketplace", value: "DrawstringMarketplace.near", image: logo1 }
+        collection: { label: "drawstring1", value: "drawstring_v1.near", image: logo1 }
     });
 
     const accountId = wallet.getAccountId();
@@ -108,7 +108,7 @@ export default function MintNft({ contractX, account, wallet }) {
     let navigate = useNavigate();
 
     const init1 = async () => {
-        const subaccount = ("Drawstring Marketplace").toLowerCase().replace(/ /g, "_");
+        const subaccount = ("drawstring1").toLowerCase().replace(/ /g, "_");
         let contract = await init(wallet, subaccount);
         setContract(contract);
         getCollections();
