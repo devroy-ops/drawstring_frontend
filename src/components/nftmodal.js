@@ -75,7 +75,6 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
             //const nft_contract_token = `${subaccount}.${smartContractName}.${nft.token_id}`; //nftData.collection_name.toLowerCase().replace(/ /g, "_") + ".deploycontract1.testnet" + "." + nft.token_id;
             // const sale = await contract.get_sale({ "nft_contract_token": nft_contract_token });
 
-            // TODO update mongo db update owner
             const data = nft;
             data.marketType = MarketplaceTypes.OFFER; //"offer"
             localStorage.setItem("nft", JSON.stringify(data));
@@ -96,8 +95,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
 
     const removeFromSale = async () => {
         try {
-            debugger;
-            // TODO update mongo db update is_live field
+           
             const contract = await initMarketplaceContract(wallet);
             const subaccount = nftData.collection_name.toLowerCase().replace(/ /g, "_");
 
@@ -114,9 +112,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                 1
                 //parseNearAmount("1")
             );
-            debugger
         } catch (error) {
-            debugger;
             console.log(error);
         }
 
@@ -204,8 +200,10 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
 
                                         <div className="pb-5 pt-4">
                                             {console.log("nft data ", nftData)}
-                                            <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nftData?.price} Near</button>
-                                            {nft?.owner_id == wallet.getAccountId() && (
+                                            {nft?.owner_id != wallet.getAccountId() && nftData.is_live && (
+                                                <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nftData?.price} Near</button>
+                                            )}
+                                            {nft?.owner_id == wallet.getAccountId() && nftData.is_live && (
                                                 <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
                                             )}
                                             {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button> */}

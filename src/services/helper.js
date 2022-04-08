@@ -2,9 +2,11 @@ import * as nearAPI from "near-api-js";
 import { db } from "../db/firebase";
 import Big from "big.js";
 import { ObjectID } from 'bson';
-import { mongodb } from "../db/mongodb";
+import { getUser, getUserForUpdateDb, mongodb } from "../db/mongodb";
 import { marketContractName, smartContractName } from "./utils";
 import { Account } from 'near-api-js';
+import { MarketplaceTypes } from "../enums/filetypes";
+import { toast } from "react-toastify";
 
 export const doesAccountExist = async (userId, connection) => {
   try {
@@ -151,15 +153,43 @@ const init = async (wallet, subaccount) => {
 };
 
 const author = async (authorId) => {
-  //  return await db.collection('authors').doc(authorId).get().then((querySnapshot) => {
-  //       let response = querySnapshot.data();
-  //       return response;
-  //   });
   const id = ObjectID(authorId);
   return await mongodb.collection('authors').findOne({ _id: id });
 
 }
 
+const buyOrRemoveFromSale = async (transactionHashes) => {
+  // var transactionHashes = searchParams.get("transactionHashes");
+  try{
+  if (transactionHashes) {
+    const nft = JSON.parse(localStorage.getItem("nft"));
+    if (nft) {
+      debugger;
+      if (nft.marketType == MarketplaceTypes.OFFER) {
+        // TODO update db
+        debugger;
+        const user = await getUserForUpdateDb();
+        const removed = await user.functions.buy_nft(nft.owner_id);
+        debugger;
+        toast("Nft purchased successfully", { type: "success" });
+      } if (nft.marketType == MarketplaceTypes.REMOVED) {
+        // TODO update db
+        debugger;
+        const user = await getUserForUpdateDb();
+        const removed = await user.functions.remove_sale(nft.token_id);
+        debugger
+        toast("Nft removed from sale successfully", { type: "success" });
+      }
+      localStorage.removeItem("nft");
+      window.location.reload();
+    }
+  }
+}catch(error){
+  debugger;
+  console.log(error)
+}
+}
 
-export { init, mint_txFee, deploy_txFee, transfer_txFee, GAS, author, txFee, storageDeposit, initMarketplaceContract };
+
+export { init, mint_txFee, deploy_txFee, transfer_txFee, GAS, author, txFee, storageDeposit, initMarketplaceContract, buyOrRemoveFromSale };
 

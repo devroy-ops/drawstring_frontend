@@ -33,6 +33,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 import { Loader } from '../services/ui';
 import NftsLists from './nftslist';
+import { buyOrRemoveFromSale } from '../services/helper';
 
 
 const Profile = ({ contractX, account, wallet }) => {
@@ -57,15 +58,17 @@ const Profile = ({ contractX, account, wallet }) => {
     }
 
     useEffect(() => {
-        checkForByOrRemovedFromSale()
+        //checkForByOrRemovedFromSale()
+        const transactionHashes = searchParams.get("transactionHashes");
+        buyOrRemoveFromSale(transactionHashes);
     }, []);
 
-    const checkForByOrRemovedFromSale = async() =>{
-        var transactionHashes = searchParams.get("transactionHashes");
-        if (transactionHashes) {
-            debugger;
-        }
-    }
+    // const checkForByOrRemovedFromSale = async() =>{
+    //     var transactionHashes = searchParams.get("transactionHashes");
+    //     if (transactionHashes) {
+    //         debugger;
+    //     }
+    // }
 
     useEffect(() => {
         return getProfile();
@@ -89,9 +92,9 @@ const Profile = ({ contractX, account, wallet }) => {
         const allListedNfts = await user.functions.get_nfts_by_owner(accountId);
         console.log(allListedNfts);
         const liveNfts = allListedNfts.filter(x=>x.is_live === true);
-        // TODO filter by created
-        const created = allListedNfts.filter(x=>x.owner === accountId);
+        const created = allListedNfts.filter(x=>x.createdBy === accountId);
         const owned = allListedNfts.filter(x=>x.owner === accountId);
+
         setOnSaleNfts(liveNfts);
         setCreatedNfts(created);
         setOwnedNfts(owned);
@@ -104,7 +107,7 @@ const Profile = ({ contractX, account, wallet }) => {
         setLoader(true);
         const user = await getUser();
         //const top = await user.functions.get_collections(limit, offset)
-        const response = await user.functions.get_collections(500, 0);
+        const response = await user.functions.get_collections_by_createdBy(accountId);
         console.log(response);
         debugger
         setCollections(response);
@@ -185,48 +188,8 @@ const Profile = ({ contractX, account, wallet }) => {
                                     {onSaleNfts && (
                                         <NftsLists nfts={onSaleNfts} wallet={wallet}/>
                                     )}
-                                    {/* {listedNfts && listedNfts.length > 0 && listedNfts.filter(x=>x.is_live === true).map((nft, index) => {
-                                        return (
-                                            <div className="col-sm-3 pb-4" key={index}>
-                                                <div className="top-sec-box">
-                                                    <div className="row py-2 px-3">
-                                                        <div className="col-sm-8">
-                                                            <div className="d-flex">
-                                                                <div className="explore-dot bg-pink"></div>
-                                                                <div className="explore-dot bg-blue"></div>
-                                                                <div className="explore-dot bg-green"></div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-sm-4 ">
-                                                            <div className="explore-dot bg-black float-end">
-                                                                <img src={more} className="pb-1" alt="more icon" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <img src={nft.media_link} className="w-100" height="270" alt="nft media" />
-                                                    <div className="text-light font-size-18 p-3">
-                                                        <div>{nft.name}</div>
-                                                        <div className="row pt-2 bid-mobile-100">
-                                                            <div className="col-sm-6">
-                                                                {nft.price} ETN <span className="color-gray">1/1</span>
-                                                            </div>
-                                                            <div className="col-sm-6 text-end">
-                                                                <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                            </div>
-                                                        </div>
-                                                        <div className="pt-1">
-                                                            <button type="button" className="btn heart-btn p-0" onClick={() => addLike(nft, index)}><img src={heart} alt="heart icon" /> <span className="color-gray">{nft.likes}</span></button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-                                    )} */}
 
-                                    
-
-                                    {listedNfts && listedNfts.length == 0 && (
+                                    {onSaleNfts && onSaleNfts.length == 0 && (
                                         <div className="alert alert-secondary" role="alert">
                                         No data available
                                         </div>
