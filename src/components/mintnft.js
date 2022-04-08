@@ -130,7 +130,8 @@ export default function MintNft({ contractX, account, wallet }) {
                     accountId,
                     nft.contractName,
                     nft.description,
-                    nft.type
+                    nft.type,
+                    wallet.getAccountId()
                 );
 
                 setLoader(false);

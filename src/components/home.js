@@ -30,6 +30,7 @@ import NftDetailModal from './nftmodal';
 import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
 import { toast } from 'react-toastify';
 import NftsLists from './nftslist';
+import { buyOrRemoveFromSale } from '../services/helper';
 
 const app = new Realm.App({ id: "drawstringrealmapp-vafye" });
 
@@ -52,26 +53,26 @@ const Home = ({ contractX, account, wallet }) => {
     }
 
     useEffect(() => {
-        checkForByOrRemovedFromSale();
+        const transactionHashes = searchParams.get("transactionHashes");
+        buyOrRemoveFromSale(transactionHashes);
     }, []);
 
-    const checkForByOrRemovedFromSale = async() =>{
-        var transactionHashes = searchParams.get("transactionHashes");
-        if (transactionHashes) {
-            debugger
-            const nft = JSON.parse(localStorage.getItem("nft"));
-            if(nft){
-                if(nft.marketType == MarketplaceTypes.OFFER){
-                    // TODO update db
-                    toast("Nft purchased successfully", {type: "success"});
-                }if(nft.marketType == MarketplaceTypes.REMOVED){
-                    // TODO update db
-                    toast("Nft removed from sale successfully", {type: "success"});
-                }
-                localStorage.removeItem("nft");
-            }
-        }
-    }
+    // const checkForByOrRemovedFromSale = async() =>{
+    //     if (transactionHashes) {
+    //         debugger
+    //         const nft = JSON.parse(localStorage.getItem("nft"));
+    //         if(nft){
+    //             if(nft.marketType == MarketplaceTypes.OFFER){
+    //                 // TODO update db
+    //                 toast("Nft purchased successfully", {type: "success"});
+    //             }if(nft.marketType == MarketplaceTypes.REMOVED){
+    //                 // TODO update db
+    //                 toast("Nft removed from sale successfully", {type: "success"});
+    //             }
+    //             localStorage.removeItem("nft");
+    //         }
+    //     }
+    // }
 
     useEffect(() => {
         return getNfts();

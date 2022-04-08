@@ -60,7 +60,6 @@ const NftsLists = ({nfts, wallet}) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        {console.log("nft ", nft)}
                                         {nft?.type && nft?.type.includes(FileTypes.IMAGE) && (
                                             <img src={nft.media_link} className="w-100" height="270" alt="nft media" onClick={() => handleShow(nft)} />
                                         )}

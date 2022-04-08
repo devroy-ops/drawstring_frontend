@@ -1,18 +1,13 @@
 import '../App.css';
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import React, { useEffect, useState } from 'react';
-import product from '../images/product/product.svg';
-import creater from '../images/product/creater.svg';
-import collection from '../images/product/collection.svg';
-import heart from '../images/home/heart.svg';
-import more from '../images/home/more.svg';
-import copy_icon from '../images/users/copy_icon.svg';
-import { Tabs, Tab } from 'react-bootstrap';
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 import { Loader } from '../services/ui';
-import { init } from '../services/helper';
+import { buyOrRemoveFromSale, GAS, init, initMarketplaceContract } from '../services/helper';
 import avtar from '../images/users/avatar.svg';
-import { FileTypes } from '../enums/filetypes';
+import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
+import { smartContractName } from '../services/utils';
+import { parseNearAmount } from 'near-api-js/lib/utils/format';
 
 const Nft = ({ wallet }) => {
     const [activeTab, setActiveTab] = useState(1);
@@ -21,6 +16,7 @@ const Nft = ({ wallet }) => {
     const [owner, setOwner] = useState({});
     const [creator, setCreator] = useState({});
     const [collection, setCollection] = useState({});
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const handleSelect = (selectedTab) => {
         setActiveTab(parseInt(selectedTab))
@@ -34,6 +30,12 @@ const Nft = ({ wallet }) => {
             viewNFTs(contract);
         });
         //return getNft();
+    }, []);
+
+    useEffect(() => {
+        //checkForByOrRemovedFromSale()
+        const transactionHashes = searchParams.get("transactionHashes");
+        buyOrRemoveFromSale(transactionHashes);
     }, []);
 
     // const getNft = async () => {
@@ -55,7 +57,6 @@ const Nft = ({ wallet }) => {
             const user = await getUserForUpdateDb();
             const owner = await getProfile(user, response.owner_id);
             setOwner(owner);
-            debugger
             const creator = await getProfile(user, extra.creator_id);
             setCreator(creator);
             getCollection(contract);
@@ -95,6 +96,60 @@ const Nft = ({ wallet }) => {
         // await user.functions.add_like(walletId, nft.id, nft.contract_id);
     }
 
+    const buyNft = async () => {
+        try {
+            setLoader(true);
+            const contract = await initMarketplaceContract(wallet);
+            const user = await getUser();
+            const nftData = await user.functions.get_nft_by_token_id(tokenId);
+            debugger;
+            const subaccount = nftData.collection_name.toLowerCase().replace(/ /g, "_");
+            const data = nft;
+            data.marketType = MarketplaceTypes.OFFER; //"offer"
+            localStorage.setItem("nft", JSON.stringify(data));
+            setLoader(false);
+
+            await contract.offer(
+                {
+                    nft_contract_id: `${subaccount}.${smartContractName}`,
+                    token_id: nft.token_id
+                },
+                GAS,
+                parseNearAmount(nft.price.toString())
+            );
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const removeFromSale = async () => {
+        try {
+            setLoader(true);
+
+            const contract = await initMarketplaceContract(wallet);
+            const user = await getUser();
+            const nftData = await user.functions.get_nft_by_token_id(tokenId);
+
+            const subaccount = nftData.collection_name.toLowerCase().replace(/ /g, "_");
+            const data = nft;
+            data.marketType = MarketplaceTypes.REMOVED; //"removed"
+            localStorage.setItem("nft", JSON.stringify(data));
+            setLoader(false);
+            await contract.remove_sale(
+                {
+                    nft_contract_id: `${subaccount}.${smartContractName}`,
+                    token_id: nft.token_id
+                },
+                GAS,
+                1
+            );
+        } catch (error) {
+            console.log(error);
+        }
+
+    }
+
     return (
         <div className="bg-darkmode pt-4 product-pages">
             {isLoading ? <Loader /> : null}
@@ -107,17 +162,17 @@ const Nft = ({ wallet }) => {
                                 {/* Product Name */}
                                 {nft.metadata?.title}
                             </div>
-                            <div>
+                            {/* <div>
                                 <button type="button" className="btn heart-btn pt-3 px-5" onClick={addLike}><img src={heart} /> <span className="color-gray">{nft.likes}</span></button>
 
                             </div>
-                            <div className="explore-dot bg-black float-end mt-3"><img src={more} className="pb-1" /></div>
+                            <div className="explore-dot bg-black float-end mt-3"><img src={more} className="pb-1" /></div> */}
                         </div>
 
-                        <div className="copy-btn pt-2 mt-3 mb-4"> #27513  0x47BE...6f4f <img src={copy_icon} className="float-end" /></div>
+                        {/* <div className="copy-btn pt-2 mt-3 mb-4"> #27513  0x47BE...6f4f <img src={copy_icon} className="float-end" /></div> */}
 
                         <div className="d-flex font-size-18 mt-4 mb-3 onsel-mob-text-16" >
-                            <div className="me-5">On sale for {nft.price} ETH</div>
+                            <div className="me-5">On sale for {nft.price} Near</div>
                             {/* <div>Highest bid 7 WETH</div> */}
                         </div>
 
@@ -135,8 +190,8 @@ const Nft = ({ wallet }) => {
 
                         <div className="pt-4">
                             <div className="tabs-links mt-4">
-                                <Tabs activeKey={activeTab} onSelect={handleSelect}>
-                                    <Tab eventKey={1} title="Details" className="mt-3">
+                                {/* <Tabs activeKey={activeTab} onSelect={handleSelect}>
+                                    <Tab eventKey={1} title="Details" className="mt-3"> */}
                                         <div className="font-size-16 pt-3 pb-2">Owner</div>
                                         <div className="d-flex font-size-18">
                                             <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : avtar} width="48" height="48" /> {nft?.owner_id}</div>
@@ -162,22 +217,29 @@ const Nft = ({ wallet }) => {
 
                                         </div>
 
-                                        <div className="d-flex font-size-18 border-top-2 border-bottom-2 py-3">
+                                        {/* <div className="d-flex font-size-18 border-top-2 border-bottom-2 py-3">
                                             <div className="me-2"><img className="mr-2" src={creater} /></div>
                                             <div>
                                                 <div className="gray-textsn"><span>Highest bid by</span>   0x381f673af...a810</div>
                                                 <div className="gray-textsn">7 WETH   <span>$22,305 for 1 edition</span></div>
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         <div className="pb-5 pt-4">
-                                            <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for {nft.price} ETH</button>
-                                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button>
+                                    {nft?.owner_id != wallet.getAccountId() && (
+                                        <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nft?.price} Near</button>
+                                    )}
+                                    {nft?.owner_id == wallet.getAccountId() && (
+                                        <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
+                                    )}
+                                            {/* <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for {nft.price} Near</button>
+                                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Remove from sale</button> */}
+                                            {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button> */}
                                         </div>
-                                    </Tab>
+                                    {/* </Tab>
                                     <Tab eventKey={2} title="Bids" className="mt-3">Tab 2 content</Tab>
                                     <Tab eventKey={3} title="History" className="mt-3">Tab 3 content</Tab>
-                                </Tabs>
+                                </Tabs> */}
 
                             </div>
                         </div>

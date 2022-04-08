@@ -32,31 +32,30 @@ export default function CreateCollection({ contractX, account, wallet }) {
     const [image, setImage] = useState();
     const [submitted, setSubmitted] = useState(false);
     const [talbeRows, setRows] = useState([{
-        royalty: '',
+        royalty: '5',
         walletaddress: wallet.getAccountId()
     }
     ]);
 
     // Add New Row
-    const addNewRow = (event) => {
-        event.preventDefault()
+    // const addNewRow = (event) => {
+    //     event.preventDefault()
+    //     tableRowIndex = parseFloat(tableRowIndex) + 1
+    //     var updatedRows = [...talbeRows]
+    //     updatedRows[tableRowIndex] = { royalty: 0, walletaddress: "" }
+    //     setRows(updatedRows)
+    // }
 
-        tableRowIndex = parseFloat(tableRowIndex) + 1
-        var updatedRows = [...talbeRows]
-        updatedRows[tableRowIndex] = { royalty: 0, walletaddress: "" }
-        setRows(updatedRows)
-    }
-
-    const deleteRow = (index) => {
-        if (talbeRows.length > 1) {
-            var updatedRows = [...talbeRows]
-            // var indexToRemove = updatedRows.findIndex(x => x.index == index);
-            if (index) {
-                updatedRows.splice(index, 1)
-                setRows(updatedRows);
-            }
-        }
-    }
+    // const deleteRow = (index) => {
+    //     if (talbeRows.length > 1) {
+    //         var updatedRows = [...talbeRows]
+    //         // var indexToRemove = updatedRows.findIndex(x => x.index == index);
+    //         if (index) {
+    //             updatedRows.splice(index, 1)
+    //             setRows(updatedRows);
+    //         }
+    //     }
+    // }
 
 
     const handleRoyaltyChange = (e, index) => {
@@ -110,7 +109,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
     const saveContract = async (col, subaccount) => {
         setLoader(true);
         const user = await getUserForUpdateDb();
-        await user.functions.add_collection(col.name.toLowerCase(), col.fileUrl, subaccount);
+        await user.functions.add_collection(col.name.toLowerCase(), col.fileUrl, subaccount, wallet.getAccountId());
         setLoader(false);
 
         navigate(`/viewcollection/${subaccount}`);
@@ -169,7 +168,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
                             },
                         }),
                     ),
-                    GAS/2
+                    GAS / 2
                 )
             ]
             if (col.royalties) {
@@ -180,10 +179,10 @@ export default function CreateCollection({ contractX, account, wallet }) {
                         'set_contract_royalty',
                         Buffer.from(
                             JSON.stringify(
-                                { contract_royalty: royal}// col.royalties
+                                { contract_royalty: royal }// col.royalties
                             )
                         ),
-                        GAS/2
+                        GAS / 2
                     ),
                 )
             }
@@ -242,7 +241,7 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
             talbeRows.forEach((item) => {
                 let colroyalty = parseInt(item.royalty)
-                let royalty = colroyalty/100 * total_unit;
+                let royalty = colroyalty / 100 * total_unit;
                 console.log(royalty);
                 if (item.royalty) {
                     royalties[item.walletaddress] = royalty;
@@ -413,13 +412,13 @@ export default function CreateCollection({ contractX, account, wallet }) {
                                                     </div>
                                                 )} */}
                                                 </div>
-                                                <div className='text-end'>
+                                                {/* <div className='text-end'>
                                                     {index != 0 && (
                                                         <OverlayTrigger overlay={<Tooltip>Remove item</Tooltip>}>
                                                             <Button variant="link" type='button' onClick={() => deleteRow(index)}> <FontAwesomeIcon icon={faTrash} className="color-theme" /></Button>
                                                         </OverlayTrigger>
                                                     )}
-                                                </div>
+                                                </div> */}
                                             </div>
                                         )
                                 })
