@@ -23,7 +23,9 @@ import heart from '../images/home/heart.svg';
 import { Tabs, Tab } from 'react-bootstrap';
 import React, { useEffect, useState } from "react";
 import { init, author } from "../services/helper";
-import { Loader } from "../services/ui";
+import { smartContractName } from '../services/utils';
+import { Loader} from "../services/ui";
+
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 
 const ViewCollection = ({ contractX, account, wallet }) => {
@@ -39,7 +41,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     }
 
     const { collectionId } = useParams();
-
     const accountId = wallet.getAccountId();
     useEffect(() => {
         //return init1()
@@ -55,7 +56,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     const viewCollection = async () => {
         try {
             setLoader(true);
-
             const user = await getUser();
             const collection = await user.functions.get_collection_with_id(collectionId);
             console.log(collection);

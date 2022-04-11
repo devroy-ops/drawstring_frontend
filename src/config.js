@@ -1,5 +1,5 @@
 
-const CONTRACT_NAME = process.env.CONTRACT_NAME || "drawstring1.drawstring_v1.near"//"drawstringnft.testnetdrawstring1.drawstring_v1.near";
+const CONTRACT_NAME = process.env.CONTRACT_NAME || "drawstringmarketplace.drawstring_v2.near"//"drawstringnft.testnetdrawstring1.drawstring_v1.near";
 
 export default function getConfig(env) {
 	switch (env) {
