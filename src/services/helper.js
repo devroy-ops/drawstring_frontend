@@ -43,9 +43,15 @@ const txFee = Big(1)
   .times(10 ** 24)
   .toFixed();
 
+ const mGAS = Big(200)
+  .times(10 ** 13)
+  .toFixed();
 // const GAS = Big(30)
 //   .times(10 ** 13)
 //   .toFixed();
+const mtxFee = Big(0.1)
+.times(10 ** 24)
+.toFixed();
 
 const storageDeposit = async (wallet) => {
   const loadMarketplaceContract = await initMarketplaceContract(wallet);
@@ -56,7 +62,7 @@ const storageDeposit = async (wallet) => {
     const balance = await loadMarketplaceContract.storage_balance_of({ account_id: accoutnId });
 
     if (minBalance > balance) {
-      const response = await loadMarketplaceContract.storage_deposit({ "account_id": accoutnId }, GAS, txFee);
+      const response = await loadMarketplaceContract.storage_deposit({ "account_id": accoutnId }, mGAS, mtxFee);
     }
     return;
   } catch (err) {
