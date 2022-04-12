@@ -199,10 +199,12 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                         </div> */}
 
                                         <div className="pb-5 pt-4">
+
                                             {console.log("nft data ", nftData)}
                                             {nft?.owner_id != wallet.getAccountId() && nftData?.createdBy != wallet.getAccountId() && nftData.is_live && (
+
                                                 <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nftData?.price} Near</button>
-                                            )}
+
                                             {nft?.owner_id == wallet.getAccountId() && nftData.is_live && (
                                                 <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
                                             )}

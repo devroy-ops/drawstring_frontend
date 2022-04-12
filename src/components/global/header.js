@@ -65,10 +65,10 @@ export default function Header({ currentUser, wallet, nearConfig }) {
   let User = wallet.isSignedIn();
   const handleUser = async (e) => {
     if (User) {
-      signOut().then(() => navigate("/"));
+      signOut()
 
     } else if (!User) {
-      signIn().then(() => navigate("/"));
+      signIn()
     }
   }
 

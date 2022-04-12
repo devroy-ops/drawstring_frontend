@@ -23,7 +23,9 @@ import heart from '../images/home/heart.svg';
 import { Tabs, Tab } from 'react-bootstrap';
 import React, { useEffect, useState } from "react";
 import { init, author } from "../services/helper";
-import { Loader } from "../services/ui";
+import { smartContractName } from '../services/utils';
+import { Loader} from "../services/ui";
+
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 
 const ViewCollection = ({ contractX, account, wallet }) => {
@@ -39,8 +41,7 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     }
 
     const { collectionId } = useParams();
-
-
+    const accountId = wallet.getAccountId();
     useEffect(() => {
         //return init1()
         getAllListedNfts();
@@ -55,7 +56,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     const viewCollection = async () => {
         try {
             setLoader(true);
-
             const user = await getUser();
             const collection = await user.functions.get_collection_with_id(collectionId);
             console.log(collection);
@@ -117,7 +117,7 @@ const ViewCollection = ({ contractX, account, wallet }) => {
             <div className="container pb-5 px-0">
                 <div className="text-light font-size-32 font-w-700">{collection?.name}</div>
                 <div className="text-light pt-2">
-                    <div className="copy-btn"> #27513 0x47BE...6f4f  <img src={copy_icon} className="float-end" /></div>
+                    <div className="copy-btn"> {accountId}<img src={copy_icon} className="float-end" /></div>
                 </div>
 
                 <div className="d-flex text-light pt-3 viw-call-details">
@@ -193,11 +193,11 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                                                         <div>{nft.name}</div>
                                                         <div className="row pt-2 bid-mobile-100">
                                                             <div className="col-sm-6">
-                                                                {nft.price} ETN <span className="color-gray">1/1</span>
+                                                                {nft.price} Near <span className="color-gray">1/1</span>
                                                             </div>
-                                                            <div className="col-sm-6 text-end">
+                                                            {/* <div className="col-sm-6 text-end">
                                                                 <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
-                                                            </div>
+                                                            </div> */}
                                                         </div>
                                                         <div className="pt-1">
                                                             <button type="button" className="btn heart-btn p-0" onClick={() => addLike(nft, index)}><img src={heart} alt="heart icon" /> <span className="color-gray">{nft.likes}</span></button>
