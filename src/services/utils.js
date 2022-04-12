@@ -25,31 +25,16 @@ export async function initContracts() {
       accountId: walletConnection.getAccountId(),
 
     };
+  const near = await connect({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() }, ...nearConfig });
+  const account = await near.account(currentUser.accountId);
+  const balance = await account.getAccountBalance()
+   available = formatNearAmount(balance.available);
   } else {
     currentUser = {
       accountId: "drawstringmarketplace.drawstring_v2.near",//'stingy.testnet',
     };
   }
-
   const account = await near.account(currentUser.accountId);
-  const balance = await account.getAccountBalance()
-   available = formatNearAmount(balance.available);
-  const user = walletConnection.getAccountId()
- 
-  const keys = await account.getAccessKeys();
-  console.log(keys);
-
-  const data = await account.state();
-  const codeHash = data.code_hash.split("");
-
-  const containsContract = codeHash.every((el) => el === "1");
-
-  if (!containsContract) {
-    //alert("This account contains a smart contract");
-    console.log("This account contains a smart contract");
-  } else {
-	  console.log("This account doesnt contain a smart contract");
-  }
 
   const contractX = await new Contract(
     walletConnection.account(),
