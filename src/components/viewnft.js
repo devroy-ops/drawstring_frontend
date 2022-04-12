@@ -8,6 +8,7 @@ import avtar from '../images/users/avatar.svg';
 import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
 import { smartContractName } from '../services/utils';
 import { parseNearAmount } from 'near-api-js/lib/utils/format';
+import { Tabs, Tab } from 'react-bootstrap';
 
 const Nft = ({ wallet }) => {
     const [activeTab, setActiveTab] = useState(1);
@@ -190,8 +191,8 @@ const Nft = ({ wallet }) => {
 
                         <div className="pt-4">
                             <div className="tabs-links mt-4">
-                                {/* <Tabs activeKey={activeTab} onSelect={handleSelect}>
-                                    <Tab eventKey={1} title="Details" className="mt-3"> */}
+                                <Tabs activeKey={activeTab} onSelect={handleSelect}>
+                                    <Tab eventKey={1} title="Details" className="mt-3">
                                         <div className="font-size-16 pt-3 pb-2">Owner</div>
                                         <div className="d-flex font-size-18">
                                             <div><img className="mr-2 border-radius-50" src={owner?.profile_pic ? owner?.profile_pic : avtar} width="48" height="48" /> {nft?.owner_id}</div>
@@ -236,10 +237,10 @@ const Nft = ({ wallet }) => {
                                             <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Remove from sale</button> */}
                                             {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button> */}
                                         </div>
-                                    {/* </Tab>
-                                    <Tab eventKey={2} title="Bids" className="mt-3">Tab 2 content</Tab>
+                                    </Tab>
+                                    {/* <Tab eventKey={2} title="Bids" className="mt-3">Tab 2 content</Tab> */}
                                     <Tab eventKey={3} title="History" className="mt-3">Tab 3 content</Tab>
-                                </Tabs> */}
+                                </Tabs>
 
                             </div>
                         </div>

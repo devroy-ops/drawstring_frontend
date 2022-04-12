@@ -30,7 +30,7 @@ import NftDetailModal from './nftmodal';
 import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
 import { toast } from 'react-toastify';
 import NftsLists from './nftslist';
-import { buyOrRemoveFromSale } from '../services/helper';
+import { buyOrRemoveFromSale, init, init1, initMarketplaceContract } from '../services/helper';
 
 const app = new Realm.App({ id: "drawstringrealmapp-vafye" });
 
@@ -57,26 +57,50 @@ const Home = ({ contractX, account, wallet }) => {
         buyOrRemoveFromSale(transactionHashes);
     }, []);
 
-    // const checkForByOrRemovedFromSale = async() =>{
-    //     if (transactionHashes) {
-    //         debugger
-    //         const nft = JSON.parse(localStorage.getItem("nft"));
-    //         if(nft){
-    //             if(nft.marketType == MarketplaceTypes.OFFER){
-    //                 // TODO update db
-    //                 toast("Nft purchased successfully", {type: "success"});
-    //             }if(nft.marketType == MarketplaceTypes.REMOVED){
-    //                 // TODO update db
-    //                 toast("Nft removed from sale successfully", {type: "success"});
-    //             }
-    //             localStorage.removeItem("nft");
-    //         }
-    //     }
-    // }
 
     useEffect(() => {
         return getNfts();
     }, [count]);
+
+    useEffect(() => {
+        return getNftsFromBlockChain();
+    }, []);
+
+    const getNftsFromBlockChain = async () => {
+        if (wallet.isSignedIn()) {
+            const contract = await initMarketplaceContract(wallet);
+            const response = await contract.get_sales({
+                from_index: '0',
+                limit: 12,
+            });
+
+             const sales = [];
+            
+             for (const item of response) {
+
+                const newContract = await init1(wallet, item.nft_contract_id);
+                const nft = await newContract.nft_token({
+                    "token_id": item.token_id,
+                });
+                
+                const extra = JSON.parse(nft.metadata.extra);
+                const nftData = {
+                    id: nft.token_id,
+                    name: nft.metadata.title,
+                    owner: nft.owner_id,
+                    createdBy: extra.creator_id,
+                    contract_id: "",
+                    collection_name: "",
+                    media_link: nft.metadata.media,
+                    type: extra.media_type,
+                    price: extra.price
+                }
+                sales.push(nftData);
+            }
+
+            setListedNfts([...listedNfts, ...sales]);
+        }
+    }
 
     const getNfts = async () => {
         setLoader(true);
@@ -87,6 +111,7 @@ const Home = ({ contractX, account, wallet }) => {
         const allListedNfts = await user.functions.get_all_listed_nfts(12, count * 12);
         console.log(allListedNfts)
         setListedNfts([...listedNfts, ...allListedNfts]);
+        
         const top = await user.functions.get_top_collections();
         setTopCollections(top);
         
@@ -110,6 +135,7 @@ const Home = ({ contractX, account, wallet }) => {
         const user = await getUserForUpdateDb();
         await user.functions.add_like(walletId, nft.id, nft.contract_id);
     }
+
     const loadMore = () => {
         setCount((prev) => prev + 1)
     }
@@ -121,10 +147,58 @@ const Home = ({ contractX, account, wallet }) => {
             {isLoading ? <Loader /> : null}
 
             <div className="pos-rel home_banner-section">
-                <AliceCarousel ref={(el) => (carousel = el)} disableButtonsControls="true" disableDotsControls="true">
+                {/* <AliceCarousel ref={(el) => (carousel = el)} disableButtonsControls="true" disableDotsControls="true">
                     {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isMainSlideNft === true).map((nft, index) => {
                         return (
                             <div className="sliderimg" key={index}>
+                                <div className="container">
+                                    <div className="row">
+                                        <div className="col-sm-7 pe-4">
+                                            <div className="row first-box">
+                                                <div className="col-sm-6 p-5 pb-3">
+                                                    <div className="title text-light mb-3">Welcome to <a href='https://drawstring.io/' target="_blank" >Drawstring.io</a></div>
+                                                    <div className="slide-desc text-light mb-3">The newest marketplace on Near</div>
+                                                  * <div className="my-5">
+                                                        <NavLink exact="true" activeclassname="active" to="/" className="create-link" onClick={viewDrop}>View Drop</NavLink>
+                                                    </div> *
+                                                    <div className="pos-rel">
+                                                        <div className="long-line"></div>
+                                                        <div className="short-line"></div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }}></div>
+                                            </div>
+                                        </div>
+                                        <div className="col-sm-5">
+                                            <div className="row">
+                                                {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isChildSlideNft === true).slice(index * 4, index === 0 ? 4 : index * 4 + 4).map((nft, i) => {
+                                                    return (
+                                                        <div className="col-sm-6 col-xs-12 mb-4" key={i}>
+                                                            <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }}>
+                                                                * <div className="img-title">
+                                                                    <div>{nft?.name}</div>
+                                                                    <div>Collection</div>
+                                                                </div> *
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                }
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
+                    )}
+                </AliceCarousel> */}
+
+
+                <AliceCarousel ref={(el) => (carousel = el)} disableButtonsControls="true" disableDotsControls="true">
+                    {/* {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isMainSlideNft === true).map((nft, index) => { */}
+                        {/* return ( */}
+                            <div className="sliderimg" >
                                 <div className="container">
                                     <div className="row">
                                         <div className="col-sm-7 pe-4">
@@ -140,19 +214,16 @@ const Home = ({ contractX, account, wallet }) => {
                                                         <div className="short-line"></div>
                                                     </div>
                                                 </div>
-                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }}></div>
+                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${listedNfts && listedNfts[0]?.media_link}')` }}></div>
                                             </div>
                                         </div>
                                         <div className="col-sm-5">
                                             <div className="row">
-                                                {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isChildSlideNft === true).slice(index * 4, index === 0 ? 4 : index * 4 + 4).map((nft, i) => {
+                                                {listedNfts && listedNfts.length > 0 && listedNfts.slice(1, 5).map((nft, i) => {
                                                     return (
                                                         <div className="col-sm-6 col-xs-12 mb-4" key={i}>
                                                             <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }}>
-                                                                {/* <div className="img-title">
-                                                                    <div>{nft?.name}</div>
-                                                                    <div>Collection</div>
-                                                                </div> */}
+                                                              
                                                             </div>
                                                         </div>
                                                     )
@@ -163,9 +234,9 @@ const Home = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                             </div>
-                        )
+                        {/* )
                     }
-                    )}
+                    )} */}
                 </AliceCarousel>
 
                 {/* <div>

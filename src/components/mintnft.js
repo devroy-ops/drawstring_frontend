@@ -162,8 +162,9 @@ export default function MintNft({ contractX, account, wallet }) {
     const getCollections = async () => {
         // setLoader(true);
         const user = await getUser();
-        const response = await user.functions.get_collections(40, colCount * 40);
-
+        debugger
+       // const response = await user.functions.get_collections(40, colCount * 40);
+       const response = await user.functions.get_collections_by_createdBy(40, colCount, accountId);
         var allCollections = [...collections, ...response];
         setCollections(allCollections);
 
