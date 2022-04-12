@@ -60,8 +60,9 @@ const ViewCollection = ({ contractX, account, wallet }) => {
             const collection = await user.functions.get_collection_with_id(collectionId);
             console.log(collection);
             setCollection(collection[0]);
+          
             const response = await user.functions.get_nfts_in_collection(collectionId);
-            console.log(response)
+            console.log(response);
             setListedNfts(response);
             
             setLoader(false);
@@ -476,7 +477,7 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                             </div>
                         </Tab>
                         <Tab eventKey={2} title="Activity">Tab 2 content</Tab>
-                        <Tab eventKey={3} title="Stats">Tab 3 content</Tab>
+                        {/* <Tab eventKey={3} title="Stats">Tab 3 content</Tab> */}
                     </Tabs>
                 </div>
             </div>
