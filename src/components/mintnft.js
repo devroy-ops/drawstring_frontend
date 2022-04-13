@@ -8,6 +8,7 @@ import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
 import { ObjectID } from 'bson';
+import Big from "big.js";
 import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 import { Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { components } from 'react-select';
@@ -20,6 +21,7 @@ import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
 import * as nearAPI from "near-api-js";
 import { marketContractName } from '../services/utils';
+
 import { FileTypes } from '../enums/filetypes';
 import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 
@@ -330,7 +332,7 @@ export default function MintNft({ contractX, account, wallet }) {
                 description: nft.description,
                 media: mediaLink,
                 // media_hash: undefined,
-                copies: nft.copies,
+                copies: Number(nft.copies),
                 issued_at: Date.now(), // Unix epoch in milliseconds
                 // expires_at: undefined,
                 // starts_at: undefined, // When token starts being valid, Unix epoch in milliseconds
@@ -558,7 +560,7 @@ export default function MintNft({ contractX, account, wallet }) {
                             <div className="border-bottom-2"></div>
                             <div>
                                 <div className="font-size-18 text-light py-3">Number of copies</div>
-                                <input type="text" className="profile-input pb-3 w-100" placeholder='E. g. 10”'
+                                <input type="number" className="profile-input pb-3 w-100" placeholder='E. g. 10”'
                                     name="copies"
                                     defaultValue={nft.copies}
                                     onChange={handleChange}
