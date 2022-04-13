@@ -15,13 +15,13 @@ import Select from 'react-select';
 import dp from '../images/header/dp.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-
 import logo1 from '../images/collection/logo1.png';
 import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
 import * as nearAPI from "near-api-js";
 import { marketContractName } from '../services/utils';
 import { FileTypes } from '../enums/filetypes';
+import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 
 const { utils } = nearAPI;
 
@@ -60,6 +60,7 @@ export default function MintNft({ contractX, account, wallet }) {
         description: "",
         copies: 1,
         price: 1,
+        isLive: true,
         collection: { label: "drawstringmarketplace", value: "drawstring_v2.near", image: logo1 }
     });
 
@@ -114,11 +115,12 @@ export default function MintNft({ contractX, account, wallet }) {
         getCollections();
         var transactionHashes = searchParams.get("transactionHashes");
         if (transactionHashes) {
-            debugger;
             const nft = JSON.parse(localStorage.getItem("nft"));
 
             if (nft) {
                 setLoader(true);
+            debugger;
+
                 const user = await getUserForUpdateDb();
                 await user.functions.add_new_nft_listing(
                     nft.title,
@@ -131,7 +133,8 @@ export default function MintNft({ contractX, account, wallet }) {
                     nft.contractName,
                     nft.description,
                     nft.type,
-                    wallet.getAccountId()
+                    wallet.getAccountId(),
+                    nft.isLive
                 );
 
                 setLoader(false);
@@ -296,7 +299,8 @@ export default function MintNft({ contractX, account, wallet }) {
                 mediaLink: mediaLink,
                 price: parseInt(nft.price),
                 description: nft.description,
-                type: nft.media.type
+                type: nft.media.type,
+                isLive: nft.isLive
             };// price: nft.price, isApproved: false
             localStorage.setItem("nft", JSON.stringify(data));
 
@@ -336,7 +340,7 @@ export default function MintNft({ contractX, account, wallet }) {
                 // referance_hash: undefined,
             };
 
-            const response = await contract.account.signAndSendTransaction(contract.contractId, [
+            const allTransactions = [
                 transactions.functionCall(
                     'nft_mint',
                     Buffer.from(
@@ -349,22 +353,31 @@ export default function MintNft({ contractX, account, wallet }) {
                     ),
                     GAS/2,
                     mint_txFee
-                ),
-                transactions.functionCall(
-                    'nft_approve',
-                    Buffer.from(
-                        JSON.stringify({
-                            token_id: nft.token,
-                            account_id: marketContractName,
-                            msg: JSON.stringify({
-                                sale_conditions: utils.format.parseNearAmount(nft.price.toString()), is_auction: false,
-                            }),
-                        })
+                )
+            ];
+
+            if(nft.isLive){
+                allTransactions.push(
+                    transactions.functionCall(
+                        'nft_approve',
+                        Buffer.from(
+                            JSON.stringify({
+                                token_id: nft.token,
+                                account_id: marketContractName,
+                                msg: JSON.stringify({
+                                    sale_conditions: utils.format.parseNearAmount(nft.price.toString()), is_auction: false,
+                                }),
+                            })
+                        ),
+                        GAS/2,
+                        mint_txFee
                     ),
-                    GAS/2,
-                    mint_txFee
-                ),
-            ]);
+                )
+            }
+            
+            const response = await contract.account.signAndSendTransaction(contract.contractId,
+                allTransactions
+            );
 
             console.log(response);
         } catch (error) {
@@ -574,6 +587,18 @@ export default function MintNft({ contractX, account, wallet }) {
                             </Form.Control.Feedback> */}
                             </div>
                             {/* <div className="border-bottom-2"></div> */}
+                           
+                            <div className='pt-4'>
+
+                                <div className="font-size-18 text-light py-3">List nft on marketplace?</div>
+                                <BootstrapSwitchButton checked={true} onstyle="danger" 
+                                        onChange={(checked) => {
+                                            setNft((prev) => {
+                                                return { ...prev, 'isLive': checked };
+                                            });
+                                        }}
+                                />
+                            </div>
 
                             <div>
                                 <div className="font-size-18 text-light py-3">Price (Near)</div>

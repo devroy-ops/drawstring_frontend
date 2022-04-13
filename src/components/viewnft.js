@@ -18,6 +18,7 @@ const Nft = ({ wallet }) => {
     const [creator, setCreator] = useState({});
     const [collection, setCollection] = useState({});
     const [searchParams, setSearchParams] = useSearchParams();
+    const [nftData, setNftData] = useState({});
 
     const handleSelect = (selectedTab) => {
         setActiveTab(parseInt(selectedTab))
@@ -52,6 +53,11 @@ const Nft = ({ wallet }) => {
         try {
             const response = await contract.nft_token({ "token_id": tokenId });
             console.log(response);
+
+            const user1 = await getUser();
+            const nftData1 = await user1.functions.get_nft_by_token_id(tokenId);
+            setNftData(nftData1);
+
             const extra = JSON.parse(response.metadata.extra);
             response.price = extra.price;
             setNft(response);
@@ -101,9 +107,9 @@ const Nft = ({ wallet }) => {
         try {
             setLoader(true);
             const contract = await initMarketplaceContract(wallet);
-            const user = await getUser();
-            const nftData = await user.functions.get_nft_by_token_id(tokenId);
-            debugger;
+            // const user = await getUser();
+            // const nftData = await user.functions.get_nft_by_token_id(tokenId);
+            // debugger;
             const subaccount = nftData.collection_name.toLowerCase().replace(/ /g, "_");
             const data = nft;
             data.marketType = MarketplaceTypes.OFFER; //"offer"
@@ -129,8 +135,8 @@ const Nft = ({ wallet }) => {
             setLoader(true);
 
             const contract = await initMarketplaceContract(wallet);
-            const user = await getUser();
-            const nftData = await user.functions.get_nft_by_token_id(tokenId);
+            // const user = await getUser();
+            // const nftData = await user.functions.get_nft_by_token_id(tokenId);
 
             const subaccount = nftData.collection_name.toLowerCase().replace(/ /g, "_");
             const data = nft;
@@ -230,7 +236,7 @@ const Nft = ({ wallet }) => {
                                     {nft?.owner_id != wallet.getAccountId() && (
                                         <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nft?.price} Near</button>
                                     )}
-                                    {nft?.owner_id == wallet.getAccountId() && (
+                                    {nft?.owner_id == wallet.getAccountId() && nftData.is_live && (
                                         <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
                                     )}
                                             {/* <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for {nft.price} Near</button>

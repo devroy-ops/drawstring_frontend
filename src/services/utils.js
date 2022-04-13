@@ -5,10 +5,17 @@ import { nftMethods, marketMethods } from '../Constants/contractMethods';
 const APP_NAME = 'Drawstring'
 let available;
 
-const nearConfig = getConfig("mainnet");
+////for live
 
- export const marketContractName = "drawstringmarketplace_v1.near"; //'drawstring_market.testnet';//'drawstringnft.testnet';
- export const smartContractName = "drawstring_v2.near"; //drawstring_v1.near
+//  const nearConfig = getConfig("mainnet");
+//  export const marketContractName = "drawstringmarketplace_v1.near"; 
+//  export const smartContractName = "drawstring_v2.near";
+
+//// for dev
+ const nearConfig = getConfig("testnet");
+ export const marketContractName = "drawstringmarketplace.testnet";
+ export const smartContractName = "deploycontract1.testnet";
+
 // Initialize contract & set global variables
 export async function initContracts() {
   // Initialize connection to the NEAR testnet
@@ -31,7 +38,11 @@ export async function initContracts() {
    available = formatNearAmount(balance.available);
   } else {
     currentUser = {
-      accountId: "drawstringmarketplace.drawstring_v2.near",//'stingy.testnet',
+      //// live
+      //accountId: "drawstringmarketplace.drawstring_v2.near",//'stingy.testnet',
+
+      //// dev
+      accountId: smartContractName
     };
   }
   const account = await near.account(currentUser.accountId);

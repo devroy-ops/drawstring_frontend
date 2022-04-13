@@ -170,7 +170,8 @@ export default function CreateCollection({ contractX, account, wallet }) {
                     ),
                     GAS / 2
                 )
-            ]
+            ];
+            
             if (col.royalties) {
                 let col_royalty = col.royalties;
                 let royal = Object.values(col_royalty)[0]

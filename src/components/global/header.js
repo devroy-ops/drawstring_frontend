@@ -32,7 +32,8 @@ export default function Header({ currentUser, wallet, nearConfig }) {
 
   const navigate = useNavigate();
 
-  const scrollToSection = () => {
+  const scrollToSection = async() => {
+    await navigate('/');
     scroller.scrollTo("explore", {
       duration: 500,
       delay: 0,

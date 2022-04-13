@@ -23,7 +23,8 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     const [owner, setOwner] = useState({});
     const [creator, setCreator] = useState({});
     const [collection, setCollection] = useState({});
-
+    const [isError, setError] = useState(false);
+    
     useEffect(() => {
         return viewNFTs();
     }, []);
@@ -44,6 +45,9 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
             getCollection(contract);
             return response;
         } catch (error) {
+            setError(true);
+            handleClose();
+            toast(JSON.stringify(error), {type: "error"})
             console.log(error);
         }
     };
