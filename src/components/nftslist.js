@@ -89,7 +89,7 @@ const NftsLists = ({nfts, wallet}) => {
                         }
                         )}
 
-{show && (
+            {show && (
                 <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet} />
             )}
         </>

@@ -24,7 +24,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 import React, { useEffect, useState } from "react";
 import { init, author } from "../services/helper";
 import { smartContractName } from '../services/utils';
-import { Loader} from "../services/ui";
+import { Loader } from "../services/ui";
 
 import { getUser, getUserForUpdateDb } from '../db/mongodb';
 
@@ -32,9 +32,10 @@ const ViewCollection = ({ contractX, account, wallet }) => {
 
     const [activeTab, setActive] = useState(1);
     const [collection, setCollection] = useState({});
-    const [contracts, setContract] = useState();
+    // const [contracts, setContract] = useState();
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
+    const [stats, setStats] = useState({});
 
     const handleSelect = (selectedTab) => {
         setActive(parseInt(selectedTab))
@@ -60,11 +61,20 @@ const ViewCollection = ({ contractX, account, wallet }) => {
             const collection = await user.functions.get_collection_with_id(collectionId);
             console.log(collection);
             setCollection(collection[0]);
-          
+
+            // get stats
+            const stat = await user.functions.get_stats(collection[0].contractId);
+            const ownerStats = await user.functions.get_owner_stats(collection[0].contractId);
+            var statData = stat[0];
+            statData.ownerStats = ownerStats;
+
+            setStats(statData);
+            debugger;
+
             const response = await user.functions.get_nfts_in_collection(collectionId);
             console.log(response);
             setListedNfts(response);
-            
+
             setLoader(false);
 
             return response;
@@ -120,32 +130,34 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                     <div className="copy-btn"> {accountId}<img src={copy_icon} className="float-end" /></div>
                 </div>
 
-                <div className="d-flex text-light pt-3 viw-call-details">
-                    <div className="pe-5">
-                        <div className="font-size-18"><b className="font-w-700">$1.4M</b></div>
-                        <div className="font-size-16">Highest Sale</div>
-                    </div>
-                    <div className="pe-5">
-                        <div className="font-size-18"><b className="font-w-700">$24.1K</b></div>
-                        <div className="font-size-16">Floor price</div>
-                    </div>
-                    <div className="pe-5">
-                        <div className="font-size-18"><b className="font-w-700">$252.8M</b></div>
-                        <div className="font-size-16">Market Cap</div>
-                    </div>
-                    <div className="pe-5">
-                        <div className="font-size-18"><b className="font-w-700">17.1K</b></div>
-                        <div className="font-size-16">Items</div>
-                    </div>
-                    <div className="pe-5">
-                        <div className="font-size-18"><b className="font-w-700">11.6K</b></div>
-                        <div className="font-size-16">Owners</div>
-                    </div>
-                    <div>
+                {stats && (
+                    <div className="d-flex text-light pt-3 viw-call-details">
+                        <div className="pe-5">
+                            <div className="font-size-18"><b className="font-w-700">${stats.highest_sale}</b></div>
+                            <div className="font-size-16">Highest Sale</div>
+                        </div>
+                        <div className="pe-5">
+                            <div className="font-size-18"><b className="font-w-700">${stats.floor_price}</b></div>
+                            <div className="font-size-16">Floor price</div>
+                        </div>
+                        <div className="pe-5">
+                            <div className="font-size-18"><b className="font-w-700">${stats.marketCap}</b></div>
+                            <div className="font-size-16">Market Cap</div>
+                        </div>
+                        <div className="pe-5">
+                            <div className="font-size-18"><b className="font-w-700">{stats.count}</b></div>
+                            <div className="font-size-16">Items</div>
+                        </div>
+                        <div className="pe-5">
+                            <div className="font-size-18"><b className="font-w-700">{stats.ownerStats}</b></div>
+                            <div className="font-size-16">Owners</div>
+                        </div>
+                        {/* <div>
                         <div className="font-size-18"><b className="font-w-700">$745.1M</b></div>
                         <div className="font-size-16">Total Volume</div>
+                    </div> */}
                     </div>
-                </div>
+                )}
 
                 <div className="d-flex py-3 mt-4">
                     <button type="button" className="btn me-4 up-btn"><img src={upload} /></button>

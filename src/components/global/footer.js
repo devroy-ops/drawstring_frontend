@@ -33,12 +33,12 @@ function Footer({wallet}) {
                 voluptatem veniam, est atque cumque eum delectus sint!
                 </p> */}
 
-              {/* <div className="slide-dots">
-                <div><a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT"><img src={twitter} width="30" height="30" alt="twitter" /></a></div>
-                <div><a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT"><img src={instagram} width="30" height="30" alt="instagram" /></a></div>
+              <div className="slide-dots">
+                <div><a className="text-white footer-links" href="https://twitter.com/drawstring_nft"><img src={twitter} width="30" height="30" alt="twitter" /></a></div>
+                <div><a className="text-white footer-links" href="https://www.instagram.com/drawstringnft"><img src={instagram} width="30" height="30" alt="instagram" /></a></div>
                 <div><a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT"><img src={discord} width="30" height="30" alt="discord" /></a></div>
                 <div><a className="text-white footer-links" href="https://twitter.com/Drawstring_NFT"><img src={telegram} width="30" height="30" alt="telegram" /></a></div>
-              </div> */}
+              </div>
             </div>
             <div className="col-lg-7 col-md-6">
               <div className="row">
