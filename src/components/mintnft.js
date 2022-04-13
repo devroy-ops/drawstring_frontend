@@ -8,6 +8,7 @@ import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
 import { ObjectID } from 'bson';
+import Big from "big.js";
 import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 import { Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { components } from 'react-select';
@@ -20,6 +21,7 @@ import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
 import * as nearAPI from "near-api-js";
 import { marketContractName } from '../services/utils';
+
 import { FileTypes } from '../enums/filetypes';
 import BootstrapSwitchButton from 'bootstrap-switch-button-react';
 
