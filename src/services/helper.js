@@ -43,13 +43,13 @@ const txFee = Big(1)
   .times(10 ** 24)
   .toFixed();
 
- const mGAS = Big(200)
+ const mGAS = Big(300)
   .times(10 ** 13)
   .toFixed();
 // const GAS = Big(30)
 //   .times(10 ** 13)
 //   .toFixed();
-const mtxFee = Big(0.1)
+const mtxFee = Big(0.01)
 .times(10 ** 24)
 .toFixed();
 

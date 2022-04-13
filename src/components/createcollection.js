@@ -15,6 +15,7 @@ import { storage } from '../db/firebase';
 import { toast } from 'react-toastify';
 import { Loader } from '../services/ui';
 import { create } from "ipfs-http-client";
+import { generateSeedPhrase } from "near-seed-phrase";
 import { transactions } from 'near-api-js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -26,7 +27,7 @@ const fileTypes = ['PNG', 'GIF', 'JPG', 'WEBP', 'JPEG'];
 
 var tableRowIndex = 0;
 
-export default function CreateCollection({ contractX, account, wallet }) {
+export default function CreateCollection({ contractX, account, wallet, nearConfig }) {
 
     const [isLoading, setLoader] = useState(false);
     const [image, setImage] = useState();
@@ -126,12 +127,16 @@ export default function CreateCollection({ contractX, account, wallet }) {
 
 
     const deploy = async () => {
+
         try {
-            // load and deploy smart contract
+            let {publicKey} = generateSeedPhrase();
+            
             const subaccount = collection.name.toLowerCase().replace(/ /g, "_");
+            // load and deploy smart contract
             const respons = await contractX.deploy_contract_code(
                 {
-                    account_id: `${subaccount}.${smartContractName}` //"${subaccount}.stingy.testnet" //"pack.stingy.testnet",
+                    subaccount_id: `${subaccount}.${smartContractName}`, //"${subaccount}.stingy.testnet" //"pack.stingy.testnet",
+                    new_public_key: publicKey,
                 },
                 GAS,
                 deploy_txFee
