@@ -32,7 +32,8 @@ export default function Header({ currentUser, wallet, nearConfig }) {
 
   const navigate = useNavigate();
 
-  const scrollToSection = () => {
+  const scrollToSection = async() => {
+    await navigate('/');
     scroller.scrollTo("explore", {
       duration: 500,
       delay: 0,
@@ -188,7 +189,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
               {/* collections */}
             </li>
             <li className="nav-item">
-              <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate(`/user/${wallet.getAccountId()}`) }} className="nav-link">Profile</NavLink>
+              <NavLink exact="true" activeclassname="active" to="/myprofile" onClick={(e) => { e.preventDefault(); !User ? handleUser() : navigate(`/user/${wallet.getAccountId()}`);window.location.reload() }} className="nav-link">Profile</NavLink>
             </li>
             {/* <li className="nav-item">
               <NavLink exact="true" activeclassname="active" to="/about" onClick={(e) => { e.preventDefault(); navigate("/about") }} className="nav-link">Wtf?</NavLink>
@@ -323,7 +324,7 @@ export default function Header({ currentUser, wallet, nearConfig }) {
               <Dropdown.Divider />
               <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/createcollection") }}>Create Collection</Dropdown.Item>
               <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/mintnft") }}>Mint Nft</Dropdown.Item>
-              <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate(`/user/${wallet.getAccountId()}`) }}>My Profile</Dropdown.Item>
+              <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate(`/user/${wallet.getAccountId()}`); window.location.reload()}}>My Profile</Dropdown.Item>
               <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/editprofile") }}>Edit Profile</Dropdown.Item>
               {/* <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/collections") }}>View Collections</Dropdown.Item>
               <Dropdown.Item onClick={(e) => { e.preventDefault(); navigate("/nfts") }}>View Nfts</Dropdown.Item> */}

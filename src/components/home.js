@@ -30,7 +30,7 @@ import NftDetailModal from './nftmodal';
 import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
 import { toast } from 'react-toastify';
 import NftsLists from './nftslist';
-import { buyOrRemoveFromSale } from '../services/helper';
+import { buyOrRemoveFromSale, init, init1, initMarketplaceContract } from '../services/helper';
 
 const app = new Realm.App({ id: "drawstringrealmapp-vafye" });
 
@@ -57,26 +57,50 @@ const Home = ({ contractX, account, wallet }) => {
         buyOrRemoveFromSale(transactionHashes);
     }, []);
 
-    // const checkForByOrRemovedFromSale = async() =>{
-    //     if (transactionHashes) {
-    //         debugger
-    //         const nft = JSON.parse(localStorage.getItem("nft"));
-    //         if(nft){
-    //             if(nft.marketType == MarketplaceTypes.OFFER){
-    //                 // TODO update db
-    //                 toast("Nft purchased successfully", {type: "success"});
-    //             }if(nft.marketType == MarketplaceTypes.REMOVED){
-    //                 // TODO update db
-    //                 toast("Nft removed from sale successfully", {type: "success"});
-    //             }
-    //             localStorage.removeItem("nft");
-    //         }
-    //     }
-    // }
 
     useEffect(() => {
         return getNfts();
     }, [count]);
+
+    useEffect(() => {
+        return getNftsFromBlockChain();
+    }, []);
+
+    const getNftsFromBlockChain = async () => {
+        if (wallet.isSignedIn()) {
+            const contract = await initMarketplaceContract(wallet);
+            const response = await contract.get_sales({
+                from_index: '0',
+                limit: 12,
+            });
+
+             const sales = [];
+            
+             for (const item of response) {
+
+                const newContract = await init1(wallet, item.nft_contract_id);
+                const nft = await newContract.nft_token({
+                    "token_id": item.token_id,
+                });
+                
+                const extra = JSON.parse(nft.metadata.extra);
+                const nftData = {
+                    id: nft.token_id,
+                    name: nft.metadata.title,
+                    owner: nft.owner_id,
+                    createdBy: extra ? extra.creator_id : "",
+                    contract_id: "",
+                    collection_name: "",
+                    media_link: nft.metadata.media,
+                    type: extra ? extra.media_type : 'image',
+                    price: extra ? extra.price : ""
+                }
+                sales.push(nftData);
+            }
+
+            setListedNfts([...listedNfts, ...sales]);
+        }
+    }
 
     const getNfts = async () => {
         setLoader(true);
@@ -84,12 +108,15 @@ const Home = ({ contractX, account, wallet }) => {
         const user = await getUser();
         // const featured = await user.functions.get_featured();
         // setFeatured(featured);
+        // const allListedNfts = await user.functions.get_urls(12, count * 12);
+        // debugger;
         const allListedNfts = await user.functions.get_all_listed_nfts(12, count * 12);
         console.log(allListedNfts)
         setListedNfts([...listedNfts, ...allListedNfts]);
+
+        
         const top = await user.functions.get_top_collections();
         setTopCollections(top);
-        
         setLoader(false);
         // mongodb.collection('nfts').find().then(nftss => {
         //     setNfts(nftss);
@@ -110,6 +137,7 @@ const Home = ({ contractX, account, wallet }) => {
         const user = await getUserForUpdateDb();
         await user.functions.add_like(walletId, nft.id, nft.contract_id);
     }
+
     const loadMore = () => {
         setCount((prev) => prev + 1)
     }
@@ -121,7 +149,7 @@ const Home = ({ contractX, account, wallet }) => {
             {isLoading ? <Loader /> : null}
 
             <div className="pos-rel home_banner-section">
-                <AliceCarousel ref={(el) => (carousel = el)} disableButtonsControls="true" disableDotsControls="true">
+                {/* <AliceCarousel ref={(el) => (carousel = el)} disableButtonsControls="true" disableDotsControls="true">
                     {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isMainSlideNft === true).map((nft, index) => {
                         return (
                             <div className="sliderimg" key={index}>
@@ -130,11 +158,11 @@ const Home = ({ contractX, account, wallet }) => {
                                         <div className="col-sm-7 pe-4">
                                             <div className="row first-box">
                                                 <div className="col-sm-6 p-5 pb-3">
-                                                    <div className="title text-light mb-3">Welcome to <a href='https://drawstring.io/' target="_blank" >Drawstring.io</a></div>
+                                                    <div className="title text-light mb-3">Drawstring a NFT experience platform</div>
                                                     <div className="slide-desc text-light mb-3">The newest marketplace on Near</div>
-                                                    {/* <div className="my-5">
+                                                  * <div className="my-5">
                                                         <NavLink exact="true" activeclassname="active" to="/" className="create-link" onClick={viewDrop}>View Drop</NavLink>
-                                                    </div> */}
+                                                    </div> *
                                                     <div className="pos-rel">
                                                         <div className="long-line"></div>
                                                         <div className="short-line"></div>
@@ -149,10 +177,10 @@ const Home = ({ contractX, account, wallet }) => {
                                                     return (
                                                         <div className="col-sm-6 col-xs-12 mb-4" key={i}>
                                                             <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }}>
-                                                                {/* <div className="img-title">
+                                                                * <div className="img-title">
                                                                     <div>{nft?.name}</div>
                                                                     <div>Collection</div>
-                                                                </div> */}
+                                                                </div> *
                                                             </div>
                                                         </div>
                                                     )
@@ -166,6 +194,51 @@ const Home = ({ contractX, account, wallet }) => {
                         )
                     }
                     )}
+                </AliceCarousel> */}
+
+
+                <AliceCarousel ref={(el) => (carousel = el)} disableButtonsControls="true" disableDotsControls="true">
+                    {/* {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isMainSlideNft === true).map((nft, index) => { */}
+                        {/* return ( */}
+                            <div className="sliderimg" >
+                                <div className="container">
+                                    <div className="row">
+                                        <div className="col-sm-7 pe-4">
+                                            <div className="row first-box">
+                                                <div className="col-sm-6 p-5 pb-3">
+                                                    <div className="title text-light mb-3">Drawstring a NFT experience platform</div>
+                                                    <div className="slide-desc text-light mb-3">The newest marketplace on Near</div>
+                                                    {/* <div className="my-5">
+                                                        <NavLink exact="true" activeclassname="active" to="/" className="create-link" onClick={viewDrop}>View Drop</NavLink>
+                                                    </div> */}
+                                                    <div className="pos-rel">
+                                                        <div className="long-line"></div>
+                                                        <div className="short-line"></div>
+                                                    </div>
+                                                </div>
+                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${listedNfts && listedNfts.find(x=>x.isMainSlideNft == true)?.media_link}')` }} onClick={() => handleShow(listedNfts.find(x=>x.isMainSlideNft == true))}></div>
+                                            </div>
+                                        </div>
+                                        <div className="col-sm-5">
+                                            <div className="row">
+                                                {listedNfts && listedNfts.length > 0 && listedNfts.slice(0, 4).map((nft, i) => {
+                                                    return (
+                                                        <div className="col-sm-6 col-xs-12 mb-4" key={i}>
+                                                            <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }} onClick={() => handleShow(nft)}>
+                                                              
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                }
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {/* )
+                    }
+                    )} */}
                 </AliceCarousel>
 
                 {/* <div>
@@ -183,7 +256,7 @@ const Home = ({ contractX, account, wallet }) => {
                         {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isChildSlideNft === true).map((nft, i) => {
                         return (
                             <div className="col-sm-3" key={i}>
-                                <img src={nft?.img} className="img-fluid w-100 featured-img" alt="nft media" />
+                                <img src={nft?.img} className="img-fluid w-100 featured-img" alt="nft media"  onClick={() => handleShow(nft)}/>
                             </div>
                         )
                     })
@@ -192,11 +265,23 @@ const Home = ({ contractX, account, wallet }) => {
 
                 <div className="home-top-collection mt-60 ">
                     <div className="row pb-4">
-                        <div className="col-sm-6 title text-light">
+                        <div className="col-sm-6 title text-light d-flex">
                             Top
-                            <img src={images} className="ps-4" alt="file icon" /><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} alt="dropdown icon" />
+                            {/* <img src={images} className="ps-4" alt="file icon" /><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} alt="dropdown icon" /> */}
+                            
+                            <Dropdown className="ps-2" align="end">
+                                <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align' id="dropdown-basic">
+                                    <img src={calendar} className="ps-4" alt="calendar icon" /><span className="font-size-14 vertical-align px-2"> In 1 day </span><img src={arrow_down} alt="dropdown icon" />
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item>1 day</Dropdown.Item>
+                                    <Dropdown.Item>1 week</Dropdown.Item>
+                                    <Dropdown.Item>1 month</Dropdown.Item>
+                                    <Dropdown.Item>all time</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
 
-                            <img src={calendar} className="ps-4" alt="calendar icon" /><span className="font-size-14 vertical-align px-2"> In 1 day </span><img src={arrow_down} alt="dropdown icon" />
+                            {/* <img src={calendar} className="ps-4" alt="calendar icon" /><span className="font-size-14 vertical-align px-2"> In 1 day </span><img src={arrow_down} alt="dropdown icon" /> */}
                         </div>
                         <div className="col-sm-6 text-end">
                             <NavLink exact="true" activeclassname="active" to="/collections" className="login-link">View All</NavLink>
@@ -206,7 +291,7 @@ const Home = ({ contractX, account, wallet }) => {
                         {topCollections && topCollections.length > 0 && topCollections.slice(0, 8).map((collection, index) => {
                             return (
                                 <div className="col-sm-3 pb-4" key={index} >
-                                    <div className="top-sec-box">
+                                    <div className="top-sec-box" onClick={()=>{ debugger; navigate(`/viewcollection/${collection.contract_id}`)}}>
                                         <div className="row p-3">
                                             <div className="col-sm-4">
                                                 <div className="numbers float-start">0{index + 1}</div>
@@ -253,7 +338,7 @@ const Home = ({ contractX, account, wallet }) => {
                                 <Dropdown.Item>Animation</Dropdown.Item>
                                 </Dropdown.Menu>
                             </Dropdown> */}
-                                <Dropdown className="col-sm-3 ps-2" align="end">
+                                {/* <Dropdown className="col-sm-3 ps-2" align="end">
                                     <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align' id="dropdown-basic">
                                         <img src={images} className="ps-4" alt="images icon" /><span className="font-size-14 vertical-align px-1">Collections</span><img src={arrow_down} alt="dropdown icon" />
                                     </Dropdown.Toggle>
@@ -262,7 +347,7 @@ const Home = ({ contractX, account, wallet }) => {
                                         <Dropdown.Item>Video</Dropdown.Item>
                                         <Dropdown.Item>Animation</Dropdown.Item>
                                     </Dropdown.Menu>
-                                </Dropdown>
+                                </Dropdown> */}
                                 {/* <Dropdown className="col-sm-3" align="end">
                                 <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align px-2' id="dropdown-basic">
                                 <img src={saletype} className="ps-4" alt="saletype icon"/><span className="font-size-14 vertical-align px-2"> Sale type </span><img src={arrow_down} alt="dropdown icon"/>
@@ -305,6 +390,10 @@ const Home = ({ contractX, account, wallet }) => {
                     {listedNfts && listedNfts.length > 0 && (
                         <NftsLists nfts={listedNfts} wallet={wallet}/>
                     )}
+
+            {show && (
+                <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet} />
+            )}
                         {/* {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
                             return (
                                 <div className="col-sm-3 pb-4" key={index}>

@@ -23,7 +23,8 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     const [owner, setOwner] = useState({});
     const [creator, setCreator] = useState({});
     const [collection, setCollection] = useState({});
-
+    const [isError, setError] = useState(false);
+    
     useEffect(() => {
         return viewNFTs();
     }, []);
@@ -44,6 +45,9 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
             getCollection(contract);
             return response;
         } catch (error) {
+            setError(true);
+            handleClose();
+            toast(JSON.stringify(error), {type: "error"})
             console.log(error);
         }
     };
@@ -199,8 +203,12 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                         </div> */}
 
                                         <div className="pb-5 pt-4">
-                                                <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nftData?.price} Near</button>
 
+                                            {console.log("nft data ", nftData)}
+                                            {nft?.owner_id != wallet.getAccountId() && nftData?.createdBy != wallet.getAccountId() && nftData.is_live && (
+
+                                                <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nftData?.price} Near</button>
+                                            )}
                                             {nft?.owner_id == wallet.getAccountId() && nftData.is_live && (
                                                 <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
                                             )}

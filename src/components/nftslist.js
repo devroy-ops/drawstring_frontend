@@ -33,21 +33,20 @@ const NftsLists = ({nfts, wallet}) => {
                                             <div className="col-sm-8">
                                                 <div className="d-flex">
                                                     <OverlayTrigger overlay={<Tooltip>Owner: {nft?.owner}</Tooltip>}>
-                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/user/${nft.owner}`) }}>
+                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/user/${nft.owner}`);window.location.reload(); }}>
                                                             <div className="explore-dot bg-pink"></div>
                                                         </span>
                                                     </OverlayTrigger>
-                                                    <OverlayTrigger overlay={<Tooltip>Creater: {nft?.owner}</Tooltip>}>
-                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/user/${nft.owner}`) }}>
+                                                    <OverlayTrigger overlay={<Tooltip>Creater: {nft?.createdBy || nft?.owner}</Tooltip>}>
+                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/user/${nft.createdBy || nft?.owner}`);window.location.reload(); }}>
                                                             <div className="explore-dot bg-blue"></div>
                                                         </span>
                                                     </OverlayTrigger>
                                                     <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contract_id}</Tooltip>}>
-                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); nft?.contract_id != "DrawstringMarketplace.near" ? navigate(`viewcollection/${nft.collection_name.toLowerCase().replace(/ /g, "_")}`) : e.preventDefault(); }}>
+                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/viewcollection/${nft.collection_name.toLowerCase().replace(/ /g, "_")}`);  }}>
                                                             <div className="explore-dot bg-green"></div>
                                                         </span>
                                                     </OverlayTrigger>
-
                                                 </div>
                                             </div>
                                             <div className="col-sm-4 ">
@@ -90,7 +89,7 @@ const NftsLists = ({nfts, wallet}) => {
                         }
                         )}
 
-{show && (
+            {show && (
                 <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet} />
             )}
         </>

@@ -9,7 +9,7 @@ import copy_icon from '../images/users/copy_icon.svg';
 import upload from '../images/users/upload.svg';
 import more from '../images/home/more.svg';
 import '../styles/user.css';
-import { NavLink, useParams, useSearchParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams, useSearchParams } from "react-router-dom";
 // import blockchain from '../images/home/blockchain.svg';
 import category from '../images/home/category.svg';
 import saletype from '../images/home/saletype.svg';
@@ -48,6 +48,7 @@ const Profile = ({ contractX, account, wallet }) => {
     const [createdNfts, setCreatedNfts] = useState([]);
     const [ownedNfts, setOwnedNfts] = useState([]);
     const [searchParams, setSearchParams] = useSearchParams();
+    let navigate = useNavigate();
 
     const { userId } = useParams();
 
@@ -91,6 +92,7 @@ const Profile = ({ contractX, account, wallet }) => {
         const user = await getUser();
         const allListedNfts = await user.functions.get_nfts_by_owner(accountId);
         console.log(allListedNfts);
+
         const liveNfts = allListedNfts.filter(x=>x.is_live === true);
         const created = allListedNfts.filter(x=>x.createdBy === accountId);
         const owned = allListedNfts.filter(x=>x.owner === accountId);
@@ -107,9 +109,8 @@ const Profile = ({ contractX, account, wallet }) => {
         setLoader(true);
         const user = await getUser();
         //const top = await user.functions.get_collections(limit, offset)
-        const response = await user.functions.get_collections_by_createdBy(accountId);
+        const response = await user.functions.get_collections_by_createdBy(100, 0, accountId);
         console.log(response);
-        debugger
         setCollections(response);
         setLoader(false);
     }
@@ -266,34 +267,40 @@ const Profile = ({ contractX, account, wallet }) => {
                             <div className='mt-4'>
                             <div className="row home_explore">
                                 {/* {isLoading ? <Loader /> : null} */}
-                                {collections && collections.length > 0 && collections.map((collection, index) => {
-                                    return (
-                                        <div className="col-sm-3 pb-4" key={index}>
-                                            <div className="top-sec-box">
-                                                <div className="row py-2 px-3">
-                                                    <div className="col-sm-8">
-                                                        <div className="d-flex">
-                                                            <div className="explore-dot bg-pink"></div>
-                                                            <div className="explore-dot bg-blue"></div>
-                                                            <div className="explore-dot bg-green"></div>
+                                    {collections && collections.length > 0 && collections.map((collection, index) => {
+                                        return (
+                                            <div className="col-sm-3 pb-4" key={index}>
+                                                <div className="top-sec-box" onClick={() => navigate(`/viewcollection/${collection.contractId}`)}>
+                                                   {/* <div className="row py-2 px-3" >
+                                                          <div className="col-sm-8">
+                                                            <div className="d-flex">
+                                                                <div className="explore-dot bg-pink"></div>
+                                                                <div className="explore-dot bg-blue"></div>
+                                                                <div className="explore-dot bg-green"></div>
+                                                            </div>
                                                         </div>
+                                                        <div className="col-sm-4 ">
+                                                            <div className="explore-dot bg-black float-end">
+                                                                <img src={more} className="pb-1" alt="more icon" />
+                                                            </div>
+                                                        </div> 
+                                                    </div>*/}
+                                                    <img src={collection.img} className="w-100" height="270" alt="collection media" />
+                                                    {/* onClick={() => handleShow(nft)}  */}
+                                                    <div className="text-light font-size-18 p-3">
+                                                        <div>{collection.name}</div>
                                                     </div>
-                                                    <div className="col-sm-4 ">
-                                                        <div className="explore-dot bg-black float-end">
-                                                            <img src={more} className="pb-1" alt="more icon" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <img src={collection.img} className="w-100" height="270" alt="collection media" />
-                                                {/* onClick={() => handleShow(nft)}  */}
-                                                <div className="text-light font-size-18 p-3">
-                                                    <div>{collection.name}</div>
                                                 </div>
                                             </div>
+                                        )
+                                    }
+                                    )}
+
+                                    {collections && collections.length == 0 && (
+                                        <div className="alert alert-secondary" role="alert">
+                                            No data available
                                         </div>
-                                    )
-                                }
-                                )}
+                                    )}
                             </div>
                             </div>
                         </Tab>

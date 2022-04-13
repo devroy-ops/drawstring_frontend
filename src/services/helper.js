@@ -89,7 +89,8 @@ const initMarketplaceContract = async (wallet) => {
           "get_sales_by_nft_contract_id",
           "storage_minimum_balance",
           "storage_balance_of",
-          "get_sale"
+          "get_sale",
+          "get_sales"
         ],
         changeMethods: [
           "new",
@@ -115,11 +116,59 @@ const initMarketplaceContract = async (wallet) => {
 
 const init = async (wallet, subaccount) => {
   try {
+
     // Load the NFT from the subaccount created in the deploy function
     return await new nearAPI.Contract(
       wallet.account(),
       // `${subaccount}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
       `${subaccount}.${smartContractName}`,
+      {
+        // View methods
+        viewMethods: [
+          "nft_token",
+          "nft_tokens",
+          "nft_tokens_for_owner",
+          "nft_metadata",
+          "nft_total_supply",
+          "nft_supply_for_owner",
+          "nft_is_approved",
+          "nft_payout",
+          "nft_whitelist"
+        ],
+        // Change methods
+        changeMethods: [
+          "nft_mint",
+          "new",
+          "nft_transfer",
+          "nft_transfer_call",
+          "nft_approve",
+          "nft_revoke",
+          "nft_revoke_all",
+          "burn_nft",
+          "add_to_whitelist",
+          "remove_from_whitelist",
+          "toggle_whitelisting",
+          "set_contract_royalty"
+        ],
+        sender: wallet.getAccountId(),
+      }
+    );
+
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+};
+
+
+const init1 = async (wallet, contract_id) => {
+  try {
+
+    // Load the NFT from the subaccount created in the deploy function
+    return await new nearAPI.Contract(
+      wallet.account(),
+      // `${subaccount}.stingy.testnet`,//"jitendra.stingy.testnet", // newly created subaccount
+      contract_id,
       {
         // View methods
         viewMethods: [
@@ -197,5 +246,5 @@ const buyOrRemoveFromSale = async (transactionHashes) => {
 }
 
 
-export { init, mint_txFee, deploy_txFee, transfer_txFee, GAS, author, txFee, storageDeposit, initMarketplaceContract, buyOrRemoveFromSale };
+export { init, init1, mint_txFee, deploy_txFee, transfer_txFee, GAS, author, txFee, storageDeposit, initMarketplaceContract, buyOrRemoveFromSale };
 
