@@ -3,7 +3,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import '../styles/createcollection.css';
-import { init, author, GAS, mint_txFee, transfer_txFee, txFee, initMarketplaceContract, storageDeposit } from "../services/helper";
+import { init, author, GAS, mint_txFee, transfer_txFee, apr_mint_txFee, txFee, initMarketplaceContract, storageDeposit } from "../services/helper";
 import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
@@ -259,6 +259,7 @@ export default function MintNft({ contractX, account, wallet }) {
 
             const allProperties = {
                 creator_id: accountId,
+                collection_name: nft.collection.label,
                 media_size: nft.media.size,
                 media_type: nft.media.type,
                 price: nft.price,
@@ -332,7 +333,7 @@ export default function MintNft({ contractX, account, wallet }) {
                 description: nft.description,
                 media: mediaLink,
                 // media_hash: undefined,
-                copies: Number(nft.copies),
+                copies: parseInt(nft.copies),
                 issued_at: Date.now(), // Unix epoch in milliseconds
                 // expires_at: undefined,
                 // starts_at: undefined, // When token starts being valid, Unix epoch in milliseconds
@@ -356,7 +357,7 @@ export default function MintNft({ contractX, account, wallet }) {
                     GAS/2,
                     mint_txFee
                 )
-            ];
+            ]
 
             if(nft.isLive){
                 allTransactions.push(
@@ -372,7 +373,7 @@ export default function MintNft({ contractX, account, wallet }) {
                             })
                         ),
                         GAS/2,
-                        mint_txFee
+                        apr_mint_txFee
                     ),
                 )
             }

@@ -27,6 +27,10 @@ const mint_txFee = Big(0.01)
   .times(10 ** 24)
   .toFixed();
 
+  const apr_mint_txFee = Big(0.02)
+  .times(10 ** 24)
+  .toFixed(); 
+
 const deploy_txFee = Big(4)
   .times(10 ** 24)
   .toFixed();
@@ -60,7 +64,8 @@ debugger;
   try {
     const minBalance = await loadMarketplaceContract.storage_minimum_balance({});
     const balance = await loadMarketplaceContract.storage_balance_of({ account_id: accoutnId });
-
+    console.log(balance,'mybal')
+    console.log(minBalance,'minbal')
     // const response = await loadMarketplaceContract.storage_deposit({ "account_id": accoutnId }, mGAS, mtxFee);
     if (minBalance > balance) {
       const response = await loadMarketplaceContract.storage_deposit({ "account_id": accoutnId }, mGAS, mtxFee);
@@ -247,5 +252,5 @@ const buyOrRemoveFromSale = async (transactionHashes) => {
 }
 
 
-export { init, init1, mint_txFee, deploy_txFee, transfer_txFee, GAS, author, txFee, storageDeposit, initMarketplaceContract, buyOrRemoveFromSale };
+export { init, init1, mint_txFee,apr_mint_txFee, deploy_txFee, transfer_txFee, GAS, author, txFee, storageDeposit, initMarketplaceContract, buyOrRemoveFromSale };
 
