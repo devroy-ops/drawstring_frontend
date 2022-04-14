@@ -133,6 +133,10 @@ const Profile = ({ contractX, account, wallet }) => {
   }
 
   useEffect(() => {
+   const chris = formatNearAmount('10230000000000000000000')
+   const Ram = formatNearAmount('12390000000000000000000')
+   console.log(chris,'chris');
+   console.log(Ram,'Ram');
       
     return getProfile()
   }, [])
@@ -161,7 +165,6 @@ const Profile = ({ contractX, account, wallet }) => {
     setOnSale(onSaleNfts)
 
     onSaleNfts.forEach(async (sale) => {
-        debugger;
       const contract = await init(wallet, sale.nft_contract_id)
       const NFT = await contract.nft_token({ token_id: sale.token_id })
 

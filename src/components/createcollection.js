@@ -277,7 +277,7 @@ export default function CreateCollection({ contractX, account, wallet, nearConfi
             {isLoading ? <Loader /> : null}
             <div className="container text-light createcollection p-0">
                 <div className="pt-3 title">Create Collection</div>
-                <div className='pb-3'>A collection is a unique group of NFTs stored on the blockchain.  Creating a collection lets you claim a unique name, description, and default set of royalties for any NFTs you want to mint.  You can also mint NFTs directly to the Drawstring collection without creating a custom collection.</div>
+                <div className='pb-3'>Creating a collections deploys a custom smart contract to your Near wallet.  You can only do this once per wallet.  This costs a bit more (~4 Near) but allows you to create a unique group of NFTs on the blockchain. You can claim a unique name, description, cover, and default set of royalties for any NFTs you mint using your custom contract. You can also <a href="mint page">mint NFTs directly to the Drawstring collection</a> without creating a custom collection.</div>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     {/* <form id="contact" action="" method="post"> */}
                     <div className="row">
