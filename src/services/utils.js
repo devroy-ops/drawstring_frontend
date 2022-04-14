@@ -7,14 +7,14 @@ let available;
 
 //// live
 
-//  const nearConfig = getConfig("mainnet");
-//  export const marketContractName = "drawstringmarketplace_v1.near"; 
-//  export const smartContractName = "drawstring_v2.near";
+ const nearConfig = getConfig("mainnet");
+ export const marketContractName = "drawstringmarketplace_v1.near"; 
+ export const smartContractName = "drawstring_v2.near";
 
 //// dev
- const nearConfig = getConfig("testnet");
- export const marketContractName = "drawstringmarketplace.testnet";
- export const smartContractName = "helper1.testnet";
+//  const nearConfig = getConfig("testnet");
+//  export const marketContractName = "drawstringmarketplace.testnet";
+//  export const smartContractName = "helper1.testnet";
 
 // Initialize contract & set global variables
 export async function initContracts() {
