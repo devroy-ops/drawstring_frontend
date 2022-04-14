@@ -73,6 +73,7 @@ const Home = ({ contractX, account, wallet }) => {
                 from_index: '0',
                 limit: 12,
             });
+console.log("sales ", response);
 
              const sales = [];
             

@@ -161,6 +161,7 @@ const Profile = ({ contractX, account, wallet }) => {
     setOnSale(onSaleNfts)
 
     onSaleNfts.forEach(async (sale) => {
+        debugger;
       const contract = await init(wallet, sale.nft_contract_id)
       const NFT = await contract.nft_token({ token_id: sale.token_id })
 
