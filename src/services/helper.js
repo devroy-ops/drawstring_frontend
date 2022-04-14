@@ -27,7 +27,7 @@ const mint_txFee = Big(0.01)
   .times(10 ** 24)
   .toFixed();
 
-  const apr_mint_txFee = Big(0.02)
+const apr_mint_txFee = Big(0.02)
   .times(10 ** 24)
   .toFixed(); 
 
@@ -53,7 +53,7 @@ const txFee = Big(1)
 // const GAS = Big(30)
 //   .times(10 ** 13)
 //   .toFixed();
-const mtxFee = Big(0.1)
+const mtxFee = Big(0.3)
 .times(10 ** 24)
 .toFixed();
 
