@@ -216,12 +216,12 @@ const Home = ({ contractX, account, wallet }) => {
                                                         <div className="short-line"></div>
                                                     </div>
                                                 </div>
-                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${listedNfts && listedNfts.find(x=>x.isMainSlideNft == true)?.media_link}')` }} onClick={() => handleShow(listedNfts.find(x=>x.isMainSlideNft == true))}></div>
+                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${listedNfts && listedNfts[0]?.media_link}')` }} onClick={() => handleShow(listedNfts.find(x=>x.isMainSlideNft == true))}></div>
                                             </div>
                                         </div>
                                         <div className="col-sm-5">
                                             <div className="row">
-                                                {listedNfts && listedNfts.length > 0 && listedNfts.slice(0, 4).map((nft, i) => {
+                                                {listedNfts && listedNfts.length > 0 && listedNfts.slice(1, 5).map((nft, i) => {
                                                     return (
                                                         <div className="col-sm-6 col-xs-12 mb-4" key={i}>
                                                             <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }} onClick={() => handleShow(nft)}>
@@ -312,7 +312,9 @@ const Home = ({ contractX, account, wallet }) => {
                                                 </div>
                                             </div>
                                             <div className="col-sm-8 text-light font-size-18">
-                                                <div className="collect-name">{collection.collection_name}</div>
+                                                <OverlayTrigger overlay={<Tooltip>{collection.collection_name}</Tooltip>}>
+                                                    <div className="collect-name text-ellipsis">{collection.collection_name}</div>
+                                                </OverlayTrigger>
                                                 <div className="color-gray">{collection.price} Near</div>
                                             </div>
                                         </div>
