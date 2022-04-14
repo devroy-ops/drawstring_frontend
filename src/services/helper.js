@@ -27,7 +27,7 @@ const mint_txFee = Big(0.01)
   .times(10 ** 24)
   .toFixed();
 
-const apr_mint_txFee = Big(0.02)
+const apr_mint_txFee = Big(0.1)
   .times(10 ** 24)
   .toFixed(); 
 
