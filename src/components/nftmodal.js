@@ -5,7 +5,7 @@ import heart from '../images/home/heart.svg';
 import more from '../images/home/more.svg';
 import copy_icon from '../images/users/copy_icon.svg';
 import { useEffect, useState } from 'react';
-import { deploy_txFee, GAS, init, initMarketplaceContract, mint_txFee, txFee } from '../services/helper';
+import { deploy_txFee, GAS, init, init2, initMarketplaceContract, mint_txFee, txFee } from '../services/helper';
 import { toast } from 'react-toastify';
 import { getUserForUpdateDb } from '../db/mongodb';
 import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
@@ -29,10 +29,15 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
         return viewNFTs();
     }, []);
 
+    
+
     const viewNFTs = async () => {
         try {
-            const contract = await init(wallet, nftData.collection_name.toLowerCase().replace(/ /g, "_"));
-            const response = await contract.nft_token({ "token_id": nftData.id });
+            debugger
+            // const contract = await init(wallet, nftData.collection_name.toLowerCase().replace(/ /g, "_"));
+            const contract = await init2(wallet, nftData.nft_contract_id)
+            const response = await contract.nft_token({ token_id: nftData.token_id })
+            // const response = await contract.nft_token({ "token_id": nftData.id });
             console.log(response);
             const extra = JSON.parse(response.metadata.extra);
             response.price = extra.price;
@@ -158,8 +163,8 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                     </div>
                                     <div className="col-sm-6">
                                         <div className="pb-2">Collection</div>
-                                        <OverlayTrigger overlay={<Tooltip>{nftData?.collection_name}</Tooltip>}>
-                                            <div className='text-ellipsis'><img src={collection.icon ? collection.icon : avtar} className="me-2 border-radius-50" width="48" height="48" />{nftData?.collection_name}</div>
+                                        <OverlayTrigger overlay={<Tooltip>{nftData?.nft_contract_id}</Tooltip>}>
+                                            <div className='text-ellipsis'><img src={collection.icon ? collection.icon : avtar} className="me-2 border-radius-50" width="48" height="48" />{nftData?.nft_contract_id}</div>
                                         </OverlayTrigger>
                                     </div>
                                 </div>
