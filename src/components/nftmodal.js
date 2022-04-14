@@ -40,12 +40,12 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
             // const response = await contract.nft_token({ "token_id": nftData.id });
             console.log(response);
             const extra = JSON.parse(response.metadata.extra);
-            response.price = extra.price;
+            response.price = extra ? extra.price : null;
             setNft(response);
             const user = await getUserForUpdateDb();
             const owner = await getProfile(user, response.owner_id);
             setOwner(owner);
-            const creator = await getProfile(user, extra.creator_id);
+            const creator = await getProfile(user, extra ? extra.creator_id : response.owner_id);
             setCreator(creator);
             getCollection(contract);
             return response;
