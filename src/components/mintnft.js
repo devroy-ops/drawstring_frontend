@@ -259,6 +259,7 @@ export default function MintNft({ contractX, account, wallet }) {
 
             const allProperties = {
                 creator_id: accountId,
+                collection_name: nft.collection.label,
                 media_size: nft.media.size,
                 media_type: nft.media.type,
                 price: nft.price,
@@ -332,7 +333,7 @@ export default function MintNft({ contractX, account, wallet }) {
                 description: nft.description,
                 media: mediaLink,
                 // media_hash: undefined,
-                copies: Number(nft.copies),
+                copies: parseInt(nft.copies),
                 issued_at: Date.now(), // Unix epoch in milliseconds
                 // expires_at: undefined,
                 // starts_at: undefined, // When token starts being valid, Unix epoch in milliseconds
