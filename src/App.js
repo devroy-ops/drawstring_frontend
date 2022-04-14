@@ -26,7 +26,9 @@ import Terms from './components/terms';
 import Blog from './components/blog';
 import Near from './components/nearprotocol';
 import Search from './components/searchresult';
-
+import StepThree from './components/wizard/stepthree';
+import StepTwo from './components/wizard/steptwo';
+import StepOne from './components/wizard/stepone';
 // const routing = (
 //   <AuthProvider>
 //     <Router>
@@ -224,6 +226,25 @@ function App({ contractX, currentUser, nearConfig, wallet, account, near }) {
                 wallet={wallet}
                 nearConfig={nearConfig}
               />} /> */}
+
+              <Route path="/wizard/stepone" component={StepOne} element={<StepOne
+                contractX={contractX}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
+              <Route path="/wizard/steptwo" component={StepTwo} element={<StepTwo
+                contractX={contractX}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
+              <Route path="/wizard/stepthree" component={StepThree} element={<StepThree
+                contractX={contractX}
+                account={account}
+                wallet={wallet}
+                nearConfig={nearConfig}
+              />} />
 
               
             </Route>
