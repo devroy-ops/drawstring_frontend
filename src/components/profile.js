@@ -133,6 +133,7 @@ const Profile = ({ contractX, account, wallet }) => {
   }
 
   useEffect(() => {
+      
     return getProfile()
   }, [])
 

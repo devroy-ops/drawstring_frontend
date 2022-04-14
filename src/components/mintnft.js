@@ -3,7 +3,7 @@ import React, { useEffect, useState, useContext } from "react";
 import { FileUploader } from "react-drag-drop-files";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import '../styles/createcollection.css';
-import { init, author, GAS, mint_txFee, transfer_txFee, txFee, initMarketplaceContract, storageDeposit } from "../services/helper";
+import { init, author, GAS, mint_txFee, transfer_txFee, apr_mint_txFee, txFee, initMarketplaceContract, storageDeposit } from "../services/helper";
 import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
 import { db, storage, fb } from '../db/firebase';
@@ -357,7 +357,7 @@ export default function MintNft({ contractX, account, wallet }) {
                     GAS/2,
                     mint_txFee
                 )
-            ];
+            ]
 
             if(nft.isLive){
                 allTransactions.push(
@@ -373,7 +373,7 @@ export default function MintNft({ contractX, account, wallet }) {
                             })
                         ),
                         GAS/2,
-                        mint_txFee
+                        apr_mint_txFee
                     ),
                 )
             }
