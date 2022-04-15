@@ -27,6 +27,7 @@ import images from '../images/home/images.svg'
 import arrow_down from '../images/home/arrow_down.svg'
 import { FileTypes, MarketplaceTypes } from '../enums/filetypes'
 import NftDetailModal from './nftmodal'
+import Big from "big.js";
 // import explore1 from '../images/home/explore1.svg';
 // import explore2 from '../images/home/explore2.svg';
 // import explore3 from '../images/home/explore3.svg';
@@ -133,9 +134,9 @@ const Profile = ({ contractX, account, wallet }) => {
   }
 
   useEffect(() => {
-   const chris = formatNearAmount('10230000000000000000000')
+   const chris = formatNearAmount('100000000000000000000000')
    const Ram = formatNearAmount('12390000000000000000000')
-   console.log(chris,'chris');
+   console.log(chris,'apr');
    console.log(Ram,'Ram');
       
     return getProfile()
@@ -151,7 +152,11 @@ const Profile = ({ contractX, account, wallet }) => {
     getNftsOnSale()
     getAllListedNfts()
     getCollections()
+    console.log(apr_mint_txFee, 'apr');
   }
+  const apr_mint_txFee = Big(0.1)
+  .times(10 ** 24)
+  .toFixed(); 
 
   const getNftsOnSale = async () => {
     let NFTs = []
@@ -163,16 +168,21 @@ const Profile = ({ contractX, account, wallet }) => {
       limit: 500,
     })
     setOnSale(onSaleNfts)
+    const sales = {};
 
     onSaleNfts.forEach(async (sale) => {
       const contract = await init(wallet, sale.nft_contract_id)
       const NFT = await contract.nft_token({ token_id: sale.token_id })
 
-      NFTs.push({ ...NFT, ...sale })
+      NFTs.push({ ...NFT, ...sale, })
     })
 
     setNftResult(NFTs)
   }
+ 
+            
+     
+
 
   console.log(Nftresult, 'ass')
   const getAllListedNfts = async () => {
@@ -293,7 +303,7 @@ const Profile = ({ contractX, account, wallet }) => {
       <div className="">
         <div className="container tabs-links px-0">
           <Tabs activeKey={activeTab} onSelect={handleSelect}>
-            <Tab eventKey={1} title={`On sale ${onSaleNfts.length}`}>
+            <Tab eventKey={1} title={`On sale ${Nftresult.length}`}>
               {/* <div className="border-bottom-2"></div> */}
               <div className="pb-4">
                 <div className="row title text-light pt-3">

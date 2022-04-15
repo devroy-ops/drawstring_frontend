@@ -37,7 +37,7 @@ const NftsLists = ({nfts, wallet}) => {
                                                             <div className="explore-dot bg-pink"></div>
                                                         </span>
                                                     </OverlayTrigger>
-                                                    <OverlayTrigger overlay={<Tooltip>Creater: {nft?.createdBy || nft?.owner}</Tooltip>}>
+                                                    <OverlayTrigger overlay={<Tooltip>Creator: {nft?.createdBy || nft?.owner}</Tooltip>}>
                                                         <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/user/${nft.createdBy || nft?.owner}`);window.location.reload(); }}>
                                                             <div className="explore-dot bg-blue"></div>
                                                         </span>

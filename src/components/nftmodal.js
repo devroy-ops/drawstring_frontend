@@ -12,6 +12,7 @@ import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
 import avtar from '../images/users/avatar.svg';
 import { parseNearAmount } from 'near-api-js/lib/utils/format';
 import { marketContractName, smartContractName } from '../services/utils';
+import { logRoles } from '@testing-library/react';
 
 const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     // const [activeTab, setActiveTab] = useState(1);
@@ -33,10 +34,11 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
 
     const viewNFTs = async () => {
         try {
-            debugger
             // const contract = await init(wallet, nftData.collection_name.toLowerCase().replace(/ /g, "_"));
-            const contract = await init2(wallet, nftData.nft_contract_id)
-            const response = await contract.nft_token({ token_id: nftData.token_id })
+            console.log(nftData.nft_contract_id, 'dont');
+            const contract = await init2(wallet, nftData.nft_contract_id || nftData.contract_id)
+            const response = await contract.nft_token({ token_id: nftData.token_id || nftData.id })
+            debugger
             // const response = await contract.nft_token({ "token_id": nftData.id });
             console.log(response);
             const extra = JSON.parse(response.metadata.extra);
@@ -48,6 +50,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
             const creator = await getProfile(user, extra ? extra.creator_id : response.owner_id);
             setCreator(creator);
             getCollection(contract);
+            
             return response;
         } catch (error) {
             setError(true);
@@ -157,14 +160,14 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                 <div className="row pt-3 tab-col-w-100">
                                     <div className="col-sm-6">
                                         <div className="pb-2">Creator</div>
-                                        <OverlayTrigger overlay={<Tooltip>{creator?.display_name || wallet.getAccountId()}</Tooltip>}>
-                                            <div className='text-ellipsis'><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48" />{creator?.display_name || wallet.getAccountId()}</div>
+                                        <OverlayTrigger overlay={<Tooltip>{nftData?.createdBy || nftData?.owner_id}</Tooltip>}>
+                                            <div className='text-ellipsis'><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48" />{nftData?.createdBy|| nftData?.owner_id}</div>
                                         </OverlayTrigger>
                                     </div>
                                     <div className="col-sm-6">
                                         <div className="pb-2">Collection</div>
-                                        <OverlayTrigger overlay={<Tooltip>{nftData?.nft_contract_id}</Tooltip>}>
-                                            <div className='text-ellipsis'><img src={collection.icon ? collection.icon : avtar} className="me-2 border-radius-50" width="48" height="48" />{nftData?.nft_contract_id}</div>
+                                        <OverlayTrigger overlay={<Tooltip>{nftData?.contract_id || nftData?.nft_contract_id}</Tooltip>}>
+                                            <div className='text-ellipsis'><img src={collection.icon ? collection.icon : avtar} className="me-2 border-radius-50" width="48" height="48" />{nftData?.contract_id || nftData?.nft_contract_id}</div>
                                         </OverlayTrigger>
                                     </div>
                                 </div>
@@ -214,9 +217,13 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
 
                                                 <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nftData?.price} Near</button>
                                             )}
-                                            {nft?.owner_id == wallet.getAccountId() && nftData?.is_live && (
+                                            {nftData?.createdBy == wallet.getAccountId() && (
                                                 <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
                                             )}
+                                            {nftData?.owner_id  == wallet.getAccountId() && (
+                                                <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
+                                            )}
+                                            
                                             {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button> */}
 
                                         </div>
