@@ -33,8 +33,8 @@ export async function initContracts() {
 
     };
   const near = await connect({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() }, ...nearConfig });
-  const account = await near.account(currentUser.accountId);
-  const balance = await account.getAccountBalance()
+  // const account = await near.account(currentUser.accountId);
+  // const balance = await account.getAccountBalance()
    available = formatNearAmount(balance.available);
   } else {
     currentUser = {
