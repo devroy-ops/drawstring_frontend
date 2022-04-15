@@ -130,7 +130,7 @@ export default function MintNft({ contractX, account, wallet }) {
                     nft.mediaLink,
                     nft.mediaLink,
                     parseInt(nft.price),
-                    nft.contractId,
+                    nft.nft_contract_id,
                     accountId,
                     nft.contractName,
                     nft.description,
@@ -295,12 +295,12 @@ export default function MintNft({ contractX, account, wallet }) {
 
 
             var data = {
-                contractId: nft.collection.value,
+                nft_contract_id: `${nft.collection.label}.${nft.collection.value}`,
                 contractName: nft.collection.label,
                 tokenId: nft.token,
                 title: nft.title,
                 mediaLink: mediaLink,
-                price: parseInt(nft.price),
+                price: nft.price,
                 description: nft.description,
                 type: nft.media.type,
                 isLive: nft.isLive
@@ -605,7 +605,7 @@ export default function MintNft({ contractX, account, wallet }) {
 
                             <div>
                                 <div className="font-size-18 text-light py-3">Price (Near)</div>
-                                <input type="number" min="1" className="profile-input pb-3 w-100" placeholder='E. g. 10”'
+                                <input type="number" min="1" step="any" className="profile-input pb-3 w-100" placeholder='E. g. 10”'
                                     name="price"
                                     defaultValue={nft.price}
                                     onChange={handleChange}

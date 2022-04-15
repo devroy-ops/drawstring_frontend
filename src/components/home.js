@@ -71,7 +71,7 @@ const Home = ({ contractX, account, wallet }) => {
             const contract = await initMarketplaceContract(wallet);
             const response = await contract.get_sales({
                 from_index: '0',
-                limit: 12,
+                limit: 50,
             });
 console.log("sales ", response);
 
@@ -98,6 +98,7 @@ console.log("sales ", response);
                 }
                 sales.push(nftData);
             }
+         
 
             setListedNfts([...listedNfts, ...sales]);
         }
@@ -114,7 +115,7 @@ console.log("sales ", response);
         const allListedNfts = await user.functions.get_all_listed_nfts(12, count * 12);
         console.log(allListedNfts)
         setListedNfts([...listedNfts, ...allListedNfts]);
-
+debugger
         
         const top = await user.functions.get_top_collections();
         setTopCollections(top);

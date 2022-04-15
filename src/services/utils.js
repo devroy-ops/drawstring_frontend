@@ -8,7 +8,7 @@ let available;
 //// live
 
  const nearConfig = getConfig("mainnet");
- export const marketContractName = "drawstringmarketplace_v1.near"; 
+ export const marketContractName = "draw1.near"; 
  export const smartContractName = "drawstring_v2.near";
 
 //// dev
