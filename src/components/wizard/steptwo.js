@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { create } from "ipfs-http-client";
 import { FileUploader } from "react-drag-drop-files";
 import { transactions } from 'near-api-js';
-import { GAS, init, mint_txFee, storageDeposit } from "../../services/helper";
+import { apr_mint_txFee, GAS, init, mint_txFee, storageDeposit } from "../../services/helper";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import * as nearAPI from "near-api-js";
 import { marketContractName } from "../../services/utils";
@@ -84,7 +84,6 @@ const StepTwo = ({ contractX, account, wallet }) => {
         debugger;
         const contract = await init(wallet, subaccount);
 
-debugger;
         await contract.account.signAndSendTransaction(contract.contractId, [
             transactions.functionCall(
               'nft_mint',
@@ -112,7 +111,7 @@ debugger;
                 })
               ),
               GAS/2,
-              mint_txFee
+              apr_mint_txFee
             ),
           ]);
     };
