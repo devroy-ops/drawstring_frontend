@@ -6,9 +6,6 @@ import '../styles/createcollection.css';
 import { init, author, GAS, mint_txFee, transfer_txFee, apr_mint_txFee, txFee, initMarketplaceContract, storageDeposit } from "../services/helper";
 import { Loader } from "../services/ui";
 import { toast } from 'react-toastify';
-import { db, storage, fb } from '../db/firebase';
-import { ObjectID } from 'bson';
-import Big from "big.js";
 import { getUser, getUserForUpdateDb, mongodb } from '../db/mongodb';
 import { Form, Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { components } from 'react-select';
@@ -20,7 +17,7 @@ import logo1 from '../images/collection/logo1.png';
 import { create } from "ipfs-http-client";
 import { transactions } from 'near-api-js';
 import * as nearAPI from "near-api-js";
-import { marketContractName } from '../services/utils';
+import { marketContractName, smartContractName } from '../services/utils';
 
 import { FileTypes } from '../enums/filetypes';
 import BootstrapSwitchButton from 'bootstrap-switch-button-react';
@@ -91,11 +88,6 @@ export default function MintNft({ contractX, account, wallet }) {
                 }
             }
             setTabs((tab)=> tab-1);
-            // var indexToRemove = updatedRows.findIndex(x => x.index == index);
-            // if (indexToRemove === -1) {
-            //     updatedRows.splice(indexToRemove, 1)
-            //     setRows(updatedRows);
-            // }
         }
     }
 
@@ -110,7 +102,7 @@ export default function MintNft({ contractX, account, wallet }) {
     const [searchParams, setSearchParams] = useSearchParams();
     let navigate = useNavigate();
 
-    const init1 = async () => {
+    const pageLoad = async () => {
         const subaccount = ("drawstringmarketplace").toLowerCase().replace(/ /g, "_");
         let contract = await init(wallet, subaccount);
         setContract(contract);
@@ -161,13 +153,12 @@ export default function MintNft({ contractX, account, wallet }) {
     }, [])
 
     useEffect(() => {
-        return init1();
+        return pageLoad();
     }, [colCount]);
 
     const getCollections = async () => {
         // setLoader(true);
         const user = await getUser();
-        debugger
        // const response = await user.functions.get_collections(40, colCount * 40);
        const response = await user.functions.get_collections_by_createdBy(40, colCount, accountId);
         var allCollections = [...collections, ...response];
@@ -257,9 +248,12 @@ export default function MintNft({ contractX, account, wallet }) {
             console.log(royt);
             console.log(perpetualRoyalties, 'ppr');
 
+            debugger;
+            const contract_id = `${nft.collection.value}.${smartContractName}`;
             const allProperties = {
                 creator_id: accountId,
                 collection_name: nft.collection.label,
+                contract_id: contract_id,
                 media_size: nft.media.size,
                 media_type: nft.media.type,
                 price: nft.price,
@@ -271,31 +265,9 @@ export default function MintNft({ contractX, account, wallet }) {
                     allProperties["properties"][item.key] = item.value;
                 }
             });
-
-            // var nftData = {
-            //     token_id: nft.token,
-            //     metadata: {
-            //         title: nft.title,
-            //         description: nft.description,
-            //         media: mediaLink,
-            //         media_hash: null,
-            //         copies: parseInt(nft.copies),
-            //         issued_at: null, // Unix epoch in milliseconds
-            //         expires_at: null,
-            //         starts_at: null, // When token starts being valid, Unix epoch in milliseconds
-            //         updated_at: null, // When token was last updated, Unix epoch in milliseconds
-            //         extra: Object.keys(allProperties).length > 0 ? JSON.stringify(allProperties) : null, // anything extra the NFT wants to store on-chain. Can be stringified JSON.
-            //         referance: null, // URL to a JSON file with more info
-            //         referance_hash: null,
-            //     },
-            //     receiver_id: accountId,
-            //     perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? perpetualRoyalties : null,
-            //     price: parseInt(nft.price)
-            // };
-
-
+           
             var data = {
-                nft_contract_id: `${nft.collection.label}.${nft.collection.value}`,
+                nft_contract_id: contract_id, //`${nft.collection.label}.${nft.collection.value}`,
                 contractName: nft.collection.label,
                 tokenId: nft.token,
                 title: nft.title,
@@ -304,29 +276,8 @@ export default function MintNft({ contractX, account, wallet }) {
                 description: nft.description,
                 type: nft.media.type,
                 isLive: nft.isLive
-            };// price: nft.price, isApproved: false
+            };
             localStorage.setItem("nft", JSON.stringify(data));
-
-            //const user = await getUserForUpdateDb();
-            // await user.functions.add_new_nft_listing(
-            //     nft.title,
-            //     nft.token,
-            //     mediaLink,
-            //     mediaLink,
-            //     parseInt(nft.price),
-            //     nft.collection.value,
-            //     accountId,
-            //     nft.collection.label,
-            //     nft.description,
-            //     "image"
-            // );
-
-            // const response = await contract.nft_mint(
-            //     nftData,
-            //     GAS,
-            //     mint_txFee
-            // );
-
 
             const metadata = {
                 title: nft.title,
@@ -394,11 +345,6 @@ export default function MintNft({ contractX, account, wallet }) {
             return { ...prev, [e.target.name]: e.target.value };
         });
 
-        // if(e.target.name === "title"){
-        //     setNft((prev) => {
-        //         return { ...prev, "token": e.target.value.toLowerCase().replace(/ /g, "-") + "-token" };
-        //     });
-        // }
     };
 
     const handleRoyaltyChange = (e, index) => {
@@ -418,7 +364,7 @@ export default function MintNft({ contractX, account, wallet }) {
             return { ...prev, "collection": e };
         });
         const subaccount = e.label.toLowerCase().replace(/ /g, "_");
-        //init1(wallet, subaccount);
+       
         let contract = await init(wallet, subaccount);
         setContract(contract);
     }
@@ -536,20 +482,6 @@ export default function MintNft({ contractX, account, wallet }) {
                                 </Form.Control.Feedback>
                             </div>
                             <div className="border-bottom-2"></div>
-                            {/* <div>
-                                <div className="font-size-18 text-light py-3">Token</div>
-                                <input type="text" className="profile-input pb-3 w-100" placeholder='e.g. “nft-token”'
-                                    type="text"
-                                    name="token"
-                                    defaultValue={nft.token}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    Token is required.
-                                </Form.Control.Feedback>
-                            </div>
-                            <div className="border-bottom-2"></div> */}
                             <div>
                                 <div className="font-size-18 text-light py-3">Description <span className="color-gray"> (Optional)</span></div>
                                 <input type="text" className="profile-input pb-3 w-100" placeholder='"e.g. This holder of this NFT is entitled to a free T-Shirt"'
@@ -665,28 +597,6 @@ export default function MintNft({ contractX, account, wallet }) {
                                         )
                                 })
                             }
-
-                            {/* <div className="row bid-mobile-100">
-                                <div className="col-sm-6">
-                                    <div>
-                                        <div className="font-size-18 text-light py-3">Royalties</div>
-                                        <input type="text" className="profile-input pb-3 w-100"
-                                            placeholder='10%'
-
-                                        />
-                                    </div>
-                                    <div className="border-bottom-2"></div>
-                                    <div className="font-size-14 color-gray py-2 suggested-text">Suggested: 0%, 10%, 20%, 30%. Maximum is 50%</div>
-                                </div>
-                                <div className="col-sm-6">
-                                    <div>
-                                        <div className="font-size-18 text-light py-3">Wallet address</div>
-                                        <input type="text" className="profile-input pb-3 w-100" placeholder='|' />
-                                    </div>
-                                    <div className="border-bottom-2"></div>
-                                </div>
-                            </div> */}
-
 
                             <button disabled={tabs>3} type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
 

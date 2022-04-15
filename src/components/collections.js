@@ -40,7 +40,6 @@ const Collections = ({ contractX, account, wallet }) => {
     }
 
     useEffect(() => {
-        //return init1();
         return getCollections();
     }, [count]);
 

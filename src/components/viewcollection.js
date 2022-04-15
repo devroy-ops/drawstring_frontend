@@ -44,7 +44,6 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     const { collectionId } = useParams();
     const accountId = wallet.getAccountId();
     useEffect(() => {
-        //return init1()
         getAllListedNfts();
         return viewCollection();
     }, []);

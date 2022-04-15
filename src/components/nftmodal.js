@@ -5,7 +5,7 @@ import heart from '../images/home/heart.svg';
 import more from '../images/home/more.svg';
 import copy_icon from '../images/users/copy_icon.svg';
 import { useEffect, useState } from 'react';
-import { deploy_txFee, GAS, init, init2, initMarketplaceContract, mint_txFee, txFee } from '../services/helper';
+import { deploy_txFee, GAS, init, initSmartContract, initMarketplaceContract, mint_txFee, txFee } from '../services/helper';
 import { toast } from 'react-toastify';
 import { getUserForUpdateDb } from '../db/mongodb';
 import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
@@ -25,18 +25,18 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     const [creator, setCreator] = useState({});
     const [collection, setCollection] = useState({});
     const [isError, setError] = useState(false);
-    
+
     useEffect(() => {
         return viewNFTs();
     }, []);
 
-    
+
 
     const viewNFTs = async () => {
         try {
             // const contract = await init(wallet, nftData.collection_name.toLowerCase().replace(/ /g, "_"));
             console.log(nftData.nft_contract_id, 'dont');
-            const contract = await init2(wallet, nftData.nft_contract_id || nftData.contract_id)
+            const contract = await initSmartContract(wallet, nftData.nft_contract_id || nftData.contract_id)
             const response = await contract.nft_token({ token_id: nftData.token_id || nftData.id })
             debugger
             // const response = await contract.nft_token({ "token_id": nftData.id });
@@ -50,12 +50,12 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
             const creator = await getProfile(user, extra ? extra.creator_id : response.owner_id);
             setCreator(creator);
             getCollection(contract);
-            
+
             return response;
         } catch (error) {
             setError(true);
             handleClose();
-            toast(JSON.stringify(error), {type: "error"})
+            toast(JSON.stringify(error), { type: "error" })
             console.log(error);
         }
     };
@@ -72,6 +72,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     const getCollection = async (contract) => {
         try {
             const response = await contract.nft_metadata();
+
             console.log(response);
             setCollection(response)
             return response;
@@ -90,10 +91,10 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
             const data = nft;
             data.marketType = MarketplaceTypes.OFFER; //"offer"
             localStorage.setItem("nft", JSON.stringify(data));
-
+debugger
             await contract.offer(
                 {
-                    nft_contract_id: `${subaccount}.${smartContractName}`,//nftData.collection_name.toLowerCase().replace(/ /g, "_") + ".deploycontract1.testnet",
+                    nft_contract_id: nftData.nft_contract_id,//`${subaccount}.${smartContractName}`,//nftData.collection_name.toLowerCase().replace(/ /g, "_") + ".deploycontract1.testnet",
                     token_id: nft.token_id
                 },
                 GAS,
@@ -107,7 +108,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
 
     const removeFromSale = async () => {
         try {
-           
+
             const contract = await initMarketplaceContract(wallet);
             const subaccount = nftData.collection_name.toLowerCase().replace(/ /g, "_");
 
@@ -161,7 +162,7 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                     <div className="col-sm-6">
                                         <div className="pb-2">Creator</div>
                                         <OverlayTrigger overlay={<Tooltip>{nftData?.createdBy || nftData?.owner_id}</Tooltip>}>
-                                            <div className='text-ellipsis'><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48" />{nftData?.createdBy|| nftData?.owner_id}</div>
+                                            <div className='text-ellipsis'><img src={creator?.profile_pic ? creator?.profile_pic : avtar} className="me-2 border-radius-50" width="48" height="48" />{nftData?.createdBy || nftData?.owner_id}</div>
                                         </OverlayTrigger>
                                     </div>
                                     <div className="col-sm-6">
@@ -184,16 +185,24 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                         <div className="font-size-16 pt-5 pb-2">Properties</div>
 
                                         <div className="d-flex mb-5 properties-box-row">
-                                            {nft?.metadata?.extra && Object.keys(JSON.parse(nft?.metadata?.extra).properties).map((key, index) => {
+                                            {nft?.metadata?.extra && Object.keys(JSON.parse(nft?.metadata?.extra)?.properties).map((key, index) => {
                                                 return (
                                                     <div className="properties-box p-3 me-3" key={index.toString()}>
                                                         <div className="font-size-16 color-pink">{key}</div>
                                                         {/* <div className="font-size-18 my-1" >{key}</div> */}
-                                                        <div className="font-size-14">{JSON.parse(nft?.metadata?.extra).properties[key]}</div>
+                                                        <div className="font-size-14">{JSON.parse(nft?.metadata?.extra)?.properties[key]}</div>
                                                     </div>
                                                 )
                                             })}
-                                            {nft?.metadata?.extra && Object.keys(JSON.parse(nft.metadata.extra).properties).length == 0 &&
+                                            {console.log("nft?.metadata?.extra ", nft?.metadata?.extra)}
+                                            {(nft?.metadata?.extra && Object.keys(JSON.parse(nft.metadata.extra)?.properties).length == 0) &&
+                                                (
+                                                    <div className="properties-box p-3 me-3">
+                                                        <div className="font-size-16 color-pink">No property added for the nft</div>
+                                                    </div>
+                                                )}
+
+                                            {!nft?.metadata?.extra &&
                                                 (
                                                     <div className="properties-box p-3 me-3">
                                                         <div className="font-size-16 color-pink">No property added for the nft</div>
@@ -213,17 +222,17 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                                         <div className="pb-5 pt-4">
 
                                             {console.log("nft data ", nftData)}
-                                            {nft?.owner_id != wallet.getAccountId() && nftData?.createdBy != wallet.getAccountId() && nftData?.is_live && (
+                                            {nft?.owner_id != wallet.getAccountId() && nftData?.createdBy != wallet.getAccountId() && (
 
                                                 <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nftData?.price} Near</button>
                                             )}
                                             {nftData?.createdBy == wallet.getAccountId() && (
                                                 <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
                                             )}
-                                            {nftData?.owner_id  == wallet.getAccountId() && (
+                                            {nftData?.owner_id == wallet.getAccountId() && (
                                                 <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
                                             )}
-                                            
+
                                             {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button> */}
 
                                         </div>
@@ -238,15 +247,15 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
                             </div>
                             <div className="col-sm-6">
                                 {console.log(nft.metadata)}
-                                {nft.metadata && JSON.parse(nft.metadata.extra).media_type.includes(FileTypes.IMAGE) && (
+                                {nft.metadata && JSON.parse(nft.metadata.extra)?.media_type.includes(FileTypes.IMAGE) && (
                                     <img src={nft?.metadata?.media} className="img-fluid " height="270" alt="nft media" />
                                 )}
-                                {nft.metadata && JSON.parse(nft.metadata.extra).media_type.includes(FileTypes.VIDEO) && (
+                                {nft.metadata && JSON.parse(nft.metadata.extra)?.media_type.includes(FileTypes.VIDEO) && (
                                     <video width="100%" controls id="video" height="270">
                                         <source src={nft?.metadata?.media} type="video/mp4" />
                                     </video>
                                 )}
-                                {nft.metadata && JSON.parse(nft.metadata.extra).media_type.includes(FileTypes.AUDIO) && (
+                                {nft.metadata && JSON.parse(nft.metadata.extra)?.media_type.includes(FileTypes.AUDIO) && (
 
                                     <div className='p-5'>
                                         <audio controls src={nft.metadata.media} id="audio">

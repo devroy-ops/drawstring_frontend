@@ -37,7 +37,7 @@ const Nft = ({ wallet }) => {
     useEffect(() => {
         //checkForByOrRemovedFromSale()
         const transactionHashes = searchParams.get("transactionHashes");
-        buyOrRemoveFromSale(transactionHashes);
+        buyOrRemoveFromSale(transactionHashes, wallet.getAccountId());
     }, []);
 
     // const getNft = async () => {

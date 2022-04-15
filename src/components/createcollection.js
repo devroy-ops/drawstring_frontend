@@ -78,7 +78,7 @@ export default function CreateCollection({ contractX, account, wallet, nearConfi
 
     const [searchParams, setSearchParams] = useSearchParams();
     let navigate = useNavigate();
-    const init1 = async () => {
+    const pageLoad = async () => {
         var transactionHashes = searchParams.get("transactionHashes");
         if (transactionHashes) {
             let col = JSON.parse(localStorage.getItem("collection"));
@@ -122,7 +122,7 @@ export default function CreateCollection({ contractX, account, wallet, nearConfi
     }
 
     useEffect(() => {
-        return init1();
+        return pageLoad();
     }, []);
 
 
