@@ -144,7 +144,7 @@ const Profile = ({ contractX, account, wallet }) => {
     setAuthor(response)
     setLoader(false)
     getNftsOnSale()
-    //getAllListedNfts()
+    getAllListedNfts()
     getCollections()
     console.log(apr_mint_txFee, 'apr');
   }

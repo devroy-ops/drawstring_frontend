@@ -8,6 +8,7 @@ import { transactions, nearAPI } from 'near-api-js';
 import { init, author, GAS, deploy_txFee } from "../../services/helper";
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { smartContractName } from '../../services/utils';
+import { generateSeedPhrase } from "near-seed-phrase";
 
 const client = create('https://ipfs.infura.io:5001/api/v0');
 
@@ -59,11 +60,14 @@ const StepOne = ({ contractX, account, wallet }) => {
 
     const deploy = async (data) => {
         try {
+
+            let {publicKey} = generateSeedPhrase();
             // load and deploy smart contract
             const subaccount = data.name.toLowerCase().replace(/ /g, "_");
             const respons = await contractX.deploy_contract_code(
                 {
-                    account_id: `${subaccount}.${smartContractName}` //"jitendra.stingy.testnet" //"pack.stingy.testnet",
+                    subaccount_id: `${subaccount}.${smartContractName}`, //"${subaccount}.stingy.testnet" //"pack.stingy.testnet",
+                    new_public_key: publicKey,
                 },
                 GAS,
                 deploy_txFee
@@ -80,29 +84,20 @@ const StepOne = ({ contractX, account, wallet }) => {
         const contract = await init(wallet, subaccount);
 
         try {
-            // setLoader(true);
-            // getUserForUpdateDb().then(user => {
-                // account.accountId
-                // user.functions.add_collection(col.name, col.fileUrl, subaccount).then(async () => {
-                    // setLoader(false);
-                    //Create a collection by initializing the NFT contract
-                    const response = await contract.new({
-                        owner_id: account.accountId,
-                        metadata: {
-                            "spec": "nft-1.0.0",
-                            "name": col.name.toLowerCase(),
-                            "symbol": "CHM-10",
-                            "icon": col.fileUrl,
-                            "base_uri": null,
-                            "referance": null,
-                            "referance_hash": null, // must exist if the "referance" field exists.
-                        }
-                    }, GAS);
-                    //console.log(response);
-                // }, error => {
-                //     toast(error, { type: "error" });
-                // })
-            // });
+            
+            const response = await contract.new({
+                owner_id: account.accountId,
+                metadata: {
+                    "spec": "nft-1.0.0",
+                    "name": col.name.toLowerCase(),
+                    "symbol": "CHM-10",
+                    "icon": col.fileUrl,
+                    "base_uri": null,
+                    "referance": null,
+                    "referance_hash": null, // must exist if the "referance" field exists.
+                }
+            }, GAS);
+                   
         } catch (error) {
             console.log(error);
         }
