@@ -1,22 +1,10 @@
 import '../App.css';
 import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
 import '../styles/home.css';
-import arrow_back from '../images/home/arrow_back.svg';
-import arrow_fwd from '../images/home/arrow_fwd.svg';
-import images from '../images/home/images.svg';
 import calendar from '../images/home/calendar.svg';
 import arrow_down from '../images/home/arrow_down.svg';
-import blockchain from '../images/home/blockchain.svg';
-import category from '../images/home/category.svg';
-import saletype from '../images/home/saletype.svg';
 import audio from '../images/collection/audio_bg.png';
 import price from '../images/home/price.svg';
-import upload from '../images/users/upload.svg';
-import logo from '../../src/images/header/logo.png'
-import sort from '../images/home/sort.svg';
-import more from '../images/home/more.svg';
-import heart from '../images/home/heart.svg';
-import { db } from "../db/firebase";
 import React, { useEffect, useState } from "react";
 import { Loader } from "../services/ui";
 import { Button, Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -30,7 +18,7 @@ import NftDetailModal from './nftmodal';
 import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
 import { toast } from 'react-toastify';
 import NftsLists from './nftslist';
-import { buyOrRemoveFromSale, init, init1, initMarketplaceContract } from '../services/helper';
+import { buyOrRemoveFromSale, init, initSmartContract, initMarketplaceContract } from '../services/helper';
 
 const app = new Realm.App({ id: "drawstringrealmapp-vafye" });
 
@@ -54,72 +42,87 @@ const Home = ({ contractX, account, wallet }) => {
 
     useEffect(() => {
         const transactionHashes = searchParams.get("transactionHashes");
-        buyOrRemoveFromSale(transactionHashes);
+        buyOrRemoveFromSale(transactionHashes, wallet.getAccountId());
     }, []);
 
 
-    useEffect(() => {
-        return getNfts();
-    }, [count]);
+    // useEffect(() => {
+    //     return getNfts();
+    // }, [count]);
 
     useEffect(() => {
         return getNftsFromBlockChain();
-    }, []);
+    }, [count]);
 
     const getNftsFromBlockChain = async () => {
         if (wallet.isSignedIn()) {
+
+            setLoader(true);
+            const user = await getUser();
             const contract = await initMarketplaceContract(wallet);
-            const response = await contract.get_sales({
-                from_index: '0',
-                limit: 50,
+           
+            const onSaleNfts = await contract.get_sales({
+                from_index: (count * 12).toString(),
+                limit: 12,
             });
-console.log("sales ", response);
+            console.log("sales ", onSaleNfts);
+             
+            const sales = [];
 
-             const sales = [];
-            
-             for (const item of response) {
-
-                const newContract = await init1(wallet, item.nft_contract_id);
-                const nft = await newContract.nft_token({
-                    "token_id": item.token_id,
-                });
-                
-                const extra = JSON.parse(nft.metadata.extra);
+            for (const sale of onSaleNfts) {
+                const contract = await initSmartContract(wallet, sale.nft_contract_id)
+                const nft = await contract.nft_token({ token_id: sale.token_id });
+                const extra = nft.metadata.extra ? JSON.parse(nft.metadata.extra) : {};
                 const nftData = {
                     id: nft.token_id,
                     name: nft.metadata.title,
                     owner: nft.owner_id,
-                    createdBy: extra ? extra.creator_id : "",
-                    contract_id: "",
+                    createdBy: extra.creator_id || "",
+                    contract_id: extra.contract_id || "",
                     collection_name: "",
                     media_link: nft.metadata.media,
-                    type: extra ? extra.media_type : 'image',
-                    price: extra ? extra.price : ""
+                    type: extra.media_type || 'image',
+                    price: extra.price || ""
                 }
-                sales.push(nftData);
+                sales.push({ ...nftData, ...sale, });
             }
-         
-
+            
             setListedNfts([...listedNfts, ...sales]);
+            setLoader(false);
+            console.log("listed nfts 1 ", listedNfts);
+            console.log("sales 1 ", sales);
+
+            getNfts(user);
+            // after load nft get the more info to display from mongo db
+            
+            // const nftsWithProfiles = [];
+            // for(const sale of sales){
+            //      const response = await user.functions.get_urls(sale.id);
+            //      console.log(" response ", response)
+            //      sale.nftData = response ? response[0] : null;
+            //      nftsWithProfiles.push(sale);
+            // }
+
+            // setListedNfts([...listedNfts, ...nftsWithProfiles]);
+            // console.log("listed nfts 2 ", nftsWithProfiles);
+
         }
     }
 
-    const getNfts = async () => {
-        setLoader(true);
-
-        const user = await getUser();
+    const getNfts = async (user) => {
+        // setLoader(true);
+        debugger;
+        // const user = await getUser();
         // const featured = await user.functions.get_featured();
         // setFeatured(featured);
-        // const allListedNfts = await user.functions.get_urls(12, count * 12);
-        // debugger;
-        const allListedNfts = await user.functions.get_all_listed_nfts(12, count * 12);
-        console.log(allListedNfts)
-        setListedNfts([...listedNfts, ...allListedNfts]);
-debugger
+        // const allListedNfts = await user.functions.get_all_listed_nfts(12, count * 12);
+        // console.log(allListedNfts)
+        // setListedNfts([...listedNfts, ...allListedNfts]);
         
         const top = await user.functions.get_top_collections();
+        console.log("top collections ", top)
         setTopCollections(top);
-        setLoader(false);
+        // setLoader(false);
         // mongodb.collection('nfts').find().then(nftss => {
         //     setNfts(nftss);
         //     setLoader(false);
@@ -218,7 +221,7 @@ debugger
                                                         <div className="short-line"></div>
                                                     </div>
                                                 </div>
-                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${listedNfts && listedNfts[0]?.media_link}')` }} onClick={() => handleShow(listedNfts.find(x=>x.isMainSlideNft == true))}></div>
+                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${listedNfts && listedNfts[0]?.media_link}')` }} onClick={() => handleShow(listedNfts[0])}></div>
                                             </div>
                                         </div>
                                         <div className="col-sm-5">
@@ -226,7 +229,7 @@ debugger
                                                 {listedNfts && listedNfts.length > 0 && listedNfts.slice(1, 5).map((nft, i) => {
                                                     return (
                                                         <div className="col-sm-6 col-xs-12 mb-4" key={i}>
-                                                            <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft.media_link}')` }} onClick={() => handleShow(nft)}>
+                                                            <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft?.media_link}')` }} onClick={() => handleShow(nft)}>
                                                               
                                                             </div>
                                                         </div>
@@ -254,11 +257,11 @@ debugger
                     Featured NFT's
                 </div> */}
                 <div className="row pt-2">
-                    {/* {featuredNfts && featuredNfts.length > 0 && featuredNfts.slice(0, 4).map((nft, index) => { */}
-                        {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isChildSlideNft === true).map((nft, i) => {
+                    {listedNfts && listedNfts.length > 0 && listedNfts.slice(0, 4).map((nft, i) => {
+                        //{listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isChildSlideNft === true).map((nft, i) => {
                         return (
                             <div className="col-sm-3" key={i}>
-                                <img src={nft?.img} className="img-fluid w-100 featured-img" alt="nft media"  onClick={() => handleShow(nft)}/>
+                                <img src={nft?.media_link} className="img-fluid w-100 featured-img" alt="nft media"  onClick={() => handleShow(nft)}/>
                             </div>
                         )
                     })
@@ -391,6 +394,7 @@ debugger
                     </div>
 
                     <div className="row home_explore">
+                    {console.log("listedNfts html ", listedNfts)}
                     {listedNfts && listedNfts.length > 0 && (
                         <NftsLists nfts={listedNfts} wallet={wallet}/>
                     )}

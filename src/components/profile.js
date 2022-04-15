@@ -116,15 +116,9 @@ const Profile = ({ contractX, account, wallet }) => {
   useEffect(() => {
     //checkForByOrRemovedFromSale()
     const transactionHashes = searchParams.get('transactionHashes')
-    buyOrRemoveFromSale(transactionHashes)
+    buyOrRemoveFromSale(transactionHashes, wallet.getAccountId())
   }, [])
 
-  // const checkForByOrRemovedFromSale = async() =>{
-  //     var transactionHashes = searchParams.get("transactionHashes");
-  //     if (transactionHashes) {
-  //         debugger;
-  //     }
-  // }
   const [nft, setNft] = useState({})
   const handleClose = () => setShow(false)
   const [show, setShow] = useState(false)
@@ -150,7 +144,7 @@ const Profile = ({ contractX, account, wallet }) => {
     setAuthor(response)
     setLoader(false)
     getNftsOnSale()
-    getAllListedNfts()
+    //getAllListedNfts()
     getCollections()
     console.log(apr_mint_txFee, 'apr');
   }
@@ -177,7 +171,8 @@ const Profile = ({ contractX, account, wallet }) => {
       NFTs.push({ ...NFT, ...sale, })
     })
 
-    setNftResult(NFTs)
+    setNftResult(NFTs);
+    debugger;
   }
  
             

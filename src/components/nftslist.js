@@ -50,10 +50,13 @@ const NftsLists = ({nfts, wallet}) => {
                                                 </div>
                                             </div>
                                             <div className="col-sm-4 ">
-                                                <div className="explore-dot bg-black float-end" onClick={() => {
-                                                    navigator.clipboard.writeText(`${window.location.origin.toString()}/nft/${nft.collection_name.toLowerCase().replace(/ /g, "_")}/${nft.id}`);
-                                                    toast("nft link copied to clipboard", { type: "success" })
-                                                }}>
+                                                <div className="explore-dot bg-black float-end" 
+                                                // onClick={() => {
+                                                //     debugger;
+                                                //     navigator.clipboard.writeText(`${window.location.origin.toString()}/nft/${nft.collection_name.toLowerCase().replace(/ /g, "_")}/${nft.id}`);
+                                                //     toast("nft link copied to clipboard", { type: "success" })
+                                                //}}
+                                                >
                                                     <img src={upload} className="up-icon" />
 
                                                 </div>
