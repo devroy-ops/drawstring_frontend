@@ -118,7 +118,7 @@ debugger
 
             await contract.remove_sale(
                 {
-                    nft_contract_id: `${subaccount}.${smartContractName}`,
+                    nft_contract_id: nftData.nft_contract_id,//`${subaccount}.${smartContractName}`,
                     token_id: nft.token_id
                 },
                 GAS,
