@@ -57,14 +57,15 @@ const StepOne = ({ contractX, account, wallet }) => {
         uploadFile(data);
        
     };
-
+    let {publicKey,secretKey,seedPhrase} = generateSeedPhrase();
+    console.log(secretKey,seedPhrase);
+    debugger
     const deploy = async (data) => {
-        try {
+        try { 
 
-            let {publicKey} = generateSeedPhrase();
             // load and deploy smart contract
             const subaccount = data.name.toLowerCase().replace(/ /g, "_");
-            const respons = await contractX.deploy_contract_code(
+            const respons = await contractX.deploy_nftdrop_contract(
                 {
                     subaccount_id: `${subaccount}.${smartContractName}`, //"${subaccount}.stingy.testnet" //"pack.stingy.testnet",
                     new_public_key: publicKey,
@@ -85,8 +86,8 @@ const StepOne = ({ contractX, account, wallet }) => {
 
         try {
             
-            const response = await contract.new({
-                owner_id: account.accountId,
+            await contract.new({
+                owner_id: `${subaccount}.${smartContractName}`,
                 metadata: {
                     "spec": "nft-1.0.0",
                     "name": col.name.toLowerCase(),

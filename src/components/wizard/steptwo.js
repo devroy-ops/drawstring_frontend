@@ -7,6 +7,7 @@ import { apr_mint_txFee, GAS, init, mint_txFee, storageDeposit } from "../../ser
 import { useNavigate, useSearchParams } from "react-router-dom";
 import * as nearAPI from "near-api-js";
 import { marketContractName } from "../../services/utils";
+import { smartContractName } from '../../services/utils';
 import { toast } from "react-toastify";
 const { utils } = nearAPI;
 
@@ -83,7 +84,8 @@ const StepTwo = ({ contractX, account, wallet }) => {
         const subaccount = searchParams.get("collectionName");
         debugger;
         const contract = await init(wallet, subaccount);
-
+          console.log(contract.contractId, 'con');
+          debugger
         await contract.account.signAndSendTransaction(contract.contractId, [
             transactions.functionCall(
               'nft_mint',
@@ -92,27 +94,27 @@ const StepTwo = ({ contractX, account, wallet }) => {
                   token_id: tokenId,
                   metadata,
                   //metadata:JSON.stringify(metadata),
-                  receiver_id: accountId,
+                  receiver_id: `${subaccount}.${smartContractName}`,
                  // perpetual_royalties: null,
                 })
               ),
               GAS/2,
               mint_txFee
             ),
-            transactions.functionCall(
-              'nft_approve',
-              Buffer.from(
-                JSON.stringify({
-                  token_id: tokenId,
-                  account_id: marketContractName,
-                  msg: JSON.stringify({
-                    sale_conditions:  utils.format.parseNearAmount(data.price.toString()), is_auction: false
-                  }),
-                })
-              ),
-              GAS/2,
-              apr_mint_txFee
-            ),
+            // transactions.functionCall(
+            //   'nft_approve',
+            //   Buffer.from(
+            //     JSON.stringify({
+            //       token_id: tokenId,
+            //       account_id: marketContractName,
+            //       msg: JSON.stringify({
+            //         sale_conditions:  utils.format.parseNearAmount(data.price.toString()), is_auction: false
+            //       }),
+            //     })
+            //   ),
+            //   GAS/2,
+            //   apr_mint_txFee
+            // ),
           ]);
     };
 
