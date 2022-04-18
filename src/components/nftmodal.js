@@ -229,9 +229,6 @@ debugger
                                             {nftData?.createdBy == wallet.getAccountId() && (
                                                 <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
                                             )}
-                                            {nftData?.owner_id == wallet.getAccountId() && (
-                                                <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
-                                            )}
 
                                             {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button> */}
 
