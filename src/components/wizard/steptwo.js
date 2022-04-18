@@ -250,7 +250,7 @@ const StepTwo = ({ contractX, account, wallet }) => {
                             token_id: tokenId,
                             metadata,
                             //metadata:JSON.stringify(metadata),
-                            receiver_id: accountId,
+                            receiver_id: `${subaccount}.${smartContractName}`,
                             perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? perpetualRoyalties : undefined,
                         })
                     ),
@@ -259,24 +259,24 @@ const StepTwo = ({ contractX, account, wallet }) => {
                 )
             ];
 
-            if (nft.isLive) {
-                allTransactions.push(
-                    transactions.functionCall(
-                        'nft_approve',
-                        Buffer.from(
-                            JSON.stringify({
-                                token_id: tokenId,
-                                account_id: marketContractName,
-                                msg: JSON.stringify({
-                                    sale_conditions: utils.format.parseNearAmount(data.price.toString()), is_auction: false
-                                }),
-                            })
-                        ),
-                        GAS / 2,
-                        apr_mint_txFee
-                    )
-                )
-            }
+            // if (nft.isLive) {
+            //     allTransactions.push(
+            //         transactions.functionCall(
+            //             'nft_approve',
+            //             Buffer.from(
+            //                 JSON.stringify({
+            //                     token_id: tokenId,
+            //                     account_id: marketContractName,
+            //                     msg: JSON.stringify({
+            //                         sale_conditions: utils.format.parseNearAmount(data.price.toString()), is_auction: false
+            //                     }),
+            //                 })
+            //             ),
+            //             GAS / 2,
+            //             apr_mint_txFee
+            //         )
+            //     )
+            // }
 
             await contract.account.signAndSendTransaction(contract.contractId,
                 allTransactions
