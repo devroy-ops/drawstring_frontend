@@ -60,13 +60,13 @@ const Home = ({ contractX, account, wallet }) => {
             setLoader(true);
             const user = await getUser();
             const contract = await initMarketplaceContract(wallet);
-           
+
             const onSaleNfts = await contract.get_sales({
                 from_index: (count * 12).toString(),
                 limit: 12,
             });
             console.log("sales ", onSaleNfts);
-             
+
             const sales = [];
 
             for (const sale of onSaleNfts) {
@@ -86,7 +86,7 @@ const Home = ({ contractX, account, wallet }) => {
                 }
                 sales.push({ ...nftData, ...sale, });
             }
-            
+
             setListedNfts([...listedNfts, ...sales]);
             setLoader(false);
             console.log("listed nfts 1 ", listedNfts);
@@ -94,16 +94,28 @@ const Home = ({ contractX, account, wallet }) => {
 
             getNfts(user);
             // after load nft get the more info to display from mongo db
-            
-            // const nftsWithProfiles = [];
-            // for(const sale of sales){
-            //      const response = await user.functions.get_urls(sale.id);
-            //      console.log(" response ", response)
-            //      sale.nftData = response ? response[0] : null;
-            //      nftsWithProfiles.push(sale);
-            // }
 
-            // setListedNfts([...listedNfts, ...nftsWithProfiles]);
+            const nftsWithProfiles = [];
+            for(const sale of sales){
+                 const response = await user.functions.get_urls(sale.id);
+                 console.log(" response ", response)
+                //  sale.nftData = response ? response[0] : null;
+                //  nftsWithProfiles.push(sale);
+                const res = response[0];
+                
+                const profile = {
+                    collectionName: res ? res.collection_details.name : "",
+                    contractId: res ? res.collection_details.contractId : "",
+                    collectionImage: res ? res.collection_details.img : "",
+                    ownerImage: res ? res.owner_details.profile_pic : "" ,
+                    //// TODO
+                    //creatorImage: res ?  ,
+                }
+
+               nftsWithProfiles.push({...sale, ...profile});
+            }
+
+            setListedNfts([...listedNfts, ...nftsWithProfiles]);
             // console.log("listed nfts 2 ", nftsWithProfiles);
 
         }
@@ -111,14 +123,14 @@ const Home = ({ contractX, account, wallet }) => {
 
     const getNfts = async (user) => {
         // setLoader(true);
-        debugger;
+      
         // const user = await getUser();
         // const featured = await user.functions.get_featured();
         // setFeatured(featured);
         // const allListedNfts = await user.functions.get_all_listed_nfts(12, count * 12);
         // console.log(allListedNfts)
         // setListedNfts([...listedNfts, ...allListedNfts]);
-        
+
         const top = await user.functions.get_top_collections();
         console.log("top collections ", top)
         setTopCollections(top);
@@ -204,44 +216,44 @@ const Home = ({ contractX, account, wallet }) => {
 
                 <AliceCarousel ref={(el) => (carousel = el)} disableButtonsControls="true" disableDotsControls="true">
                     {/* {listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isMainSlideNft === true).map((nft, index) => { */}
-                        {/* return ( */}
-                            <div className="sliderimg" >
-                                <div className="container">
-                                    <div className="row">
-                                        <div className="col-sm-7 pe-4">
-                                            <div className="row first-box">
-                                                <div className="col-sm-6 p-5 pb-3">
-                                                    <div className="title text-light mb-3">Drawstring a NFT experience platform</div>
-                                                    <div className="slide-desc text-light mb-3">The newest marketplace on Near</div>
-                                                    {/* <div className="my-5">
+                    {/* return ( */}
+                    <div className="sliderimg" >
+                        <div className="container">
+                            <div className="row">
+                                <div className="col-sm-7 pe-4">
+                                    <div className="row first-box">
+                                        <div className="col-sm-6 p-5 pb-3">
+                                            <div className="title text-light mb-3">Drawstring a NFT experience platform</div>
+                                            <div className="slide-desc text-light mb-3">The newest marketplace on Near</div>
+                                            {/* <div className="my-5">
                                                         <NavLink exact="true" activeclassname="active" to="/" className="create-link" onClick={viewDrop}>View Drop</NavLink>
                                                     </div> */}
-                                                    <div className="pos-rel">
-                                                        <div className="long-line"></div>
-                                                        <div className="short-line"></div>
+                                            <div className="pos-rel">
+                                                <div className="long-line"></div>
+                                                <div className="short-line"></div>
+                                            </div>
+                                        </div>
+                                        <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${listedNfts && listedNfts[0]?.media_link}')` }} onClick={() => handleShow(listedNfts[0])}></div>
+                                    </div>
+                                </div>
+                                <div className="col-sm-5">
+                                    <div className="row">
+                                        {listedNfts && listedNfts.length > 0 && listedNfts.slice(1, 5).map((nft, i) => {
+                                            return (
+                                                <div className="col-sm-6 col-xs-12 mb-4" key={i}>
+                                                    <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft?.media_link}')` }} onClick={() => handleShow(nft)}>
+
                                                     </div>
                                                 </div>
-                                                <div className="col-sm-6 first-box-image bg-size-100" style={{ backgroundImage: `url('${listedNfts && listedNfts[0]?.media_link}')` }} onClick={() => handleShow(listedNfts[0])}></div>
-                                            </div>
-                                        </div>
-                                        <div className="col-sm-5">
-                                            <div className="row">
-                                                {listedNfts && listedNfts.length > 0 && listedNfts.slice(1, 5).map((nft, i) => {
-                                                    return (
-                                                        <div className="col-sm-6 col-xs-12 mb-4" key={i}>
-                                                            <div className="bg-img1 pos-rel bg-size-100" style={{ backgroundImage: `url('${nft?.media_link}')` }} onClick={() => handleShow(nft)}>
-                                                              
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                }
-                                                )}
-                                            </div>
-                                        </div>
+                                            )
+                                        }
+                                        )}
                                     </div>
                                 </div>
                             </div>
-                        {/* )
+                        </div>
+                    </div>
+                    {/* )
                     }
                     )} */}
                 </AliceCarousel>
@@ -261,7 +273,7 @@ const Home = ({ contractX, account, wallet }) => {
                         //{listedNfts && listedNfts.length > 0 && listedNfts.filter(x => x.isChildSlideNft === true).map((nft, i) => {
                         return (
                             <div className="col-sm-3" key={i}>
-                                <img src={nft?.media_link} className="img-fluid w-100 featured-img" alt="nft media"  onClick={() => handleShow(nft)}/>
+                                <img src={nft?.media_link} className="img-fluid w-100 featured-img" alt="nft media" onClick={() => handleShow(nft)} />
                             </div>
                         )
                     })
@@ -273,7 +285,7 @@ const Home = ({ contractX, account, wallet }) => {
                         <div className="col-sm-6 title text-light d-flex">
                             Top
                             {/* <img src={images} className="ps-4" alt="file icon" /><span className="font-size-14 vertical-align px-2"> Collections </span><img src={arrow_down} alt="dropdown icon" /> */}
-                            
+
                             <Dropdown className="ps-2" align="end">
                                 <Dropdown.Toggle variant="" className='text-white font-size-14 vertical-align' id="dropdown-basic">
                                     <img src={calendar} className="ps-4" alt="calendar icon" /><span className="font-size-14 vertical-align px-2"> In 1 day </span><img src={arrow_down} alt="dropdown icon" />
@@ -296,7 +308,7 @@ const Home = ({ contractX, account, wallet }) => {
                         {topCollections && topCollections.length > 0 && topCollections.slice(0, 8).map((collection, index) => {
                             return (
                                 <div className="col-sm-3 pb-4" key={index} >
-                                    <div className="top-sec-box" onClick={()=>{ debugger; navigate(`/viewcollection/${collection.contract_id}`)}}>
+                                    <div className="top-sec-box" onClick={() => { debugger; navigate(`/viewcollection/${collection.contract_id}`) }}>
                                         <div className="row p-3">
                                             <div className="col-sm-4">
                                                 <div className="numbers float-start">0{index + 1}</div>
@@ -394,14 +406,14 @@ const Home = ({ contractX, account, wallet }) => {
                     </div>
 
                     <div className="row home_explore">
-                    {console.log("listedNfts html ", listedNfts)}
-                    {listedNfts && listedNfts.length > 0 && (
-                        <NftsLists nfts={listedNfts} wallet={wallet}/>
-                    )}
+                        {console.log("listedNfts html ", listedNfts)}
+                        {listedNfts && listedNfts.length > 0 && (
+                            <NftsLists nfts={listedNfts} wallet={wallet} />
+                        )}
 
-            {show && (
-                <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet} />
-            )}
+                        {show && (
+                            <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet} />
+                        )}
                         {/* {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
                             return (
                                 <div className="col-sm-3 pb-4" key={index}>

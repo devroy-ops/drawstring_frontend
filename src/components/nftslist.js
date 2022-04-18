@@ -1,6 +1,9 @@
 
 import audio from '../images/collection/audio_bg.png';
 import upload from '../images/users/upload.svg';
+import iconOwner from '../images/users/icon-owner.png';
+import iconCreator from '../images/users/icon-creator.png';
+import iconCollection from '../images/users/icon-collection.png';
 import React, { useEffect, useState } from "react";
 import { Button, Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import * as Realm from 'realm-web'
@@ -34,17 +37,20 @@ const NftsLists = ({nfts, wallet}) => {
                                                 <div className="d-flex">
                                                     <OverlayTrigger overlay={<Tooltip>Owner: {nft?.owner}</Tooltip>}>
                                                         <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/user/${nft.owner}`);window.location.reload(); }}>
-                                                            <div className="explore-dot bg-pink"></div>
+                                                            {/* <div className="explore-dot bg-pink"></div> */}
+                                                            <img src={nft?.ownerImage ? nft?.ownerImage : iconOwner } width="24" height="24" className='border-radius-50 me-1'/>
                                                         </span>
                                                     </OverlayTrigger>
                                                     <OverlayTrigger overlay={<Tooltip>Creator: {nft?.createdBy || nft?.owner}</Tooltip>}>
                                                         <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/user/${nft.createdBy || nft?.owner}`);window.location.reload(); }}>
-                                                            <div className="explore-dot bg-blue"></div>
+                                                            {/* <div className="explore-dot bg-blue"></div> */}
+                                                            <img src={nft?.ownerImage ? nft?.ownerImage : iconCreator } width="24" height="24" className='border-radius-50 me-1'/>
                                                         </span>
                                                     </OverlayTrigger>
-                                                    <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contract_id}</Tooltip>}>
+                                                    <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contractId}</Tooltip>}>
                                                         <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/viewcollection/${nft.collection_name.toLowerCase().replace(/ /g, "_")}`);  }}>
-                                                            <div className="explore-dot bg-green"></div>
+                                                            {/* <div className="explore-dot bg-green"></div> */}
+                                                            <img src={nft?.collectionImage ? nft?.collectionImage : iconCollection } width="24" height="24" className='border-radius-50 me-1'/>
                                                         </span>
                                                     </OverlayTrigger>
                                                 </div>

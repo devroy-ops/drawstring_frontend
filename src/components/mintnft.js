@@ -218,7 +218,6 @@ export default function MintNft({ contractX, account, wallet }) {
                 return;
             }
 
-
             const perpetualRoyalties = {};
             const royt = {};
             const total_unit = 10000;

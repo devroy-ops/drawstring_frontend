@@ -116,7 +116,7 @@ export default function CreateCollection({ contractX, account, wallet, nearConfi
         navigate(`/viewcollection/${subaccount}`);
         toast("Collection created successfully.", { type: "success" });
 
-        localStorage.removeItem(collection);
+        localStorage.removeItem("collection");
         localStorage.removeItem(subaccount + "_isContractInitialized");
         //localStorage.removeItem(subaccount + "_isSetRoyalties");
     }
