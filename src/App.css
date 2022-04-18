@@ -178,7 +178,7 @@ body{
   width: 263px;
 }
 
-.color-pink{
+.color-pink, .error-msg{
   color: #C51254;
 }
 .bg-darkmode.edit-profile .color-pink {
