@@ -126,21 +126,21 @@ const StepOne = ({ contractX, account, wallet }) => {
                 )
             ];
 
-            if (col.royalties) {
-                let col_royalty = col.royalties;
-                let royal = Object.values(col_royalty)[0]
-                allTransactions.push(
-                    transactions.functionCall(
-                        'set_contract_royalty',
-                        Buffer.from(
-                            JSON.stringify(
-                                { contract_royalty: royal }// col.royalties
-                            )
-                        ),
-                        GAS / 2
-                    ),
-                )
-            }
+            // if (col.royalties) {
+            //     let col_royalty = col.royalties;
+            //     let royal = Object.values(col_royalty)[0]
+            //     allTransactions.push(
+            //         transactions.functionCall(
+            //             'set_contract_royalty',
+            //             Buffer.from(
+            //                 JSON.stringify(
+            //                     { contract_royalty: royal }// col.royalties
+            //                 )
+            //             ),
+            //             GAS / 2
+            //         ),
+            //     )
+            // }
             const response = await contract.account.signAndSendTransaction(contract.contractId,
                 allTransactions
             );
