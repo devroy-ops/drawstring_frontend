@@ -35,13 +35,16 @@ const NftDetailModal = ({ nftData, isModalOpen, handleClose, wallet }) => {
     const viewNFTs = async () => {
         try {
             // const contract = await init(wallet, nftData.collection_name.toLowerCase().replace(/ /g, "_"));
-            console.log(nftData.nft_contract_id, 'dont');
-            const contract = await initSmartContract(wallet, nftData.nft_contract_id || nftData.contract_id)
+            console.log(nftData.nft_contract_id,nftData.contract_id, 'dont');
+            const nftextra = nftData.metadata.extra
+            const extra = JSON.parse(nftextra)
+            console.log(extra, 'extra');
+            const contract = await initSmartContract(wallet, nftData.nft_contract_id || nftData.contract_id || extra.contract_id)
             const response = await contract.nft_token({ token_id: nftData.token_id || nftData.id })
             debugger
             // const response = await contract.nft_token({ "token_id": nftData.id });
             console.log(response);
-            const extra = JSON.parse(response.metadata.extra);
+            
             response.price = extra ? extra.price : null;
             setNft(response);
             const user = await getUserForUpdateDb();

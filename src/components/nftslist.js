@@ -47,7 +47,7 @@ const NftsLists = ({nfts, wallet}) => {
                                                             <img src={nft?.ownerImage ? nft?.ownerImage : iconCreator } width="24" height="24" className='border-radius-50 me-1'/>
                                                         </span>
                                                     </OverlayTrigger>
-                                                    <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contractId}</Tooltip>}>
+                                                    <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contractId || nft?.nft_contract_id}</Tooltip>}>
                                                         <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/viewcollection/${nft.collection_name.toLowerCase().replace(/ /g, "_")}`);  }}>
                                                             {/* <div className="explore-dot bg-green"></div> */}
                                                             <img src={nft?.collectionImage ? nft?.collectionImage : iconCollection } width="24" height="24" className='border-radius-50 me-1'/>
