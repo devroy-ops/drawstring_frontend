@@ -19,8 +19,10 @@ import explore5 from '../images/home/explore5.svg';
 import explore6 from '../images/home/explore6.svg';
 import explore7 from '../images/home/explore7.svg';
 import explore8 from '../images/home/explore8.svg';
+import {initSmartContract} from '../services/helper';
 import heart from '../images/home/heart.svg';
 import { Tabs, Tab } from 'react-bootstrap';
+import NftDetailModal from './nftmodal';
 import React, { useEffect, useState } from "react";
 import { init, author } from "../services/helper";
 import { smartContractName } from '../services/utils';
@@ -36,25 +38,37 @@ const ViewCollection = ({ contractX, account, wallet }) => {
     const [isLoading, setLoader] = useState(false);
     const [listedNfts, setListedNfts] = useState([]);
     const [stats, setStats] = useState({});
+    const [collectionNfts, setCollectionNfts] =useState([]);
 
     const handleSelect = (selectedTab) => {
         setActive(parseInt(selectedTab))
     }
 
+// modal code
+    const [nft, setNft] = useState({});
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+
+    const handleShow = (nftData) => {
+        setNft(nftData);
+        setShow(true);
+    }
+
     const { collectionId } = useParams();
+  
     const accountId = wallet.getAccountId();
     useEffect(() => {
         getAllListedNfts();
         return viewCollection();
     }, []);
 
-    let contract;
-
+    let contract = `${collectionId}.${smartContractName}`;
     /**
    * View the metadata of the contract(collection) using the contract.nft_metadata
    */
     const viewCollection = async () => {
         try {
+            viewCollectionNfts()
             setLoader(true);
             const user = await getUser();
             const collection = await user.functions.get_collection_with_id(collectionId);
@@ -82,16 +96,26 @@ const ViewCollection = ({ contractX, account, wallet }) => {
         }
     };
 
-    // const viewCollection = async () => {
-    //     try {
-    //         const response = await contract.nft_token({ token_id: collectionId });
-    //         console.log(response);
-    //         return response;
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
-
+    const viewCollectionNfts = async () => {
+        
+        try {
+            let colNfts = []
+            const colContract = await initSmartContract(wallet, contract)
+            const response = await colContract.nft_tokens({
+                "from_index": '0',
+                "limit": 500
+              });
+            
+            colNfts= response
+            setCollectionNfts(colNfts)
+            
+           
+            return response;
+        } catch (error) {
+            console.log(error);
+        }
+    };
+   console.log(collectionNfts);
     const getAllListedNfts = async () => {
         setLoader(true);
         const user = await getUser();
@@ -181,7 +205,7 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                                     </div>
                                 </div>
                                 <div className="row pt-2 view-collection-on-tab">
-                                    {listedNfts && listedNfts.length > 0 && listedNfts.map((nft, index) => {
+                                    {collectionNfts && collectionNfts.length > 0 && collectionNfts.map((nft, index) => {
                                         return (
                                             <div className="col-sm-3 pb-4" key={index}>
                                                 <div className="top-sec-box">
@@ -199,13 +223,13 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <img src={nft.media_link} className="w-100" height="270" alt="nft media" />
+                                                    <img src={nft.metadata.media} onClick={() => handleShow(nft)} className="w-100" height="270" alt="nft media" />
                                                     <div className="text-light font-size-18 p-3">
-                                                        <div>{nft.name}</div>
+                                                        <div>{nft.metadata.title}</div>
                                                         <div className="row pt-2 bid-mobile-100">
-                                                            <div className="col-sm-6">
+                                                            {/* <div className="col-sm-6">
                                                                 {nft.price} Near <span className="color-gray">1/1</span>
-                                                            </div>
+                                                            </div> */}
                                                             {/* <div className="col-sm-6 text-end">
                                                                 <NavLink exact="true" activeclassname="active" to="/" className="bid-btn">Bid</NavLink>
                                                             </div> */}
@@ -492,6 +516,9 @@ const ViewCollection = ({ contractX, account, wallet }) => {
                     </Tabs>
                 </div>
             </div>
+            {show && (
+                <NftDetailModal nftData={nft} isModalOpen={show} handleClose={handleClose} wallet={wallet} />
+            )}
         </div>
     );
 }

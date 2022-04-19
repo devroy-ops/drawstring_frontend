@@ -128,10 +128,6 @@ const Profile = ({ contractX, account, wallet }) => {
   }
 
   useEffect(() => {
-   const chris = formatNearAmount('100000000000000000000000')
-   const Ram = formatNearAmount('12390000000000000000000')
-   console.log(chris,'apr');
-   console.log(Ram,'Ram');
       
     return getProfile()
   }, [])
