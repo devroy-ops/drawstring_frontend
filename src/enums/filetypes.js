@@ -7,5 +7,8 @@ export const FileTypes = {
 export const MarketplaceTypes = {
     REMOVED: "removed",
     OFFER: "offer",
-    BID: "bid"
+    BID: "bid",
+    BURN: "burn",
+    SALE: "sale",
+    TRANSFER: "transfer"
 }

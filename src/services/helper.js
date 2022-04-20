@@ -237,6 +237,25 @@ const buyOrRemoveFromSale = async (transactionHashes, walletId) => {
         debugger
         toast("Nft removed from sale successfully", { type: "success" });
       }
+      if(nft.marketType == MarketplaceTypes.BURN){
+        const user = await getUserForUpdateDb();
+        const removed = await user.functions.burn_nft(nft.token_id);
+        debugger
+        toast("Nft burned successfully", { type: "success" });
+      }
+      if(nft.marketType == MarketplaceTypes.TRANSFER){
+        const user = await getUserForUpdateDb();
+        const removed = await user.functions.transfer_nft(nft.owner_id, nft.receiver_id);
+        debugger
+        toast("Nft transferred successfully", { type: "success" });
+      }
+      if(nft.marketType == MarketplaceTypes.SALE){
+        const user = await getUserForUpdateDb();
+        const removed = await user.functions.on_sale(nft.token_id, nft.price);
+        debugger
+        toast("Nft transferred successfully", { type: "success" });
+      }
+
       localStorage.removeItem("nft");
       window.location.reload();
     }
