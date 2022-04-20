@@ -102,7 +102,7 @@ const StepOne = ({ contractX, account, wallet }) => {
         let col = JSON.parse(localStorage.getItem("collection"));
         const subaccount = col.name.toLowerCase().replace(/ /g, "_");
         const contract = await init(wallet, subaccount);
-
+        const symbol = subaccount.substring(0,3)
         try {
 
             const allTransactions = [
@@ -114,7 +114,7 @@ const StepOne = ({ contractX, account, wallet }) => {
                             metadata: {
                                 "spec": "nft-1.0.0",
                                 "name": col.name.toLowerCase(),
-                                "symbol": "CHM-10",
+                                "symbol": symbol,
                                 "icon": col.fileUrl,
                                 "base_uri": null,
                                 "referance": null,
@@ -141,6 +141,7 @@ const StepOne = ({ contractX, account, wallet }) => {
                     ),
                 )
             }
+
             const response = await contract.account.signAndSendTransaction(contract.contractId,
                 allTransactions
             );
