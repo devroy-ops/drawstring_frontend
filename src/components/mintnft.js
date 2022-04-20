@@ -68,7 +68,7 @@ export default function MintNft({ contractX, account, wallet }) {
     // Add New Table Row
     const addNewRow = (event) => {
         event.preventDefault()
-        setTabs((tab)=> tab+1);
+        setTabs((tab) => tab + 1);
         tableRowIndex = parseFloat(tableRowIndex) + 1
         var updatedRows = [...talbeRows]
         updatedRows[tableRowIndex] = { royalty: "", walletaddress: "" }
@@ -77,7 +77,7 @@ export default function MintNft({ contractX, account, wallet }) {
     // Remove row
     const deleteRow = (items, index, type) => {
         if (items.length > 1) {
-            
+
             var updatedRows = [...items];
             if (index) {
                 updatedRows.splice(index, 1);
@@ -87,7 +87,7 @@ export default function MintNft({ contractX, account, wallet }) {
                     setRows(updatedRows);
                 }
             }
-            setTabs((tab)=> tab-1);
+            setTabs((tab) => tab - 1);
         }
     }
 
@@ -113,7 +113,7 @@ export default function MintNft({ contractX, account, wallet }) {
 
             if (nft) {
                 setLoader(true);
-            debugger;
+                debugger;
 
                 const user = await getUserForUpdateDb();
                 await user.functions.add_new_nft_listing(
@@ -159,8 +159,8 @@ export default function MintNft({ contractX, account, wallet }) {
     const getCollections = async () => {
         // setLoader(true);
         const user = await getUser();
-       // const response = await user.functions.get_collections(40, colCount * 40);
-       const response = await user.functions.get_collections_by_createdBy(40, colCount, accountId);
+        // const response = await user.functions.get_collections(40, colCount * 40);
+        const response = await user.functions.get_collections_by_createdBy(40, colCount, accountId);
         var allCollections = [...collections, ...response];
         setCollections(allCollections);
 
@@ -184,6 +184,7 @@ export default function MintNft({ contractX, account, wallet }) {
 
 
     const handleSubmit = async (event) => {
+        console.log("event ", nft);
         setSubmitted(true);
         event.preventDefault();
         const form = event.currentTarget;
@@ -223,24 +224,24 @@ export default function MintNft({ contractX, account, wallet }) {
             const total_unit = 10000;
 
             talbeRows.forEach((item) => {
-            console.log(item, 'item');
-               let royaltyPercentage = parseInt(item.royalty)
-               let royalty = royaltyPercentage/100 * total_unit;
-               console.log(royalty);
+                console.log(item, 'item');
+                let royaltyPercentage = parseInt(item.royalty)
+                let royalty = royaltyPercentage / 100 * total_unit;
+                console.log(royalty);
                 if (item.royalty) {
                     royt[item.walletaddress] = item.royalty
                     let keys = Object.values(royt);
                     const keynum = keys.map(str => {
                         return Number(str);
-                      });
+                    });
                     tot = keynum.reduce((a, b) => a + b, 0)
                     console.log(tot, 'lmaoo');
 
                     perpetualRoyalties[item.walletaddress] = parseInt(parseFloat(royalty).toFixed(0));
                 }
             });
-            if(tot>35) {
-                alert ("royalties for NFT can't be more than 35")
+            if (tot > 35) {
+                alert("royalties for NFT can't be more than 35")
                 navigate('/mintnft')
                 return;
             }
@@ -264,7 +265,7 @@ export default function MintNft({ contractX, account, wallet }) {
                     allProperties["properties"][item.key] = item.value;
                 }
             });
-           
+
             var data = {
                 nft_contract_id: contract_id, //`${nft.collection.label}.${nft.collection.value}`,
                 contractName: nft.collection.label,
@@ -304,12 +305,12 @@ export default function MintNft({ contractX, account, wallet }) {
                             perpetual_royalties: Object.keys(perpetualRoyalties).length > 0 ? perpetualRoyalties : undefined,
                         }),
                     ),
-                    GAS/2,
+                    GAS / 2,
                     mint_txFee
                 )
             ]
 
-            if(nft.isLive){
+            if (nft.isLive) {
                 allTransactions.push(
                     transactions.functionCall(
                         'nft_approve',
@@ -322,12 +323,12 @@ export default function MintNft({ contractX, account, wallet }) {
                                 }),
                             })
                         ),
-                        GAS/2,
+                        GAS / 2,
                         apr_mint_txFee
                     ),
                 )
             }
-            
+
             const response = await contract.account.signAndSendTransaction(contract.contractId,
                 allTransactions
             );
@@ -363,7 +364,7 @@ export default function MintNft({ contractX, account, wallet }) {
             return { ...prev, "collection": e };
         });
         const subaccount = e.label.toLowerCase().replace(/ /g, "_");
-       
+
         let contract = await init(wallet, subaccount);
         setContract(contract);
     }
@@ -521,16 +522,17 @@ export default function MintNft({ contractX, account, wallet }) {
                             </Form.Control.Feedback> */}
                             </div>
                             {/* <div className="border-bottom-2"></div> */}
-                           
+
                             <div className='pt-4'>
 
                                 <div className="font-size-18 text-light py-3">List nft on marketplace?</div>
-                                <BootstrapSwitchButton checked={true} onstyle="danger" 
-                                        onChange={(checked) => {
-                                            setNft((prev) => {
-                                                return { ...prev, 'isLive': checked };
-                                            });
-                                        }}
+                                <BootstrapSwitchButton checked={nft.isLive} onstyle="danger" onlabel="Yes" offlabel='No'
+                                    onChange={(checked) => {
+                                        console.log("triggered")
+                                        setNft((prev) => {
+                                            return { ...prev, 'isLive': checked };
+                                        });
+                                    }}
                                 />
                             </div>
 
@@ -597,9 +599,9 @@ export default function MintNft({ contractX, account, wallet }) {
                                 })
                             }
 
-                            <button disabled={tabs>3} type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
+                            <button disabled={tabs > 3} type="button" className="btn-submit text-light bg-darkmode border-2-solid" onClick={addNewRow}><b>+ </b> more royalties</button>
 
-                            <p style={{display: tabs>3? 'block':'none',color: 'red', fontSize:'13px'}}>You can only set 4 royalties</p>
+                            <p style={{ display: tabs > 3 ? 'block' : 'none', color: 'red', fontSize: '13px' }}>You can only set 4 royalties</p>
                             <div className="font-size-18 mob-f-16 text-light py-3">Properties <span className="color-gray"> (Optional)</span></div>
 
                             {properties.map((item, index) => {
@@ -653,7 +655,7 @@ export default function MintNft({ contractX, account, wallet }) {
                             })}
 
                             {/* {properties.length > 0 && properties[properties.length - 1]["key"] && properties[properties.length - 1]["value"] && ( */}
-                                <button type="button" className="btn-submit text-light bg-darkmode border-2-solid mt-3" onClick={addNewProperty} ><b>+ </b> more properties</button>
+                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid mt-3" onClick={addNewProperty} ><b>+ </b> more properties</button>
                             {/* )} */}
 
                             <div className="row pt-3 pb-5 bid-mobile-100">

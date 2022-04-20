@@ -41,6 +41,18 @@ const Home = ({ contractX, account, wallet }) => {
     }
 
     useEffect(() => {
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ account_id: 'jkp123' })
+        };
+        fetch('http://drawstring.io:3000/create_account', requestOptions)
+            .then(response => response.json())
+            .then(data => {
+                debugger;
+            });
+
         const transactionHashes = searchParams.get("transactionHashes");
         buyOrRemoveFromSale(transactionHashes, wallet.getAccountId());
     }, []);
@@ -55,7 +67,7 @@ const Home = ({ contractX, account, wallet }) => {
     }, [count]);
 
     const getNftsFromBlockChain = async () => {
-        if (wallet.isSignedIn()) {
+        // if (wallet.isSignedIn()) {
 
             setLoader(true);
             const user = await getUser();
@@ -65,7 +77,7 @@ const Home = ({ contractX, account, wallet }) => {
                 from_index: (count * 12).toString(),
                 limit: 12,
             });
-            console.log("sales ", onSaleNfts);
+            console.log("get_sales ", onSaleNfts);
 
             const sales = [];
 
@@ -118,7 +130,7 @@ const Home = ({ contractX, account, wallet }) => {
             setListedNfts([...listedNfts, ...nftsWithProfiles]);
             // console.log("listed nfts 2 ", nftsWithProfiles);
 
-        }
+        // }
     }
 
     const getNfts = async (user) => {

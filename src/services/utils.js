@@ -33,16 +33,16 @@ export async function initContracts() {
 
     };
   const near = await connect({ deps: { keyStore: new keyStores.BrowserLocalStorageKeyStore() }, ...nearConfig });
-  // const account = await near.account(currentUser.accountId);
-  // const balance = await account.getAccountBalance()
+  const account = await near.account(currentUser.accountId);
+  const balance = await account.getAccountBalance()
    available = formatNearAmount(balance.available);
   } else {
     currentUser = {
       //// live
-      accountId: "drawstringmarketplace.drawstring_v2.near",//'stingy.testnet',
+     accountId: "drawstringmarketplace.drawstring_v2.near",//'stingy.testnet',
 
       //// dev
-      //accountId: smartContractName
+      //  accountId: smartContractName
     };
   }
   const account = await near.account(currentUser.accountId);
@@ -52,7 +52,7 @@ export async function initContracts() {
     //nearConfig.CONTRACT_NAME,
     smartContractName,
     {
-      changeMethods: ["deploy_contract_code", "deploy_nftdrop_contract"],
+      changeMethods: ["deploy_contract_code"],
     }
   );
 

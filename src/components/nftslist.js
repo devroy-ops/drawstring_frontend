@@ -47,8 +47,8 @@ const NftsLists = ({nfts, wallet}) => {
                                                             <img src={nft?.ownerImage ? nft?.ownerImage : iconCreator } width="24" height="24" className='border-radius-50 me-1'/>
                                                         </span>
                                                     </OverlayTrigger>
-                                                    <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contractId || nft?.nft_contract_id}</Tooltip>}>
-                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/viewcollection/${nft.collection_name.toLowerCase().replace(/ /g, "_")}`);  }}>
+                                                    <OverlayTrigger overlay={<Tooltip>Collection: {nft?.contractId}</Tooltip>}>
+                                                        <span className="d-inline-block" onClick={(e) => { e.preventDefault(); navigate(`/viewcollection/${nft.collectionName.toLowerCase().replace(/ /g, "_")}`);  }}>
                                                             {/* <div className="explore-dot bg-green"></div> */}
                                                             <img src={nft?.collectionImage ? nft?.collectionImage : iconCollection } width="24" height="24" className='border-radius-50 me-1'/>
                                                         </span>
@@ -57,11 +57,11 @@ const NftsLists = ({nfts, wallet}) => {
                                             </div>
                                             <div className="col-sm-4 ">
                                                 <div className="explore-dot bg-black float-end" 
-                                                // onClick={() => {
-                                                //     debugger;
-                                                //     navigator.clipboard.writeText(`${window.location.origin.toString()}/nft/${nft.collection_name.toLowerCase().replace(/ /g, "_")}/${nft.id}`);
-                                                //     toast("nft link copied to clipboard", { type: "success" })
-                                                //}}
+                                                onClick={() => {
+                                                    debugger;
+                                                    navigator.clipboard.writeText(`${window.location.origin.toString()}/nft/${nft.collectionName.toLowerCase().replace(/ /g, "_")}/${nft.id}`);
+                                                    toast("nft link copied to clipboard", { type: "success" })
+                                                }}
                                                 >
                                                     <img src={upload} className="up-icon" />
 

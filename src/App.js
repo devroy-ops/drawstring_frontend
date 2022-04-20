@@ -1,6 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Route, BrowserRouter as Router, Routes, HashRouter } from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes, HashRouter, Link, BrowserRouter } from "react-router-dom";
 import { useRef } from 'react'
 import Home from './components/home';
 import Users from './components/users';
@@ -76,8 +76,16 @@ import StepOne from './components/wizard/stepone';
 function App({ contractX, currentUser, nearConfig, wallet, account, near }) {
   //return routing;
   return (
+
+    // <>
+    //   <BrowserRouter basename="/claimlink">
+    //     <Link to="/" />
+    //   </BrowserRouter>
+
+
     <AuthProvider>
       <Router>
+
         <div>
         <ToastContainer />
 
@@ -91,7 +99,6 @@ function App({ contractX, currentUser, nearConfig, wallet, account, near }) {
             wallet={wallet}
           />
           <Routes>
-
             {<Route exact path='/' element={<PrivateRoute />}>
               <Route exact path='/' element={<Home 
               contractX={contractX}
@@ -264,6 +271,8 @@ function App({ contractX, currentUser, nearConfig, wallet, account, near }) {
         </div>
       </Router>
     </AuthProvider>
+    // </>
+
   )
 }
 

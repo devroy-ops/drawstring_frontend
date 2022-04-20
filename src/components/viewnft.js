@@ -9,6 +9,9 @@ import { FileTypes, MarketplaceTypes } from '../enums/filetypes';
 import { smartContractName } from '../services/utils';
 import { parseNearAmount } from 'near-api-js/lib/utils/format';
 import { Tabs, Tab } from 'react-bootstrap';
+import BurnNft from './nfts/burn';
+import SaleNft from './nfts/sale';
+import TransferNft from './nfts/transfer';
 
 const Nft = ({ wallet }) => {
     const [activeTab, setActiveTab] = useState(1);
@@ -19,8 +22,22 @@ const Nft = ({ wallet }) => {
     const [collection, setCollection] = useState({});
     const [searchParams, setSearchParams] = useSearchParams();
     const [nftData, setNftData] = useState({});
+    const [showBurnModal, setBurnModalShow] = useState(false);
+    const closeBurnModal = () => setBurnModalShow(false);
+
+    const [showTransferModal, setTransferModalShow] = useState(false);
+    const closeTransferModal = () => setTransferModalShow(false);
+
+    const [showSaleModal, setSaleModalShow] = useState(false);
+    const closeSaleModal = () => setSaleModalShow(false);
 
     const handleSelect = (selectedTab) => {
+        debugger;
+        if(selectedTab == "2"){
+            window.open(`https://explorer.testnet.near.org/accounts/${collection?.name}`, '_blank');
+
+            return;
+        }
         setActiveTab(parseInt(selectedTab))
     }
 
@@ -233,19 +250,43 @@ const Nft = ({ wallet }) => {
                                         </div> */}
 
                                         <div className="pb-5 pt-4">
-                                    {nft?.owner_id != wallet.getAccountId() && (
-                                        <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode" onClick={buyNft}>Buy for {nft?.price} Near</button>
-                                    )}
-                                    {nft?.owner_id == wallet.getAccountId() && nftData.is_live && (
-                                        <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700" onClick={removeFromSale}>Remove from sale</button>
-                                    )}
-                                            {/* <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode">Buy for {nft.price} Near</button>
-                                            <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Remove from sale</button> */}
-                                            {/* <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700">Place a bid</button> */}
+                                            {nft?.owner_id != wallet.getAccountId() && (
+                                                <button type="button" className="btn-submit text-light me-3 font-w-700 text-light-mode me-2" onClick={buyNft}>Buy for {nft?.price} Near</button>
+                                            )}
+                                            {nft?.owner_id == wallet.getAccountId() && nftData.is_live && (
+                                                <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700 me-2" onClick={removeFromSale}>Remove from sale</button>
+                                            )}
+                                            {nft?.owner_id == wallet.getAccountId() && (
+                                                <>
+                                                    <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700 me-2" onClick={() => {
+                                                        // setNft(nft);
+                                                        setBurnModalShow(true);
+                                                    }}>Burn NFT</button>
+                                                    <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700 me-2" onClick={() => {
+                                                        setTransferModalShow(true);
+                                                    }}>Transfer NFT</button>
+                                                </>
+                                            )}
+                                            {nft?.owner_id == wallet.getAccountId() && !nftData.is_live && (
+                                                <button type="button" className="btn-submit text-light bg-darkmode border-2-solid font-w-700 me-2" onClick={()=>{
+                                                    setSaleModalShow(true);
+                                                }}>Put on sale</button>
+                                            )}
+
+                                            <BurnNft nft={nft} isModalOpen={showBurnModal} handleClose={closeBurnModal} wallet={wallet} />
+                                            <TransferNft nft={nft} isModalOpen={showTransferModal} handleClose={closeTransferModal} wallet={wallet} />
+                                            <SaleNft nft={nft} isModalOpen={showSaleModal} handleClose={closeSaleModal} wallet={wallet} />
+                                            
                                         </div>
                                     </Tab>
                                     {/* <Tab eventKey={2} title="Bids" className="mt-3">Tab 2 content</Tab> */}
-                                    <Tab eventKey={3} title="History" className="mt-3">Tab 3 content</Tab>
+                                    <Tab eventKey={2} title="History" className="mt-3" role="button" onClick={(event)=>{
+                                        event.preventDefault();
+                                        debugger;
+                                        window.open(`https://explorer.testnet.near.org/accounts/${collection?.name}`, '_blank');
+                                    }}>
+                                        {/* Tab 3 content */}
+                                    </Tab>
                                 </Tabs>
 
                             </div>
